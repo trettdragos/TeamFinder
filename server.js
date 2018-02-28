@@ -12,6 +12,14 @@ var io = require('socket.io').listen(server, {
     origins: '*:*'
 });
 
+
+var user=[{
+  ID:"",
+  EMAIL:"",
+  USERNAME:"",
+  PASSWORD:""
+}]
+
 var con = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -23,9 +31,11 @@ passport.use(new Strategy(
   function(username, password, cb) {
     con.query("SELECT * FROM accounts WHERE EMAIL = ? AND PASSWORD = ? LIMIT 1", [username, password], function (err, result, fields) {
     if (err) throw err;
-    console.log(result);
-    if(result.EMAIL = username)
+    if(result.EMAIL = username){
+      user = result;
+      console.log(user);
       return cb(null, result);
+    }
     else return cb(null, false);
   });
   }
@@ -52,11 +62,13 @@ io.on('connection', function(socket) {
     console.log('Client connected...');
     socket.emit('welcome', { message: 'Welcome!', id: socket.id });
     socket.on('client connected', console.log);
-    var data = 0 + 1 ;
     socket.on('reply with event', function(data){
       //listen for changes in the db
-      data = data + 1;
-      socket.emit('received event', data)
+      con.query("SELECT * FROM accounts WHERE EMAIL = ? AND PASSWORD = ? LIMIT 1", [user[0].EMAIL, user[0].PASSWORD], function (err, result, fields) {
+        if (err) throw err;
+        user=result;
+      });
+      socket.emit('received event', user[0]);
     });
 });
 
@@ -67,12 +79,10 @@ app.get('/', function(req, res) {
     res.redirect('/login');
   }
   res.render('pages/index', { user: req.user })
-  console.log(req.user);
 });
 
 app.get('/login', function(req, res){
-  console.log("lojin")
-  res.render('pages/login.ejs');
+  res.render('pages/login');
 });
 
 app.post('/login', 
