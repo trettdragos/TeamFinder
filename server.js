@@ -12,7 +12,6 @@ var io = require('socket.io').listen(server, {
     origins: '*:*'
 });
 
-
 var user=[{
   ID:"",
   EMAIL:"",
@@ -33,7 +32,6 @@ passport.use(new Strategy(
     if (err) throw err;
     if(result.EMAIL = username){
       user = result;
-      console.log(user);
       return cb(null, result);
     }
     else return cb(null, false);
@@ -55,13 +53,10 @@ app.use(require('body-parser').urlencoded({ extended: true }));
 app.use(require('express-session')({ secret: 'keyboard cat', resave: false, saveUninitialized: false }));
 app.use(passport.initialize());
 app.use(passport.session());
-
-
 app.use(express.static(path.join(__dirname, 'public')));
+
 io.on('connection', function(socket) {
     console.log('Client connected...');
-    socket.emit('welcome', { message: 'Welcome!', id: socket.id });
-    socket.on('client connected', console.log);
     socket.on('reply with event', function(data){
       //listen for changes in the db
       con.query("SELECT * FROM accounts WHERE EMAIL = ? AND PASSWORD = ? LIMIT 1", [user[0].EMAIL, user[0].PASSWORD], function (err, result, fields) {
@@ -70,6 +65,9 @@ io.on('connection', function(socket) {
       });
       socket.emit('received event', user[0]);
     });
+    socket.on('disconnect', function () {
+      console.log("Client disconected...");
+  });
 });
 
 app.set('view engine', 'ejs');
