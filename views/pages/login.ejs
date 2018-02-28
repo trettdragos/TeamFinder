@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <% include ../partials/head %>
+  </head>
+
+  <body>
+
+    <div class="container">
+      <div class="card card-container">
+        <h4 style="text-align: center; margin-bottom: 15px;">Login to Your Account</h4>
+            <form class="form-signin" action="/login" method="post">
+                <input type="email" id="username" class="form-control" placeholder="Email address" required autofocus style="margin-bottom: 10px;" name="username">
+                <input type="password" id="password" class="form-control" placeholder="Password" required style="margin-bottom: 10px" name="password">
+                <div id="remember" class="checkbox">
+                    <label>
+                        <input type="checkbox" value="remember-me" autocomplete="true"> Remember me
+                    </label>
+                </div>
+                <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit">Sign in</button>
+            </form>
+            <p>
+            <a href="#" class="forgot-password">
+                Forgot the password?
+            </a>
+
+            <a href="#" class="register">
+                Register
+            </a></p>
+        </div>
+    </div>
+    <% include ../partials/footer %>
+  </body>
+
+</html>

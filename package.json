@@ -1,0 +1,29 @@
+{
+  "name": "teamfinder",
+  "version": "0.0.1",
+  "description": "Web app for finding team",
+  "main": "server.js",
+  "scripts": {
+    "test": "node server.js"
+  },
+  "keywords": [
+    "trett"
+  ],
+  "author": "Trett Dragos",
+  "license": "ISC",
+  "dependencies": {
+    "cookie-parser": "^1.4.3",
+    "cookie-session": "^2.0.0-beta.3",
+    "ejs": "^2.5.7",
+    "express": "^4.16.2",
+    "express-session": "^1.15.6",
+    "http": "0.0.0",
+    "morgan": "^1.9.0",
+    "mysql": "^2.15.0",
+    "passport": "^0.4.0",
+    "passport-local": "^1.0.0",
+    "path": "^0.12.7",
+    "sleep": "^5.1.1",
+    "socket.io": "^2.0.4"
+  }
+}

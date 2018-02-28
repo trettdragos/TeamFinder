@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <% include ../partials/head %>
+  </head>
+
+  <body>
+    <% include ../partials/header %>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12 text-center">
+          <h1 class="mt-5">A Bootstrap 4 Starter Template</h1>
+          <p class="lead">Complete with pre-defined file paths and responsive navigation!</p>
+          <ul class="list-unstyled">
+            <% if (!user) { %>
+              <p>Welcome! Please <a href="/login">log in</a>.</p>
+            <% } else { %>
+              <p>Hello, <%= user %>. View your <a href="/profile">profile</a>.</p>
+            <% } %>
+            <p>time since login:</p>
+            <p id="time"></p>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <% include ../partials/footer %>
+
+    <script>
+      jQuery(function($){
+        var socket = io.connect();
+        var obj = {}
+        socket.emit('reply with event', obj);
+
+        socket.on('received event', function(data){
+          //do smth
+          document.getElementById("time").innerHTML = data;
+          socket.emit('reply with event', data);
+        });
+
+      });
+    </script>
+
+  </body>
+
+</html>
