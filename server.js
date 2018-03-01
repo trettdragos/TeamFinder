@@ -20,7 +20,7 @@ var user=[{
 }]
 
 var con = mysql.createConnection({
-  host: "localhost",
+  host: "localhost",x 
   user: "root",
   password: "password",
   database: "TeamFinder"
@@ -63,7 +63,7 @@ io.on('connection', function(socket) {
         if (err) throw err;
         user=result;
       });
-      socket.emit('received event', user[0]);
+      socket.emit('received event', data);
     });
     socket.on('disconnect', function () {
       console.log("Client disconected...");
