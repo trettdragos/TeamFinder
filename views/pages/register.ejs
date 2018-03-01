@@ -9,16 +9,59 @@
 
     <div class="container">
       <div class="card card-container">
-        <h4 style="text-align: center; margin-bottom: 15px;">Register</h4>
+        <h4 style="text-align: center; margin-bottom: 15px;"><b>Register</b></h4>
             <form class="form-signin" id="form">
+                <small class="text-center text-muted">Email</small>
                 <input type="email" id="email" class="form-control" placeholder="Email address" required autofocus style="margin-bottom: 10px;" name="email">
+                <small class="text-center text-muted">Password</small>
                 <input type="password" id="password" class="form-control" placeholder="Password" required style="margin-bottom: 10px" name="password">
-                <div id="remember" class="checkbox">
-                    <label>
-                        <input type="checkbox" value="remember-me" autocomplete="true" name="keepMeUp"> Keep Me LoggedIn
-                    </label>
+                <small class="text-center text-muted">Check Password</small>
+                <input type="password" id="passwordCheck" class="form-control" placeholder="Check Password" required style="margin-bottom: 10px" name="passwordCheck">
+                <small class="text-center text-muted">Full Name</small>
+                <input type="name" id="email" class="form-control" placeholder="Full Name" required autofocus style="margin-bottom: 10px;" name="email">
+                <small class="text-center text-muted">LinkedIn account</small>
+                <input type="link" id="email" class="form-control" placeholder="LinkedIn Account" required autofocus style="margin-bottom: 10px;" name="email">
+                <small class="text-center text-muted">GitHub account</small>
+                <input type="link" id="email" class="form-control" placeholder="GitHub Account" required autofocus style="margin-bottom: 10px;" name="email">
+                <small class="text-center text-muted">Please check what you desire to work</small>    
+                <div class="form-check" style="margin-bottom: 5px;">
+                    <input type="checkbox" class="form-check-input" id="webBackEnd">
+                <label class="form-check-label" for="exampleCheck1">Web Back End</label>
                 </div>
-                <button class="btn btn-lg btn-primary btn-block btn-signin" type="button" onclick="auth()" id="submit">Login</button>
+                <div class="form-check" style="margin-bottom: 5px;">
+                    <input type="checkbox" class="form-check-input" id="webFrontEnd">
+                <label class="form-check-label" for="exampleCheck1">Web Front End</label>
+                </div>
+                <div class="form-check" style="margin-bottom: 5px;">
+                    <input type="checkbox" class="form-check-input" id="androidBackEnd">
+                <label class="form-check-label" for="exampleCheck1">Android Back End</label>                    </div>
+                <div class="form-check" style="margin-bottom: 5px;">
+                    <input type="checkbox" class="form-check-input" id="androidFrontEnd">
+                <label class="form-check-label" for="exampleCheck1">Android Front End</label>
+                </div>
+                <div class="form-check" style="margin-bottom: 5px;">
+                    <input type="checkbox" class="form-check-input" id="game">
+                <label class="form-check-label" for="exampleCheck1">Game Development</label>
+                </div>
+                <div class="form-check" style="margin-bottom: 5px;">
+                    <input type="checkbox" class="form-check-input" id="design">
+                <label class="form-check-label" for="exampleCheck1">Design</label>
+                </div>
+                <div class="form-check" style="margin-bottom: 5px;">
+                    <input type="checkbox" class="form-check-input" id="embeded">
+                <label class="form-check-label" for="exampleCheck1">Embeded</label>
+                </div>
+                <div class="form-check" style="margin-bottom: 5px;">
+                    <input type="checkbox" class="form-check-input" id="security">
+                <label class="form-check-label" for="exampleCheck1">Security</label>
+                </div>
+                <div class="form-check" style="margin-bottom: 5px;">
+                    <input type="checkbox" class="form-check-input" id="other">
+                <label class="form-check-label" for="exampleCheck1">Other, specify:
+                    <input type="text" id="other" class="form-control" placeholder="Skill" required autofocus style="margin-bottom: 10px;" name="other">
+                </label>
+                </div>
+                <button class="btn btn-lg btn-primary btn-block btn-signin" type="button" onclick="auth()" id="submit">Register <i class="fas fa-user"></i></button>
             </form>
             <div class="pt-1"><small class="text-center text-muted">Already have an account? <a href="/login" class="font-weight-bold link-unstyled">Log In</a> </small></div>
         </div>
@@ -27,7 +70,7 @@
     
     <script>
         var socket = io.connect('localhost:3000');
-        socket.on('auth login', function(res){
+        socket.on('auth register', function(res){
             if(res.status == "succesfull"){
                 $.cookie('username', res.email, { expires: 14, path: '/' });
                 window.location.href = '/';
@@ -36,7 +79,7 @@
             }
         });
         function auth() {
-            socket.emit('auth login', {email:document.getElementById('email').value, password:document.getElementById('password').value})
+            socket.emit('auth register', {email:document.getElementById('email').value, password:document.getElementById('password').value})
         }
         $("#form").keyup(function(event) {
             if (event.keyCode === 13) {
