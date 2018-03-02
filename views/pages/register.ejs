@@ -11,18 +11,18 @@
       <div class="card card-container">
         <h4 style="text-align: center; margin-bottom: 15px;"><b>Register</b></h4>
             <form class="form-signin" id="form">
-                <small class="text-center text-muted">Email</small>
+                <small class="text-center text-muted">Email*</small>
                 <input type="email" id="email" class="form-control" placeholder="Email address" required autofocus style="margin-bottom: 10px;" name="email">
-                <small class="text-center text-muted">Password</small>
+                <small class="text-center text-muted">Password*</small>
                 <input type="password" id="password" class="form-control" placeholder="Password" required style="margin-bottom: 10px" name="password">
-                <small class="text-center text-muted">Check Password</small>
+                <small class="text-center text-muted">Check Password*</small>
                 <input type="password" id="passwordCheck" class="form-control" placeholder="Check Password" required style="margin-bottom: 10px" name="passwordCheck">
-                <small class="text-center text-muted">Full Name</small>
-                <input type="name" id="email" class="form-control" placeholder="Full Name" required autofocus style="margin-bottom: 10px;" name="email">
+                <small class="text-center text-muted">Full Name*</small>
+                <input type="name" id="fullName" class="form-control" placeholder="Full Name" required autofocus style="margin-bottom: 10px;" name="fullName">
                 <small class="text-center text-muted">LinkedIn account</small>
-                <input type="link" id="email" class="form-control" placeholder="LinkedIn Account" required autofocus style="margin-bottom: 10px;" name="email">
+                <input type="link" id="linkedin" class="form-control" placeholder="LinkedIn Account" required autofocus style="margin-bottom: 10px;" name="linkedin">
                 <small class="text-center text-muted">GitHub account</small>
-                <input type="link" id="email" class="form-control" placeholder="GitHub Account" required autofocus style="margin-bottom: 10px;" name="email">
+                <input type="link" id="github" class="form-control" placeholder="GitHub Account" required autofocus style="margin-bottom: 10px;" name="github">
                 <small class="text-center text-muted">Please check what you desire to work</small>    
                 <div class="form-check" style="margin-bottom: 5px;">
                     <input type="checkbox" class="form-check-input" id="webBackEnd">
@@ -34,7 +34,8 @@
                 </div>
                 <div class="form-check" style="margin-bottom: 5px;">
                     <input type="checkbox" class="form-check-input" id="androidBackEnd">
-                <label class="form-check-label" for="exampleCheck1">Android Back End</label>                    </div>
+                <label class="form-check-label" for="exampleCheck1">Android Back End</label> 
+                </div>
                 <div class="form-check" style="margin-bottom: 5px;">
                     <input type="checkbox" class="form-check-input" id="androidFrontEnd">
                 <label class="form-check-label" for="exampleCheck1">Android Front End</label>
@@ -55,13 +56,11 @@
                     <input type="checkbox" class="form-check-input" id="security">
                 <label class="form-check-label" for="exampleCheck1">Security</label>
                 </div>
-                <div class="form-check" style="margin-bottom: 5px;">
-                    <input type="checkbox" class="form-check-input" id="other">
-                <label class="form-check-label" for="exampleCheck1">Other, specify:
-                    <input type="text" id="other" class="form-control" placeholder="Skill" required autofocus style="margin-bottom: 10px;" name="other">
-                </label>
-                </div>
-                <button class="btn btn-lg btn-primary btn-block btn-signin" type="button" onclick="auth()" id="submit">Register <i class="fas fa-user"></i></button>
+                <small class="text-center text-muted">Other, please specify</small>
+                <input type="link" id="other" class="form-control" placeholder="skill" required autofocus style="margin-bottom: 10px;" name="other">
+
+                <button class="btn btn-lg btn-primary btn-block btn-register" type="button" id="submit">Register <i class="fas fa-user"></i></button>
+                <small class="text-center text-muted">* mandatory</small>
             </form>
             <div class="pt-1"><small class="text-center text-muted">Already have an account? <a href="/login" class="font-weight-bold link-unstyled">Log In</a> </small></div>
         </div>
@@ -73,17 +72,68 @@
         socket.on('auth register', function(res){
             if(res.status == "succesfull"){
                 $.cookie('username', res.email, { expires: 14, path: '/' });
-                window.location.href = '/';
+                window.location.href = '/dashboard';
             }else{
+                document.getElementById("email").style.borderColor="red";
                 alert(res.status);
             }
         });
-        function auth() {
-            socket.emit('auth register', {email:document.getElementById('email').value, password:document.getElementById('password').value})
+        $("#submit").on('click', function () {
+         auth();    
+        });
+        function auth(){  
+            var user = {
+                email:document.getElementById("email").value,
+                password:document.getElementById("password").value,
+                name:document.getElementById('fullName').value,
+                linkedin:document.getElementById('linkedin').value,
+                github:document.getElementById('github').value,
+                skills:{
+                    webBackEnd:document.getElementById('webBackEnd').checked,
+                    webFrontEnd:document.getElementById('webFrontEnd').checked,
+                    androidBackEnd:document.getElementById('androidBackEnd').checked,
+                    androidFrontEnd:document.getElementById('androidFrontEnd').checked,
+                    game:document.getElementById('game').checked,
+                    design:document.getElementById('design').checked,
+                    embeded:document.getElementById('embeded').checked,
+                    security:document.getElementById('security').checked,
+                    otherName:document.getElementById('other').value
+                }
+            }
+            var ok = true;
+            if(user.email===''){
+                document.getElementById("email").style.borderColor="red";
+                ok = false;
+            }else{
+                document.getElementById("email").style.borderColor="green";
+            }
+            if(user.password===''){
+                document.getElementById("password").style.borderColor="red";
+                ok = false;
+            }else{
+                document.getElementById("password").style.borderColor="green";
+            }
+            if(user.name===''){
+                document.getElementById("fullName").style.borderColor="red";
+                ok = false;
+            }else{
+                document.getElementById("fullName").style.borderColor="green";
+            }
+            if(user.password!==document.getElementById('passwordCheck').value){
+                document.getElementById("password").style.borderColor="red";
+                document.getElementById("passwordCheck").style.borderColor="red";
+                ok = false;
+            }else{
+                document.getElementById("password").style.borderColor="green";
+                document.getElementById("passwordCheck").style.borderColor="green";
+            }
+            if(ok==true){
+                socket.emit('auth register', user);
+            }
         }
         $("#form").keyup(function(event) {
             if (event.keyCode === 13) {
-                $("#submit").click();
+                auth();
             }
         });
     </script>

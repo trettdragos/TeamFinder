@@ -31,10 +31,11 @@
         socket.on('auth login', function(res){
             if(res.status == "succesfull"){
                 $.cookie('username', res.email, { expires: 14, path: '/' });
-                window.location.href = '/';
+                window.location.href = '/dashboard';
             }else{
                 document.getElementById("email").style.borderColor="red";
                 document.getElementById("password").style.borderColor="red";
+                $('#error').empty();
                 $('#error').append('Email or Password incorect!');
             }
         });
