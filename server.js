@@ -61,19 +61,14 @@ io.on('connection', function(socket) {
     });
 
     socket.on('disconnect', function () {
-      console.log("Client disconected...");
+      console.log("Client disconected..."+ socket.id);
   });
 });
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 app.get('/', function(req, res) {
-  if(req.cookies.username){
-    res.render('pages/index.ejs', {email:req.cookies.username});
-  }
-  else{
-    res.redirect('/login');
-  }
+    res.render('pages/about.ejs');
 });
 
 app.get('/dashboard', function(req, res) {
