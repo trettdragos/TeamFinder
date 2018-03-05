@@ -73,7 +73,7 @@ app.get('/', function(req, res) {
 
 app.get('/dashboard', function(req, res) {
   if(req.cookies.username){
-    res.render('pages/index.ejs', {email:req.cookies.username});
+    res.render('pages/index.ejs', {email:req.cookies.username, tab:'1'});
   }
   else{
     res.redirect('/login');
@@ -86,7 +86,23 @@ app.get('/login', function(req, res){
 
 app.get('/logout', function(req, res){
     res.render('pages/logout');
+});
 
+app.get('/settings', function(req, res){
+  if(req.cookies.username){
+    res.render('pages/settings', {tab:'3'});
+  }
+  else{
+    res.redirect('/');
+  }
+});
+app.get('/projects', function(req, res){
+    if(req.cookies.username){
+    res.render('pages/projects', {tab:'2'});
+  }
+  else{
+    res.redirect('/');
+  }
 });
 
 app.get('/register', function(req, res){

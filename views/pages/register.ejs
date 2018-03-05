@@ -119,7 +119,7 @@
             }else{
                 document.getElementById("fullName").style.borderColor="green";
             }
-            if(user.password!==document.getElementById('passwordCheck').value){
+            if(user.password!==document.getElementById('passwordCheck').value || user.password===''){
                 document.getElementById("password").style.borderColor="red";
                 document.getElementById("passwordCheck").style.borderColor="red";
                 ok = false;

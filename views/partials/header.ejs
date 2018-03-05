@@ -6,25 +6,30 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarResponsive">
           <ul class="navbar-nav ml-auto">
+            <% if(tab==='1'){ %>
             <li class="nav-item active">
+            <% }else{ %>
+            <li class="nav-item">
+            <% } %>
               <a class="nav-link" href="/dashboard">Dashboard <i class="fas fa-home"></i>
-                <% if(false){ %>
-                   <span class="sr-only">(current)</span>
-                <% } %>
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Account <i class="fas fa-user"></i>
-              <% if(true){ %>
-                   <span class="sr-only">(current)</span>
-                <% } %>
+              <% if(tab==='2'){ %>
+            <li class="nav-item active">
+            <% }else{ %>
+            <li class="nav-item">
+            <% } %>
+              <a class="nav-link" href="/projects">Projects <i class="fas fa-user"></i>
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Settings <i class="fas fa-cogs"></i>
-              <% if(true){ %>
-                   <span class="sr-only">(current)</span>
-                <% } %>
+              <% if(tab==='3'){ %>
+            <li class="nav-item active">
+            <% }else{ %>
+            <li class="nav-item">
+            <% } %>
+              <a class="nav-link" href="/settings">Settings <i class="fas fa-cogs"></i>
               </a>
             </li>
             <li class="nav-item">
