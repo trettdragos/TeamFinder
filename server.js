@@ -20,6 +20,8 @@ var con = mysql.createConnection({
   database: "TeamFinder"
 });
 
+var pages= ["dashboard", "login", "logout", "register", "settings", "projects"];
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
@@ -105,8 +107,35 @@ app.get('/projects', function(req, res){
   }
 });
 
+app.get('/createProject', function(req, res){
+    if(req.cookies.username){
+    res.render('pages/create-project', {tab:'2'});
+  }
+  else{
+    res.redirect('/');
+  }
+});
+
+app.get('/createTeam', function(req, res){
+    if(req.cookies.username){
+    res.render('pages/create-team', {tab:'2'});
+  }
+  else{
+    res.redirect('/');
+  }
+});
+
 app.get('/register', function(req, res){
   res.render('pages/register');
+});
+
+app.get('/:page', function(req, res){
+  if(pages.indexOf(req.params.page) < -1){
+    res.send("404 page not found");
+  }
+  else {
+    res.redirect('/');
+  }
 });
 
 server.listen(3000);
