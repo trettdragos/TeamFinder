@@ -15,18 +15,19 @@
           <p class="lead">Search for projects or create a new one</p>
           <ul class="list-unstyled">
             <p>Hello, <%= email %>. View your <a href="/profile">profile</a>.</p>
+            <p id="city"></p>
           </ul>
         </div>
       </div>
     </div>
 
     <% include ../partials/footer %>
-    
     <script>
-      jQuery(function($){
-        var socket = io.connect();
 
-      });
+      var socket = io.connect();
+      $('#city').empty();
+      
+      
     </script>
 
   </body>

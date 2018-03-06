@@ -34,6 +34,8 @@
                     <option>Full-time</option>
                     <option>Co-founder</option>
                   </select>
+                  <hr class="my-4">
+                  <h4>Do you want to work with people within your country? <input type="checkbox" id="national" data-toggle="toggle"></h4>
                 </div>
               </div>
               <hr class="my-4">
@@ -84,7 +86,7 @@
                   </select>
                 </div>
               </div>
-              <h4>Do you have funding? <input type="checkbox" id="funding" checked data-toggle="toggle"></h4>
+              <h4>Do you have funding? <input type="checkbox" id="funding" data-toggle="toggle"></h4>
               <hr class="my-4">
                 <center>
                    <button class="btn btn-lg" id="submit" type="button" style="background-color: #00A86B; width: 150px; height: 75px; font-size: 200%;"><b>Submit</b></button>
@@ -103,10 +105,21 @@
       var desktop = false;
       var webFront = false;
       var webBack = false;
-
+      
       $("#submit").on('click', function () {
          submitProject();    
         });
+      var Nation = '';
+      const proxyurl = "https://cors-anywhere.herokuapp.com/";
+          var url = 'http://api.db-ip.com/v2/32e2180846d01d7cd405b45da2699e4343dc56f3/'+userip;
+          fetch(proxyurl + url) // https://cors-anywhere.herokuapp.com/https://example.com
+          .then(response => response.text())
+          .then(contents => setCountry(JSON.parse(contents)))
+          .catch(() => console.log("Can’t access " + url + " response. Blocked by browser?"))
+          function setCountry(data){
+            Nation = data.countryName;
+          }
+                console.log(document.getElementById("national").value);
       function submitProject(){
         var e1 = document.getElementById("commitmentLevel");
         var commitmentLevel = e1.options[e1.selectedIndex].text;
@@ -114,7 +127,14 @@
         var Stage = e2.options[e2.selectedIndex].text;
         var e3 = document.getElementById("budget");
         var Budget = e3.options[e3.selectedIndex].text;
-
+        var country= '';
+        if(document.getElementById("national").checked){
+          country = Nation;
+        }
+        var hasFunding = false;
+        if(document.getElementById("funding").checked){
+          hasFunding = true;
+        }
         var project = {
           name:document.getElementById("projectName").value,
           summary:document.getElementById("summary").value,
@@ -129,7 +149,8 @@
           platformDetails:document.getElementById("platformDetails").value,
           stage:Stage,
           budget:Budget,
-          funding:document.getElementById("funding").value
+          funding:hasFunding,
+          national:country
         };
 
         var isFormOk = true;
@@ -157,6 +178,7 @@
         }else{
           document.getElementById("platformDetails").style.borderColor = "green";
         }
+        isFormOk = true;
         if(isFormOk)
           socket.emit('register project', project);
       }
