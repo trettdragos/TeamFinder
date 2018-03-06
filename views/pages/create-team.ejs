@@ -10,20 +10,20 @@
   <body>
     <% include ../partials/header %>
     <form>
-      <div class="container">
+      <div class="container"> 
         <div class="row">
           <div class="col-lg-12">
             <div class="jumbotron" style="margin-top: 10px;">
               <h2><b>Tell Us About Your Team</b></h2>
               <div class="form-group">
                 <label for="project Name">Team Name</label>
-                <input type="text" class="form-control" id="exampleInputEmail1" placeholder="Enter team name">
+                <input type="text" class="form-control" id="teamName" placeholder="Enter team name">
               </div>
               <hr class="my-4">
               <div class="form-group">
                 <label for="comment">Team's Purpose</label>
                 <small id="summarise" class="form-text text-muted"><i class="fas fa-info-circle"></i>What are you creating the team for?</small>
-                <textarea class="form-control" rows="5" id="summary"></textarea>
+                <textarea class="form-control" rows="5" id="purpose"></textarea>
               </div>
             </div>
             <div class="jumbotron" style="margin-top: 10px;">
@@ -33,7 +33,7 @@
                   <input type="text" class="form-control" id="hackaton" placeholder="Hackaton">
                   <hr class="my-4">
                   <label for="exampleFormControlSelect1">And section?</label>
-                  <input type="text" class="form-control" id="hackaton" placeholder="section">
+                  <input type="text" class="form-control" id="hackatonSection" placeholder="section">
                   <hr class="my-4">
                   <label for="exampleFormControlSelect1">Starting on...</label>
                   <input type="text" class="form-control" id="datepickerStart" placeholder="DD/MM/YYYY">
@@ -43,7 +43,7 @@
               </div>
               <hr class="my-4">
               <div class="form-group">
-                <h4>What Platform Will Your Project Be Built On?</h4>
+                <h4 id="Platform">What Platform Will Your Project Be Built On?</h4>
                 <div class="form-check form-check-inline">
                   <input class="btn btn-lg" style="background-color: lightgray; width: 175px; height:75px; margin-bottom: 5px;" type="button" id="android" value="Andoird">
                 </div>
@@ -69,10 +69,10 @@
                 <option>3</option>
                 <option>4</option>
               </select>
-              <div id="jobs"><hr class="my-4"><h4>Post #1</h4><label>Post Name</label><input type="text" class="form-control" id="hackaton" placeholder="Job name"><label>Post detailed description</label><input type="text" class="form-control" id="hackaton" placeholder="Job description"></div>
+              <div id="jobs"><hr class="my-4"><h4>Post #1</h4><label>Post Name</label><input type="text" class="form-control" id="post1" placeholder="Job name"><label>Post detailed description</label><input type="text" class="form-control" id="post1description" placeholder="Job description"></div>
               <hr class="my-4">
               <center>
-                <button class="btn btn-lg" style="background-color: #00A86B; width: 150px; height: 75px; font-size: 200%;"><b>Submit</b></button>
+                <button class="btn btn-lg" id="submit" type="button" style="background-color: #00A86B; width: 150px; height: 75px; font-size: 200%;"><b>Submit</b></button>
               </center>
             </div>
           </div>
@@ -92,13 +92,210 @@
 });
     </script>
       <script>
-      jQuery(function($){
         var socket = io.connect();
+      var android = false;
+      var ios = false;
+      var desktop = false;
+      var webFront = false;
+      var webBack = false;
+      $("#submit").on('click', function () {
+         submitTeam();    
+        });
+      function submitTeam() {
+          var e = document.getElementById("selNumber");
+          var strUser = e.options[e.selectedIndex].value;
+          var posts = {};
+          if(strUser === '2'){
+            posts = {
+              post1:{
+                name:document.getElementById('post1').value,
+                description:document.getElementById('post1description').value
+              }
+            }
+          }else if(strUser === '3'){
+            posts = {
+              post1:{
+                name:document.getElementById('post1').value,
+                description:document.getElementById('post1description').value
+              },
+              post2:{
+                name:document.getElementById('post2').value,
+                description:document.getElementById('post2description').value
+              }
+            }
+          }
+          else if(strUser === '4'){
+            posts = {
+              post1:{
+                name:document.getElementById('post1').value,
+                description:document.getElementById('post1description').value
+              },
+              post2:{
+                name:document.getElementById('post2').value,
+                description:document.getElementById('post2description').value
+              },
+              post3:{
+                name:document.getElementById('post3').value,
+                description:document.getElementById('post3description').value
+              }
+            }
+          }
+            var team = {
+              name:document.getElementById('teamName').value,
+              summary:document.getElementById('purpose').value,
+              hackaton:document.getElementById('hackaton').value,
+              section:document.getElementById('hackatonSection').value,
+              startDate:document.getElementById('datepickerStart').value,
+              endDate:document.getElementById('datepickerEnd').value,
+              platforms:{
+                Android:android,
+                iOS:ios,
+                Desktop:desktop,
+                WebFront:webFront,
+                webBack:webBack
+              },
+              nrMembers:strUser,
+              posts:posts
+            }
+            var isFormOk = true;
+            if(team.name===''){
+              isFormOk = false;
+              document.getElementById('teamName').style.borderColor = "red";
+            }else{
+              document.getElementById('teamName').style.borderColor = "green";
+            }
+            if(team.summary===''){
+              isFormOk = false;
+              document.getElementById('purpose').style.borderColor = "red";
+            }else{
+              document.getElementById('purpose').style.borderColor = "green";
+            }
+            if(team.hackaton===''){
+              isFormOk = false;
+              document.getElementById('hackaton').style.borderColor = "red";
+            }else{
+              document.getElementById('hackaton').style.borderColor = "green";
+            }
+            if(team.section===''){
+              isFormOk = false;
+              document.getElementById('hackatonSection').style.borderColor = "red";
+            }else{
+              document.getElementById('hackatonSection').style.borderColor = "green";
+            }
+            if(team.startDate===''){
+              isFormOk = false;
+              document.getElementById('datepickerStart').style.borderColor = "red";
+            }else{
+              document.getElementById('datepickerStart').style.borderColor = "green";
+            }
+            if(team.endDate===''){
+              isFormOk = false;
+              document.getElementById('datepickerEnd').style.borderColor = "red";
+            }else{
+              document.getElementById('datepickerEnd').style.borderColor = "green";
+            }
+            if(!(ios ||  android || desktop || webBack || webFront)){
+              isFormOk = false;
+              document.getElementById('Platform').style.color = "red";
+            }else{
+              document.getElementById('Platform').style.color = "green";
+            }
+            if(team.nrMembers==='2'){
+              if(team.posts.post1.name===''){
+                isFormOk =false;
+                document.getElementById('post1').style.borderColor = "red";
+              }else{
+                document.getElementById('post1').style.borderColor = "green";
+              }
+              if(team.posts.post1.description===''){
+                isFormOk = false;
+                document.getElementById('post1description').style.borderColor = "red";
+              }else{
+                document.getElementById('post1description').style.borderColor = "green";
+              } 
+            }else if(team.nrMembers === '3'){
+              if(team.posts.post1.name===''){
+                isFormOk =false;
+                document.getElementById('post1').style.borderColor = "red";
+              }else{
+                document.getElementById('post1').style.borderColor = "green";
+              }
+              if(team.posts.post1.description===''){
+                isFormOk = false;
+                document.getElementById('post1description').style.borderColor = "red";
+              }else{
+                document.getElementById('post1description').style.borderColor = "green";
+              } 
+              if(team.posts.post2.name===''){
+                isFormOk =false;
+                document.getElementById('post2').style.borderColor = "red";
+              }else{
+                document.getElementById('post2').style.borderColor = "green";
+              }
+              if(team.posts.post2.description===''){
+                isFormOk = false;
+                document.getElementById('post2description').style.borderColor = "red";
+              }else{
+                document.getElementById('post2description').style.borderColor = "green";
+              } 
+            }else if(team.nrMembers === '4'){
+              if(team.posts.post1.name===''){
+                isFormOk =false;
+                document.getElementById('post1').style.borderColor = "red";
+              }else{
+                document.getElementById('post1').style.borderColor = "green";
+              }
+              if(team.posts.post1.description===''){
+                isFormOk = false;
+                document.getElementById('post1description').style.borderColor = "red";
+              }else{
+                document.getElementById('post1description').style.borderColor = "green";
+              } 
+              if(team.posts.post2.name===''){
+                isFormOk =false;
+                document.getElementById('post2').style.borderColor = "red";
+              }else{
+                document.getElementById('post2').style.borderColor = "green";
+              }
+              if(team.posts.post2.description===''){
+                isFormOk = false;
+                document.getElementById('post2description').style.borderColor = "red";
+              }else{
+                document.getElementById('post2description').style.borderColor = "green";
+              }if(team.posts.post3.name===''){
+                isFormOk =false;
+                document.getElementById('post3').style.borderColor = "red";
+              }else{
+                document.getElementById('post3').style.borderColor = "green";
+              }
+              if(team.posts.post3.description===''){
+                isFormOk = false;
+                document.getElementById('post3description').style.borderColor = "red";
+              }else{
+                document.getElementById('post3escription').style.borderColor = "green";
+              } 
+            }
+            isFormOk = true;
+            if(isFormOk)
+              socket.emit('register team', team);
+        }
+        $("#form").keyup(function(event) {
+            if (event.keyCode === 13) {
+                $("#submit").click();
+            }
+        });
+      jQuery(function($){
+        socket.on('register team', function(data){
+          if(data.status==='succesfull')
+            window.location.href = '/projects';
+          else alert(data.status); 
+        });
+        
       });
 
       function change(){
         var e = document.getElementById("selNumber");
-        var strUser = e.options[e.selectedIndex].value;
+        var strUser = e.options[e.selectedIndex].text;
         if(strUser === '2'){
           document.getElementById("jobs").innerHTML = '<hr class="my-4"><h4>Post #1</h4><label>Post Name</label><input type="text" class="form-control" id="post1" placeholder="Job name"><label>Post detailed description</label><input type="text" class="form-control" id="post1description" placeholder="Job description">'
         }else if(strUser === '3'){
@@ -108,11 +305,6 @@
         }
       };
 
-      var android = false;
-      var ios = false;
-      var desktop = false;
-      var webFront = false;
-      var webBack = false;
       (function() {
         document.getElementById("android").onclick = function() { 
             if(android == false){

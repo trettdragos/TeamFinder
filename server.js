@@ -62,6 +62,22 @@ io.on('connection', function(socket) {
         });
     });
 
+    socket.on('register team', function(team){
+      console.log('registering team...'+ JSON.stringify(team));
+      if(team.name==='')//check if name is unique
+        socket.emit('register team', {status:'failed, team name already exists'})
+      else
+        socket.emit('register team', {status:'succesfull'})
+    });
+
+    socket.on('register project', function(project){
+      console.log('registering project...'+ JSON.stringify(project));
+      if(project.name==='')//check if name is unique
+        socket.emit('register project', {status:'failed, team name already exists'})
+      else
+        socket.emit('register project', {status:'succesfull'})
+    });
+
     socket.on('disconnect', function () {
       console.log("Client disconected..."+ socket.id);
   });

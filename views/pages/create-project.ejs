@@ -15,7 +15,7 @@
               <h2><b>Tell Us About Your Project</b></h2>
               <div class="form-group">
                 <label for="project Name">Project Name</label>
-                <input type="text" class="form-control" id="exampleInputEmail1" placeholder="Enter project name">
+                <input type="text" class="form-control" id="projectName" placeholder="Enter project name">
               </div>
               <hr class="my-4">
               <div class="form-group">
@@ -38,7 +38,7 @@
               </div>
               <hr class="my-4">
               <div class="form-group">
-                <h4>What Platform Will Your Project Be Built On?</h4>
+                <h4 id="platform">What Platform Will Your Project Be Built On?</h4>
                 <div class="form-check form-check-inline">
                   <input class="btn btn-lg" style="background-color: lightgray; width: 175px; height:75px; margin-bottom: 5px;" type="button" id="android" value="Andoird">
                 </div>
@@ -56,13 +56,13 @@
                 </div>
               </div>
               <label for="comment"><i class="fas fa-info-circle"></i>More details on the specific skills</label>
-              <textarea class="form-control" rows="5" id="summary"></textarea>
+              <textarea class="form-control" rows="5" id="platformDetails"></textarea>
             </div>
             <div class="jumbotron" style="margin-top: 10px;">
               <div class="form-group">
                 <div class="form-group">
                   <label for="exampleFormControlSelect1">Current Stage of Project</label>
-                  <select class="form-control" id="commitmentLevel">
+                  <select class="form-control" id="stage">
                     <option>Ideea Stage</option>
                     <option>Prototype Already Build</option>
                     <option>Live-version available</option>
@@ -73,7 +73,7 @@
               <div class="form-group">
                 <div class="form-group">
                   <label for="exampleFormControlSelect1">Project Budget Range</label>
-                  <select class="form-control" id="commitmentLevel">
+                  <select class="form-control" id="budget">
                     <option>$0-$1,000</option>
                     <option>$1,000-$5,000</option>
                     <option>$5,000-$10,000</option>
@@ -84,10 +84,10 @@
                   </select>
                 </div>
               </div>
-              <h4>Do you have funding? <input type="checkbox" checked data-toggle="toggle"></h4>
+              <h4>Do you have funding? <input type="checkbox" id="funding" checked data-toggle="toggle"></h4>
               <hr class="my-4">
                 <center>
-                   <button class="btn btn-lg" style="background-color: #00A86B; width: 150px; height: 75px; font-size: 200%;"><b>Submit</b></button>
+                   <button class="btn btn-lg" id="submit" type="button" style="background-color: #00A86B; width: 150px; height: 75px; font-size: 200%;"><b>Submit</b></button>
                 </center>
             </div>
           </div>
@@ -97,15 +97,76 @@
     <% include ../partials/footer %>
     
     <script>
-      jQuery(function($){
-        var socket = io.connect();
-
-      });
+      var socket = io.connect();
       var android = false;
       var ios = false;
       var desktop = false;
       var webFront = false;
       var webBack = false;
+
+      $("#submit").on('click', function () {
+         submitProject();    
+        });
+      function submitProject(){
+        var e1 = document.getElementById("commitmentLevel");
+        var commitmentLevel = e1.options[e1.selectedIndex].text;
+        var e2 = document.getElementById("stage");
+        var Stage = e2.options[e2.selectedIndex].text;
+        var e3 = document.getElementById("budget");
+        var Budget = e3.options[e3.selectedIndex].text;
+
+        var project = {
+          name:document.getElementById("projectName").value,
+          summary:document.getElementById("summary").value,
+          commitment:commitmentLevel,
+          platforms:{
+                Android:android,
+                iOS:ios,
+                Desktop:desktop,
+                WebFront:webFront,
+                webBack:webBack
+          },
+          platformDetails:document.getElementById("platformDetails").value,
+          stage:Stage,
+          budget:Budget,
+          funding:document.getElementById("funding").value
+        };
+
+        var isFormOk = true;
+        if(project.name===''){
+          isFormOk = false;
+          document.getElementById("projectName").style.borderColor = "red";
+        }else{
+          document.getElementById("projectName").style,borderColor = "green";
+        }
+        if(project.summary===''){
+          isFormOk = false;
+          document.getElementById("summary").style.borderColor = "red";
+        }else{
+          document.getElementById("summary").style.borderColor = "green";
+        }
+        if(!(android || ios || desktop || webFront || webBack)){
+          isFormOk = false;
+          document.getElementById("platform").style.color = "red";
+        }else{
+          document.getElementById("platform").style.color = "green";
+        }
+        if(project.platformDetails===''){
+          isFormOk = false;
+          document.getElementById("platformDetails").style.borderColor = "red";
+        }else{
+          document.getElementById("platformDetails").style.borderColor = "green";
+        }
+        if(isFormOk)
+          socket.emit('register project', project);
+      }
+      jQuery(function($){
+        socket.on('register project', function(data){
+          if(data.status==='succesfull')
+            window.location.href = '/projects';
+          else alert(data.status); 
+        });
+      });
       (function() {
         document.getElementById("android").onclick = function() { 
             if(android == false){
