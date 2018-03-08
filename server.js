@@ -108,6 +108,27 @@ io.on('connection', function(socket) {
       console.log("Client disconected..."+ socket.id);
   });
 });
+
+function getPlatformString(platforms){
+  var pl = '';
+  if(platforms.Android){
+    pl = pl+'Android ';
+  }
+  if(platforms.iOS){
+    pl = pl+'iOS ';
+  }
+  if(platforms.Desktop){
+    pl = pl+'Desktop ';
+  }
+  if(platforms.WebFront){
+    pl = pl+'Web FrontEnd ';
+  }
+  if(platforms.webBack){
+    pl = pl+'Web BackEnd';
+  }
+  return pl;
+  console.log(pl);
+}
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
@@ -120,12 +141,12 @@ app.get('/dashboard', function(req, res) {
     con.query("SELECT * FROM projects LIMIT 25", function(err, projects, fields){
       if(err) throw err;
       for(i in projects){
-        projects[i].PLATFORMS = JSON.parse(projects[i].PLATFORMS);
+        projects[i].PLATFORMS = getPlatformString(JSON.parse(projects[i].PLATFORMS));
       }
       con.query("SELECT * FROM teams LIMIT 25", function(err, teams, fields){
         if(err) throw err;
         for(i in teams){
-          teams[i].PLATFORMS = JSON.parse(teams[i].PLATFORMS);
+          teams[i].PLATFORMS = getPlatformString(JSON.parse(teams[i].PLATFORMS));
           teams[i].POSTS = JSON.parse(teams[i].POSTS);
         }
         var list = teams.concat(projects);
