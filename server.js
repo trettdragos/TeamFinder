@@ -63,19 +63,45 @@ io.on('connection', function(socket) {
     });
 
     socket.on('register team', function(team){
-      console.log('registering team...'+ JSON.stringify(team));
-      if(team.name==='')//check if name is unique
-        socket.emit('register team', {status:'failed, team name already exists'})
-      else
-        socket.emit('register team', {status:'succesfull'})
+      console.log('checking if team...'+team.name+ ' is in db');
+      con.query("SELECT * FROM teams WHERE NAME = ? LIMIT 1", [team.name], function (err, result, fields) {
+          if (err) throw err;
+          if(result[0]){
+            console.log("team failed to register: "+team.name);
+            socket.emit('register team', {status:"failed, team already exists"});
+          }
+          else{
+            console.log("register team: "+ result[0]);
+            con.query("INSERT INTO teams (ID, NAME, SUMMARY, HACKATON, SECTION, START_DATE, END_DATE, PLATFORMS, NR_MEMBERS, POSTS, LEADER) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, team.name, team.summary, team.hackaton, team.section, team.startDate, team.endDate, JSON.stringify(team.platforms), team.nrMembers, JSON.stringify(team.posts), team.leader], function (err, result) {
+              if (err){
+                socket.emit('register team', {status:JSON.stringify(err)});
+              } 
+              console.log('registered team '+team.name+' successful');
+              socket.emit('register team', {status:"succesfull"});
+            });
+          }
+        });
     });
 
     socket.on('register project', function(project){
-      console.log('registering project...'+ JSON.stringify(project));
-      if(project.name==='')//check if name is unique
-        socket.emit('register project', {status:'failed, team name already exists'})
-      else
-        socket.emit('register project', {status:'succesfull'})
+      console.log('checking if project...'+project.name+ ' is in db');
+      con.query("SELECT * FROM projects WHERE NAME = ? LIMIT 1", [project.name], function (err, result, fields) {
+          if (err) throw err;
+          if(result[0]){
+            console.log("project failed to register: "+project.name);
+            socket.emit('register project', {status:"failed, project already exists"});
+          }
+          else{
+            console.log("register project: "+ result[0]);
+            con.query("INSERT INTO projects (ID, NAME, SUMMARY, COMMITMENT, PLATFORMS, PLATFORM_DETAILS, STAGE, BUDGET, FUNDING, NATIONAL, FOUNDER) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, project.name, project.summary, project.commitment, JSON.stringify(project.platforms), project.platformDetails, project.stage, project.budget, project.funding, project.national, project.founder], function (err, result) {
+              if (err){
+                socket.emit('register project', {status:JSON.stringify(err)});
+              } 
+              console.log('registered project '+project.name+' successful');
+              socket.emit('register project', {status:"succesfull"});
+            });
+          }
+        });
     });
 
     socket.on('disconnect', function () {
