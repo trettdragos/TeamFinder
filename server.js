@@ -117,7 +117,21 @@ app.get('/', function(req, res) {
 
 app.get('/dashboard', function(req, res) {
   if(req.cookies.username){
-    res.render('pages/index.ejs', {email:req.cookies.username, tab:'1'});
+    con.query("SELECT * FROM projects LIMIT 25", function(err, projects, fields){
+      if(err) throw err;
+      for(i in projects){
+        projects[i].PLATFORMS = JSON.parse(projects[i].PLATFORMS);
+      }
+      con.query("SELECT * FROM teams LIMIT 25", function(err, teams, fields){
+        if(err) throw err;
+        for(i in teams){
+          teams[i].PLATFORMS = JSON.parse(teams[i].PLATFORMS);
+          teams[i].POSTS = JSON.parse(teams[i].POSTS);
+        }
+        var list = teams.concat(projects);
+        res.render('pages/index.ejs', {email:req.cookies.username, tab:'1', posts:list});
+      });
+    });
   }
   else{
     res.redirect('/login');

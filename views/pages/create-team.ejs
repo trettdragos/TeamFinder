@@ -104,41 +104,41 @@
       function submitTeam() {
           var e = document.getElementById("selNumber");
           var strUser = e.options[e.selectedIndex].value;
-          var posts = {};
+          var postsAUX = [];
           if(strUser === '2'){
-            posts = {
-              post1:{
+            postsAUX = [
+              {
                 name:document.getElementById('post1').value,
                 description:document.getElementById('post1description').value
               }
-            }
+            ];
           }else if(strUser === '3'){
-            posts = {
-              post1:{
+            postsAUX = [
+              {
                 name:document.getElementById('post1').value,
                 description:document.getElementById('post1description').value
               },
-              post2:{
+              {
                 name:document.getElementById('post2').value,
                 description:document.getElementById('post2description').value
               }
-            }
+              ];
           }
           else if(strUser === '4'){
-            posts = {
-              post1:{
+            postsAUX = [
+              {
                 name:document.getElementById('post1').value,
                 description:document.getElementById('post1description').value
               },
-              post2:{
+              {
                 name:document.getElementById('post2').value,
                 description:document.getElementById('post2description').value
               },
-              post3:{
+              {
                 name:document.getElementById('post3').value,
                 description:document.getElementById('post3description').value
               }
-            }
+              ];
           }
             var team = {
               name:document.getElementById('teamName').value,
@@ -155,7 +155,7 @@
                 webBack:webBack
               },
               nrMembers:strUser,
-              posts:posts,
+              posts:postsAUX,
               leader:$.cookie('username')
             }
             var isFormOk = true;
@@ -200,7 +200,7 @@
               document.getElementById('Platform').style.color = "red";
             }else{
               document.getElementById('Platform').style.color = "green";
-            }
+            }/*
             if(team.nrMembers==='2'){
               if(team.posts.post1.name===''){
                 isFormOk =false;
@@ -275,8 +275,7 @@
               }else{
                 document.getElementById('post3escription').style.borderColor = "green";
               } 
-            }
-            isFormOk = true;
+            }*/
             if(isFormOk)
               socket.emit('register team', team);
         }
