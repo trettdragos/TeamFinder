@@ -1,11 +1,9 @@
 var express = require('express');
 var app = express();
-var sleep = require('sleep');
 var path = require('path');
 var mysql = require('mysql');
-let cookieParser = require('cookie-parser');
-let bodyParser = require('body-parser');
-let xss = require('xss');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
 var server = require('http').createServer(app);
 var io = require('socket.io').listen(server, {
     log: false,
@@ -16,7 +14,7 @@ var io = require('socket.io').listen(server, {
 var con = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "password",
+  password: "",
   database: "TeamFinder"
 });
 
@@ -137,7 +135,7 @@ app.get('/', function(req, res) {
 });
 
 app.get('/dashboard', function(req, res) {
-  if(req.cookies.username){
+
     con.query("SELECT * FROM projects LIMIT 25", function(err, projects, fields){
       if(err) throw err;
       for(i in projects){
@@ -150,13 +148,10 @@ app.get('/dashboard', function(req, res) {
           teams[i].POSTS = JSON.parse(teams[i].POSTS);
         }
         var list = teams.concat(projects);
+        list.reverse();
         res.render('pages/index.ejs', {email:req.cookies.username, tab:'1', posts:list});
       });
     });
-  }
-  else{
-    res.redirect('/login');
-  }
 });
 
 app.get('/login', function(req, res){
