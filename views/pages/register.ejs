@@ -6,7 +6,7 @@
   </head>
 
   <body>
-    <% include ../partials/empty-header %>
+    <% include ../partials/login-register-header %>
     <div class="container">
       <div class="card card-container">
         <h4 style="text-align: center; margin-bottom: 15px;"><b>Register</b></h4>
@@ -71,8 +71,8 @@
         var socket = io.connect('localhost:3000');
         socket.on('auth register', function(res){
             if(res.status == "succesfull"){
-                $.cookie('username', res.email, { expires: 14, path: '/' });
-                window.location.href = '/dashboard';
+                //$.cookie('username', res.email, { expires: 14, path: '/' });
+                window.location.href = '/';
             }else{
                 document.getElementById("email").style.borderColor="red";
                 alert(res.status);

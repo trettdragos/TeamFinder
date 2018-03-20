@@ -77,7 +77,11 @@
             </b></h4>
           <p class="lead"><%= posts[i].SUMMARY %></p>
           <p class="lead">
-            <a class="btn btn-lg" href="#" role="button">Learn more</a>
+            <% if(posts[i].HACKATON){ %>
+            <a class="btn btn-lg" href="/teams/<%= posts[i].NAME %>" role="button">Learn more</a>
+            <% }else{ %>
+            <a class="btn btn-lg" href="/projects/<%= posts[i].NAME %>" role="button">Learn more</a>
+            <% } %>
           </p>
         </div>
       <% } %>

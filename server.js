@@ -5,6 +5,8 @@ var mysql = require('mysql');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var server = require('http').createServer(app);
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey('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');
 var io = require('socket.io').listen(server, {
     log: false,
     agent: false,
@@ -55,6 +57,15 @@ io.on('connection', function(socket) {
             con.query("INSERT INTO accounts (ID, USERNAME, EMAIL, PASSWORD, LINKEDIN, GITHUB, SKILLS) VALUES (?, ?, ?, ?, ?, ?, ?)", [0, user.name, user.email, user.password, user.linkedin, user.github, JSON.stringify(user.skills)], function (err, result) {
               if (err) throw err;
               socket.emit('auth register', {status:"succesfull", email:user.email});
+              var msg = {
+                to: 'trettdragos@gmail.com',
+                from: 'register@hacksquad.com',
+                subject: 'Please verify your email',
+                text: 'and easy to do anywhere, even with Node.js',
+                html: '<a href="localhost:3000/verification/'+user.email+'">localhost:3000/verification/'+user.email+'</a>',
+              };
+              sgMail.send(msg);
+              console.log('sent verification email');
             });
           }
         });
@@ -164,7 +175,7 @@ app.get('/logout', function(req, res){
 
 app.get('/settings', function(req, res){
   if(req.cookies.username){
-    res.render('pages/settings', {tab:'3'});
+    res.render('pages/settings', {tab:'4'});
   }
   else{
     res.redirect('/');
@@ -173,6 +184,14 @@ app.get('/settings', function(req, res){
 app.get('/projects', function(req, res){
     if(req.cookies.username){
     res.render('pages/projects', {tab:'2'});
+  }
+  else{
+    res.redirect('/');
+  }
+});
+app.get('/teams', function(req, res){
+    if(req.cookies.username){
+    res.render('pages/teams', {tab:'3 '});
   }
   else{
     res.redirect('/');
@@ -208,6 +227,28 @@ app.get('/:page', function(req, res){
   else {
     res.redirect('/');
   }
+});
+
+app.get('/projects/:project', function(req, res){
+  con.query("SELECT * FROM projects WHERE NAME = ? LIMIT 1", [req.params.project], function (err, result, fields) {
+      if (err) throw err;
+      if(result[0])    
+        res.send('shit working man '+result[0]);
+      else res.send('Error 404 project not found with the name '+req.params.project);
+  });
+});
+
+app.get('/teams/:team', function(req, res){
+ con.query("SELECT * FROM teams WHERE NAME = ? LIMIT 1", [req.params.team], function (err, result, fields) {
+      if (err) throw err;
+      if(result[0])    
+        res.send('shit working man '+result[0]);
+      else res.send('Error 404 team not found with the name '+req.params.team);
+  });
+});
+
+app.get('/verification/:accountToken', function(req, res){
+  res.send('thanks for verifing email '+ req.params.accountToken);
 });
 
 server.listen(3000);

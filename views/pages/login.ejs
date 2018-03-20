@@ -6,7 +6,7 @@
   </head>
 
   <body>
-    <% include ../partials/empty-header %>
+    <% include ../partials/login-register-header %>
     <div class="container">
       <div class="card card-container">
         <h4 style="text-align: center; margin-bottom: 15px;"><b>Login to Your Account</b></h4>
@@ -25,7 +25,14 @@
         </div>
     </div>
     <% include ../partials/footer %>
-
+    <script>
+      var user = $.cookie('username');
+      if(user){
+        $('#list').append('<li class="nav-item"><a class="nav-link" href="/dashboard">Search <i class="fas fa-home"></i></a></li><li class="nav-item"><a class="nav-link" href="/projects">Projects <i class="fas fa-user"></i></a></li><li class="nav-item"><a class="nav-link" href="/settings">Settings <i class="fas fa-cogs"></i></a></li><li class="nav-item"><a class="nav-link" id="logout" href="/logout">Logout <i class="fas fa-sign-out-alt"></i></a></li>');
+      }else{
+        $('#list').append('<li class="nav-item"><a class="nav-link" href="/dashboard">Search <i class="fas fa-home"></i></a></li><li class="nav-item"><a class="nav-link" id="logout" href="/register">Sign Up <i class="fas fa-user-plus"></i></a></li><li class="nav-item"><a class="nav-link" id="logout" href="/login">Login <i class="fas fa-sign-in-alt"></i></a></li>');
+      }
+    </script>
     <script>
         var socket = io.connect();
         socket.on('auth login', function(res){

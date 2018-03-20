@@ -15,7 +15,7 @@
               </a>
             </li>
             <li class="nav-item">
-              <% if(tab==='2'){ %>
+            <% if(tab==='2'){ %>
             <li class="nav-item active">
             <% }else{ %>
             <li class="nav-item">
@@ -23,8 +23,16 @@
               <a class="nav-link" href="/projects">Projects <i class="fas fa-user"></i>
               </a>
             </li>
+            <% if(tab==='3'){ %>
+            <li class="nav-item active">
+            <% }else{ %>
             <li class="nav-item">
-              <% if(tab==='3'){ %>
+            <% } %>
+              <a class="nav-link" href="/teams">Teams <i class="fas fa-user"></i>
+              </a>
+            </li>
+            <li class="nav-item">
+              <% if(tab==='4'){ %>
             <li class="nav-item active">
             <% }else{ %>
             <li class="nav-item">
