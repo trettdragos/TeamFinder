@@ -34,8 +34,12 @@ io.on('connection', function(socket) {
         con.query("SELECT * FROM accounts WHERE EMAIL = ? AND PASSWORD = ? LIMIT 1", [user.email, user.password], function (err, result, fields) {
           if (err) throw err;
           if(result[0]){
-            console.log("auth succesfull with user: "+user.email);
-            socket.emit('auth login', {status:"succesfull", email:user.email});
+            if(result[0].CONFIRMED=='1'){
+              console.log("auth succesfull with user: "+user.email);
+              socket.emit('auth login', {status:"succesfull", email:user.email});
+            }else{
+              socket.emit('auth login', {status:"account not verified", email:user.email})
+            }
           }
           else{
             console.log("auth failed for user: "+user.email);
@@ -54,7 +58,7 @@ io.on('connection', function(socket) {
           }
           else{
             console.log("registering user: "+user.name+" with the email: "+user.email);
-            con.query("INSERT INTO accounts (ID, USERNAME, EMAIL, PASSWORD, LINKEDIN, GITHUB, SKILLS) VALUES (?, ?, ?, ?, ?, ?, ?)", [0, user.name, user.email, user.password, user.linkedin, user.github, JSON.stringify(user.skills)], function (err, result) {
+            con.query("INSERT INTO accounts (ID, USERNAME, EMAIL, PASSWORD, LINKEDIN, GITHUB, SKILLS, CONFIRMED) VALUES (?, ?, ?, ?, ?, ?, ?, '0')", [0, user.name, user.email, user.password, user.linkedin, user.github, JSON.stringify(user.skills)], function (err, result) {
               if (err) throw err;
               socket.emit('auth register', {status:"succesfull", email:user.email});
               var msg = {
@@ -65,7 +69,7 @@ io.on('connection', function(socket) {
                 html: '<a href="localhost:3000/verification/'+user.email+'">localhost:3000/verification/'+user.email+'</a>',
               };
               sgMail.send(msg);
-              console.log('sent verification email');
+              console.log('sent verification email to '+user.email);
             });
           }
         });
@@ -264,9 +268,9 @@ app.get('/teams/:team', function(req, res){
   });
 });
 
-app.get('/verification/:accountToken', function(req, res){
-  res.send('thanks for verifing email '+ req.params.accountToken);
-});
+let verification = require('./routes/verification')
+
+app.use('/verification', verification);
 
 server.listen(3000);
 
