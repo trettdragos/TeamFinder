@@ -182,8 +182,16 @@ app.get('/settings', function(req, res){
   }
 });
 app.get('/projects', function(req, res){
-    if(req.cookies.username){
-    res.render('pages/projects', {tab:'2'});
+  if(req.cookies.username){
+    con.query("SELECT * FROM projects LIMIT 25", function(err, projects, fields){
+      if(err) throw err;
+      for(i in projects){
+        projects[i].PLATFORMS = getPlatformString(JSON.parse(projects[i].PLATFORMS));
+      }
+      var list = projects;
+      list.reverse();
+      res.render('pages/projects.ejs', {email:req.cookies.username, tab:'2', posts:list});
+    });
   }
   else{
     res.redirect('/');
@@ -191,7 +199,16 @@ app.get('/projects', function(req, res){
 });
 app.get('/teams', function(req, res){
     if(req.cookies.username){
-    res.render('pages/teams', {tab:'3 '});
+      con.query("SELECT * FROM teams LIMIT 25", function(err, teams, fields){
+        if(err) throw err;
+        for(i in teams){
+          teams[i].PLATFORMS = getPlatformString(JSON.parse(teams[i].PLATFORMS));
+          teams[i].POSTS = JSON.parse(teams[i].POSTS);
+        }
+        var list = teams;
+        list.reverse();
+        res.render('pages/teams', {email:req.cookies.username, tab:'3', posts:list});
+      });
   }
   else{
     res.redirect('/');
