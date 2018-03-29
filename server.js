@@ -28,96 +28,174 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 
 io.on('connection', function(socket) {
-    console.log('Client connected...'+socket.id);
+  console.log('Client connected...'+socket.id);
+  socket.on('auth login',function (user) {
+      con.query("SELECT * FROM accounts WHERE EMAIL = ? AND PASSWORD = ? LIMIT 1", [user.email, user.password], function (err, result, fields) {
+        if (err) throw err;
+        if(result[0]){
+          if(result[0].CONFIRMED=='1'){
+            console.log("auth succesfull with user: "+user.email);
+            socket.emit('auth login', {status:"succesfull", email:user.email});
+          }else{
+            socket.emit('auth login', {status:"account not verified", email:user.email})
+          }
+        }
+        else{
+          console.log("auth failed for user: "+user.email);
+          socket.emit('auth login', {status:"failed", email:user.email});
+        }
+      });
+  });
+  socket.on('auth register', function(user){
+    console.log("checking if user: "+user.email+" is already in the db...")
+    con.query("SELECT * FROM accounts WHERE EMAIL = ? LIMIT 1", [user.email], function (err, result, fields) {
+        if (err) throw err;
+        if(result[0]){
+          console.log("user with email "+user.email+" already exists");
+          socket.emit('auth register', {status:"Email already used.", email:user.email});
+        }
+        else{
+          console.log("registering user: "+user.name+" with the email: "+user.email);
+          con.query("INSERT INTO accounts (ID, USERNAME, EMAIL, PASSWORD, LINKEDIN, GITHUB, SKILLS, CONFIRMED) VALUES (?, ?, ?, ?, ?, ?, ?, '0')", [0, user.name, user.email, user.password, user.linkedin, user.github, JSON.stringify(user.skills)], function (err, result) {
+            if (err) throw err;
+            socket.emit('auth register', {status:"succesfull", email:user.email});
+            var msg = {
+              to: 'trettdragos@gmail.com',
+              from: 'register@hacksquad.com',
+              subject: 'Please verify your email',
+              text: 'and easy to do anywhere, even with Node.js',
+              html: '<a href="localhost:3000/verification/'+user.email+'">localhost:3000/verification/'+user.email+'</a>',
+            };
+            sgMail.send(msg);
+          console.log('sent verification email to '+user.email);
+        });
+      }
+    });
+  });
 
-    socket.on('auth login',function (user) {
-        con.query("SELECT * FROM accounts WHERE EMAIL = ? AND PASSWORD = ? LIMIT 1", [user.email, user.password], function (err, result, fields) {
-          if (err) throw err;
-          if(result[0]){
-            if(result[0].CONFIRMED=='1'){
-              console.log("auth succesfull with user: "+user.email);
-              socket.emit('auth login', {status:"succesfull", email:user.email});
+  socket.on('register team', function(team){
+    console.log('checking if team...'+team.name+ ' is in db');
+    con.query("SELECT * FROM teams WHERE NAME = ? LIMIT 1", [team.name], function (err, result, fields) {
+        if (err) throw err;
+        if(result[0]){
+          console.log("team failed to register: "+team.name);
+          socket.emit('register team', {status:"failed, team already exists"});
+        }
+        else{
+          console.log("register team: "+ result[0]);
+          con.query("INSERT INTO teams (ID, NAME, SUMMARY, HACKATON, SECTION, START_DATE, END_DATE, PLATFORMS, NR_MEMBERS, POSTS, LEADER) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, team.name, team.summary, team.hackaton, team.section, team.startDate, team.endDate, JSON.stringify(team.platforms), team.nrMembers, JSON.stringify(team.posts), team.leader], function (err, result) {
+            if (err){
+              socket.emit('register team', {status:JSON.stringify(err)});
+            } 
+            console.log('registered team '+team.name+' successful');
+            socket.emit('register team', {status:"succesfull"});
+          });
+        }
+      });
+  });
+
+  socket.on('register project', function(project){
+    console.log('checking if project...'+project.name+ ' is in db');
+    con.query("SELECT * FROM projects WHERE NAME = ? LIMIT 1", [project.name], function (err, result, fields) {
+        if (err) throw err;
+        if(result[0]){
+          console.log("project failed to register: "+project.name);
+          socket.emit('register project', {status:"failed, project already exists"});
+        }
+        else{
+          console.log("register project: "+ result[0]);
+          con.query("INSERT INTO projects (ID, NAME, SUMMARY, COMMITMENT, PLATFORMS, PLATFORM_DETAILS, STAGE, BUDGET, FUNDING, NATIONAL, FOUNDER) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, project.name, project.summary, project.commitment, JSON.stringify(project.platforms), project.platformDetails, project.stage, project.budget, project.funding, project.national, project.founder], function (err, result) {
+            if (err){
+              socket.emit('register project', {status:JSON.stringify(err)});
+            } 
+            console.log('registered project '+project.name+' successful');
+            socket.emit('register project', {status:"succesfull"});
+          });
+        }
+      });
+  });
+
+  socket.on('request join team', function(req){
+    console.log("client "+ req.username + " requested to join team "+ req.teamName +" of user "+req.leader+ " with token "+ req.token);
+    con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ? LIMIT 1", [req.leader], function(err, result, fields) {
+      if(err) throw err;
+      if(result){
+        var notifications = JSON.parse(result[0].NOTIFICATION);
+        var newReq = {
+          "user": req.username,
+          "vis": "false",
+          "type": "team",
+          "name": req.teamName
+        };
+        var reqtest= JSON.stringify(newReq);
+        var isValid = true;
+        for(var i in notifications){
+          if(reqtest===JSON.stringify(notifications[i])){
+            socket.emit('request join team', {status:"already requested"});
+            console.log("failed to send request, already exists");
+            isValid = false;
+            break;
+          }
+        }
+        if(isValid){
+          notifications.push(newReq);
+          var notifTxt = JSON.stringify(notifications);
+          con.query("UPDATE accounts SET NOTIFICATION = ? WHERE EMAIL = ?" , [notifTxt, req.leader], function(err, result){
+            if (err) throw err;
+            if(result.affectedRows==0){
+              socket.emit('request join team', {status:"failed"});
+              console.log('failed to register request to team leader ' + req.leader + " from user "+ req.username+" in team "+req.teamName);
             }else{
-              socket.emit('auth login', {status:"account not verified", email:user.email})
+              console.log('succesfully registered request to team leader ' + req.leader + " from user "+ req.username+" in team "+req.teamName);
+              socket.emit('request join team', {status:"succesfull"});
             }
-          }
-          else{
-            console.log("auth failed for user: "+user.email);
-            socket.emit('auth login', {status:"failed", email:user.email});
-          }
-        });
+          }); 
+        }        
+      }
     });
+  });
 
-    socket.on('auth register', function(user){
-      console.log("checking if user: "+user.email+" is already in the db...")
-      con.query("SELECT * FROM accounts WHERE EMAIL = ? LIMIT 1", [user.email], function (err, result, fields) {
-          if (err) throw err;
-          if(result[0]){
-            console.log("user with email "+user.email+" already exists");
-            socket.emit('auth register', {status:"Email already used.", email:user.email});
+  socket.on('request join project', function(req){
+    console.log("client "+ req.username + " requested to join project "+ req.projectName +" of user "+req.leader+ " with token "+ req.token);
+    con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ? LIMIT 1", [req.leader], function(err, result, fields) {
+      if(err) throw err;
+      if(result){
+        var notifications = JSON.parse(result[0].NOTIFICATION);
+        var newReq = {
+          "user": req.username,
+          "vis": "false",
+          "type": "projet",
+          "name": req.projectName
+        };
+        var reqtest= JSON.stringify(newReq);
+        var isValid = true;
+        for(var i in notifications){
+          if(reqtest===JSON.stringify(notifications[i])){
+            socket.emit('request join team', {status:"already requested"});
+            console.log("failed to send request, already exists");
+            isValid = false;
+            break;
           }
-          else{
-            console.log("registering user: "+user.name+" with the email: "+user.email);
-            con.query("INSERT INTO accounts (ID, USERNAME, EMAIL, PASSWORD, LINKEDIN, GITHUB, SKILLS, CONFIRMED) VALUES (?, ?, ?, ?, ?, ?, ?, '0')", [0, user.name, user.email, user.password, user.linkedin, user.github, JSON.stringify(user.skills)], function (err, result) {
-              if (err) throw err;
-              socket.emit('auth register', {status:"succesfull", email:user.email});
-              var msg = {
-                to: 'trettdragos@gmail.com',
-                from: 'register@hacksquad.com',
-                subject: 'Please verify your email',
-                text: 'and easy to do anywhere, even with Node.js',
-                html: '<a href="localhost:3000/verification/'+user.email+'">localhost:3000/verification/'+user.email+'</a>',
-              };
-              sgMail.send(msg);
-              console.log('sent verification email to '+user.email);
-            });
-          }
-        });
+        }
+        if(isValid){
+          notifications.push(newReq);
+          var notifTxt = JSON.stringify(notifications);
+          con.query("UPDATE accounts SET NOTIFICATION = ? WHERE EMAIL = ?" , [notifTxt, req.leader], function(err, result){
+            if (err) throw err;
+            if(result.affectedRows==0){
+              socket.emit('request join project', {status:"failed"});
+              console.log('failed to register request to team leader ' + req.leader + " from user "+ req.username+" in team "+req.teamName);
+            }else{
+              console.log('succesfully registered request to team leader ' + req.leader + " from user "+ req.username+" in team "+req.teamName);
+              socket.emit('request join project', {status:"succesfull"});
+            }
+          }); 
+        }        
+      }
     });
+  });
 
-    socket.on('register team', function(team){
-      console.log('checking if team...'+team.name+ ' is in db');
-      con.query("SELECT * FROM teams WHERE NAME = ? LIMIT 1", [team.name], function (err, result, fields) {
-          if (err) throw err;
-          if(result[0]){
-            console.log("team failed to register: "+team.name);
-            socket.emit('register team', {status:"failed, team already exists"});
-          }
-          else{
-            console.log("register team: "+ result[0]);
-            con.query("INSERT INTO teams (ID, NAME, SUMMARY, HACKATON, SECTION, START_DATE, END_DATE, PLATFORMS, NR_MEMBERS, POSTS, LEADER) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, team.name, team.summary, team.hackaton, team.section, team.startDate, team.endDate, JSON.stringify(team.platforms), team.nrMembers, JSON.stringify(team.posts), team.leader], function (err, result) {
-              if (err){
-                socket.emit('register team', {status:JSON.stringify(err)});
-              } 
-              console.log('registered team '+team.name+' successful');
-              socket.emit('register team', {status:"succesfull"});
-            });
-          }
-        });
-    });
-
-    socket.on('register project', function(project){
-      console.log('checking if project...'+project.name+ ' is in db');
-      con.query("SELECT * FROM projects WHERE NAME = ? LIMIT 1", [project.name], function (err, result, fields) {
-          if (err) throw err;
-          if(result[0]){
-            console.log("project failed to register: "+project.name);
-            socket.emit('register project', {status:"failed, project already exists"});
-          }
-          else{
-            console.log("register project: "+ result[0]);
-            con.query("INSERT INTO projects (ID, NAME, SUMMARY, COMMITMENT, PLATFORMS, PLATFORM_DETAILS, STAGE, BUDGET, FUNDING, NATIONAL, FOUNDER) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, project.name, project.summary, project.commitment, JSON.stringify(project.platforms), project.platformDetails, project.stage, project.budget, project.funding, project.national, project.founder], function (err, result) {
-              if (err){
-                socket.emit('register project', {status:JSON.stringify(err)});
-              } 
-              console.log('registered project '+project.name+' successful');
-              socket.emit('register project', {status:"succesfull"});
-            });
-          }
-        });
-    });
-
-    socket.on('disconnect', function () {
+  socket.on('disconnect', function () {
       console.log("Client disconected..."+ socket.id);
   });
 });

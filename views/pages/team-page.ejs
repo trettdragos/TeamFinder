@@ -33,40 +33,44 @@
         <div class="row">
           <div class="col-lg-12">
             <div class="jumbotron" style="margin-top: 10px;">
-              <h2><b><%= team.NAME %> - team for Hackaton <%= team.HACKATON %></b></h2>
+              <h4 id="titleTeam"><b><%= team.NAME %> - team for Hackaton <%= team.HACKATON %></b></h4>
               <hr class="my-4">
               <label for="comment">Team's Purpose</label>
-              <h3><%= team.SUMMARY %></h3>
+              <h5><%= team.SUMMARY %></h5>
             </div>
             <div class="row">
               <div class="col-6">
                 <div class="jumbotron" style="margin-top: 10px; height: 90%;">
-                  <h3><b>Hackaton - <%= team.HACKATON %></b></h3>
+                  <h4><b>Hackaton - <%= team.HACKATON %></b></h4>
                   <hr class="my-4">
                   <label for="comment">Section</label>
-                  <h4><%= team.SECTION %></h4>
+                  <h5><%= team.SECTION %></h5>
                   <label for="comment">Start Date</label>
-                  <h4><%= team.START_DATE %></h4>
+                  <h5><%= team.START_DATE %></h5>
                   <label for="comment">End Date</label>
-                  <h4><%= team.END_DATE %></h4>
+                  <h5><%= team.END_DATE %></h5>
                   <label for="comment">Platforms</label>
-                  <h4><%= team.PLATFORMS %></h4>
+                  <h5><%= team.PLATFORMS %></h5>
                 </div>
               </div>
               <div class="col-6">
                 <div class="jumbotron" style="margin-top: 10px; height: 90%;">
-                  <h3><b>Number of current members: <%= team.NR_MEMBERS %></b></h3>
+                  <h4><b>Number of current members: <%= team.NR_MEMBERS %></b></h4>
                   <hr class="my-4">
                   <label for="comment">Founder</label>
-                  <h4><%= team.LEADER %></h4>
+                  <h5><%= team.LEADER %></h5>
                   <label for="comment">Other Members:</label>
                   <% if(!team.POST){ %>
-                  <h4>none</h4>
+                  <h5>none</h5>
                   <% }else{ %>
-                  <h4><%= team.POSTS %></h4>
+                  <h5><%= team.POSTS %></h5>
                   <% } %>
+                  <% if(email!=team.LEADER){ %>
                   <label for="comment">Press the button to join the team</label><br>  
                   <button class="btn" id="join" style="width: 150px; height: 20%; font-size: 200%;"><b>Join</b></button>
+                  <% }else{ %>
+                  <h5>You are the Founder of this team</h5>
+                  <% } %>
                 </div>
               </div>
             </div>
@@ -74,10 +78,22 @@
           </div>
         </div>
       </div>
+      <h1 style="display: none" id="teamNAME"><%= team.NAME %></h1>
     <script type="text/javascript">
       $("#join").on('click', function () {
-        alert('A request was sent to the leader. Please wait for confirmation')
-        window.location.replace("/");
+        var socket = io.connect();
+        var teamname = <%- JSON.stringify(team.NAME) %>;
+        var leadern = <%- JSON.stringify(team.LEADER) %>;
+        socket.emit('request join team', {username:$.cookie('username'), teamName:teamname, leader:leadern, token:'alabalaportocala'});
+        socket.on('request join team', function(res){
+          if(res.status==="succesfull"){
+            alert('A request was sent to the leader. Please wait for confirmation');
+            window.location.replace("/dashboard");
+          }else{
+            alert('An error has occurred:'+ res.status);
+          }      
+        });
+
       });
     </script>
   </body>

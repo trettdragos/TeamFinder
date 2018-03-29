@@ -33,44 +33,58 @@
         <div class="row">
           <div class="col-lg-12">
             <div class="jumbotron" style="margin-top: 10px;">
-              <h2><b><%= project.NAME %> - project for Hackaton <%= project.HACKATON %></b></h2>
+              <h4><b><%= project.NAME %></b></h4>
               <hr class="my-4">
               <label for="comment" project's Purpose</label>
-              <h3><%= project.SUMMARY %></h3>
+              <h5><%= project.SUMMARY %></h5>
             </div>
             <div class="row">
               <div class="col-6">
                 <div class="jumbotron" style="margin-top: 10px; height: 90%;">
-                  <h3><b>More details</b></h3>
+                  <h4><b>More details</b></h4>
                   <hr class="my-4">
                   <label for="comment">Commitment</label>
-                  <h4><%= project.COMMITMENT %></h4>
+                  <h5><%= project.COMMITMENT %></h5>
                   <label for="comment">Platforms</label>
-                  <h4><%= project.PLATFORMS %></h4>
+                  <h5><%= project.PLATFORMS %></h5>
                   <label for="comment">Platform details</label>
-                  <h4><%= project.PLATFORM_DETAILS %></h4>
+                  <h5><%= project.PLATFORM_DETAILS %></h5>
                   <label for="comment">Stage</label>
-                  <h4><%= project.STAGE %></h4>
+                  <h5><%= project.STAGE %></h5>
                   <label for="comment">Budget</label>
-                  <h4><%= project.BUDGET %></h4>
+                  <h5><%= project.BUDGET %></h5>
                 </div>
               </div>
               <div class="col-6">
                 <div class="jumbotron" style="margin-top: 10px; height: 90%;">
-                  <h3><b>Development details</b></h3>
+                  <h4><b>Development details</b></h4>
                   <hr class="my-4">
                   <label for="comment">Has funding?</label>
                   <% if(project.FUNDING==='0'){ %>
-                  <h4><b>NO</b></h4>
+                  <h5><b>NO</b></h5>
                   <% }else{ %>
-                  <h4><b>YES</b></h4>
+                  <h5><b>YES</b></h5>
                   <% } %>
                   <label for="comment">Founder</label>
-                  <h4><%= project.FOUNDER %></h4>
+                  <h5><%= project.FOUNDER %></h5>
                   <label for="comment">Country for development</label>
-                  <h4><%= project.NATIONAL %></h4>
-                  <label for="comment">Press the button to join the project</label><br>  
-                  <button class="btn" id="join" style="width: 25%; height: 15%; font-size: 200%; margin-left: 5%;"><b>Join</b></button>
+                  <% if(project.NATIONAL){ %>
+                  <h5><%= project.NATIONAL %></h5>
+                  <% }else{ %>
+                  <h5>Everywhere</h5>
+                  <% } %>
+                  <label for="comment">Collaborators</label>
+                  <% if(project.COLLABORATORS){ %>
+                  <h5><%= project.COLLABORATORS %></h5>
+                  <% }else{ %>
+                  <h5>none yet</h5>
+                  <% } %>
+                  <% if(email!=project.FOUNDER){ %>
+                  <center>
+                  <button class="btn" id="join" style="width: 150px; height: 15%; font-size: 200%; margin-left: 5%; margin-top: 5%;"><b>Join</b></button></center>
+                  <% }else{ %>
+                  <h5>You are the Founder of this project</h5>
+                  <% } %>
                 </div>
               </div>
             </div>
@@ -80,8 +94,19 @@
       </div>
     <script type="text/javascript">
       $("#join").on('click', function () {
-        alert('A request was sent to the leader. Please wait for confirmation')
-        window.location.replace("/");
+        var socket = io.connect();
+        var teamname = <%- JSON.stringify(project.NAME) %>;
+        var leadern = <%- JSON.stringify(project.FOUNDER) %>;
+        socket.emit('request join project', {username:$.cookie('username'), projectName:teamname, leader:leadern, token:'alabalaportocala'});
+        socket.on('request join project', function(res){
+          if(res.status==="succesfull"){
+            alert('A request was sent to the leader. Please wait for confirmation');
+            window.location.replace("/dashboard");
+          }else{
+            alert('An error has occurred:'+ res.status);
+          }      
+        });
+
       });
     </script>
   </body>
