@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <% include ../partials/head %>
+    <link href="search-bar.css" rel="stylesheet">
+    <style type="text/css">
+      .jumbotron{
+        box-shadow: 2px 8px 16px -8px black;
+        padding: 2%;
+      }
+    </style>
+  </head>
+  <body>
+    <% if(!email){ %>
+    <% include ../partials/dashboard-header.ejs %>
+    <% } else { %>
+    <% include ../partials/header.ejs %>
+    <% } %>
+    <% include ../partials/footer %>
+    <script>
+
+  </body>
+
+</html>

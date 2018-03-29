@@ -160,7 +160,6 @@ app.get('/dashboard', function(req, res) {
         if(err) throw err;
         for(i in teams){
           teams[i].PLATFORMS = getPlatformString(JSON.parse(teams[i].PLATFORMS));
-          teams[i].POSTS = JSON.parse(teams[i].POSTS);
         }
         var list = teams.concat(projects);
         list.reverse();
@@ -207,7 +206,6 @@ app.get('/teams', function(req, res){
         if(err) throw err;
         for(i in teams){
           teams[i].PLATFORMS = getPlatformString(JSON.parse(teams[i].PLATFORMS));
-          teams[i].POSTS = JSON.parse(teams[i].POSTS);
         }
         var list = teams;
         list.reverse();
@@ -230,7 +228,7 @@ app.get('/createProject', function(req, res){
 
 app.get('/createTeam', function(req, res){
     if(req.cookies.username){
-    res.render('pages/create-team', {tab:'2'});
+    res.render('pages/create-team', {tab:'3'});
   }
   else{
     res.redirect('/');
@@ -254,7 +252,7 @@ app.get('/projects/:project', function(req, res){
   con.query("SELECT * FROM projects WHERE NAME = ? LIMIT 1", [req.params.project], function (err, result, fields) {
       if (err) throw err;
       if(result[0])    
-        res.send('shit working man '+result[0]);
+        res.render('pages/project-page', {email:req.cookies.username, tab:'2', project:result[0]});
       else res.send('Error 404 project not found with the name '+req.params.project);
   });
 });
@@ -262,8 +260,10 @@ app.get('/projects/:project', function(req, res){
 app.get('/teams/:team', function(req, res){
  con.query("SELECT * FROM teams WHERE NAME = ? LIMIT 1", [req.params.team], function (err, result, fields) {
       if (err) throw err;
-      if(result[0])    
-        res.send('shit working man '+result[0]);
+      if(result[0]){   
+        result[0].PLATFORMS = getPlatformString(JSON.parse(result[0].PLATFORMS))
+        res.render('pages/team-page', {email:req.cookies.username, tab:'3', team:result[0]});
+      }
       else res.send('Error 404 team not found with the name '+req.params.team);
   });
 });

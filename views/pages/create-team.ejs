@@ -62,15 +62,6 @@
               </div>
             </div>
             <div class="jumbotron" style="margin-top: 10px;">
-              <h4>About team members</h4>
-              <label for="exampleFormControlSelect1">How many members, including yourself, do you want?</label>
-               <select onchange="change()" class="form-control" id="selNumber">
-                <option>2</option>
-                <option>3</option>
-                <option>4</option>
-              </select>
-              <div id="jobs"><hr class="my-4"><h4>Post #1</h4><label>Post Name</label><input type="text" class="form-control" id="post1" placeholder="Job name"><label>Post detailed description</label><input type="text" class="form-control" id="post1description" placeholder="Job description"></div>
-              <hr class="my-4">
               <center>
                 <button class="btn btn-lg" id="submit" type="button" style="width: 150px; height: 75px; font-size: 200%;"><b>Submit</b></button>
               </center>
@@ -102,44 +93,7 @@
          submitTeam();    
         });
       function submitTeam() {
-          var e = document.getElementById("selNumber");
-          var strUser = e.options[e.selectedIndex].value;
-          var postsAUX = [];
-          if(strUser === '2'){
-            postsAUX = [
-              {
-                name:document.getElementById('post1').value,
-                description:document.getElementById('post1description').value
-              }
-            ];
-          }else if(strUser === '3'){
-            postsAUX = [
-              {
-                name:document.getElementById('post1').value,
-                description:document.getElementById('post1description').value
-              },
-              {
-                name:document.getElementById('post2').value,
-                description:document.getElementById('post2description').value
-              }
-              ];
-          }
-          else if(strUser === '4'){
-            postsAUX = [
-              {
-                name:document.getElementById('post1').value,
-                description:document.getElementById('post1description').value
-              },
-              {
-                name:document.getElementById('post2').value,
-                description:document.getElementById('post2description').value
-              },
-              {
-                name:document.getElementById('post3').value,
-                description:document.getElementById('post3description').value
-              }
-              ];
-          }
+          
             var team = {
               name:document.getElementById('teamName').value,
               summary:document.getElementById('purpose').value,
@@ -154,8 +108,8 @@
                 WebFront:webFront,
                 webBack:webBack
               },
-              nrMembers:strUser,
-              posts:postsAUX,
+              nrMembers:1,
+              posts:'',
               leader:$.cookie('username')
             }
             var isFormOk = true;
@@ -200,82 +154,7 @@
               document.getElementById('Platform').style.color = "red";
             }else{
               document.getElementById('Platform').style.color = "green";
-            }/*
-            if(team.nrMembers==='2'){
-              if(team.posts.post1.name===''){
-                isFormOk =false;
-                document.getElementById('post1').style.borderColor = "red";
-              }else{
-                document.getElementById('post1').style.borderColor = "green";
-              }
-              if(team.posts.post1.description===''){
-                isFormOk = false;
-                document.getElementById('post1description').style.borderColor = "red";
-              }else{
-                document.getElementById('post1description').style.borderColor = "green";
-              } 
-            }else if(team.nrMembers === '3'){
-              if(team.posts.post1.name===''){
-                isFormOk =false;
-                document.getElementById('post1').style.borderColor = "red";
-              }else{
-                document.getElementById('post1').style.borderColor = "green";
-              }
-              if(team.posts.post1.description===''){
-                isFormOk = false;
-                document.getElementById('post1description').style.borderColor = "red";
-              }else{
-                document.getElementById('post1description').style.borderColor = "green";
-              } 
-              if(team.posts.post2.name===''){
-                isFormOk =false;
-                document.getElementById('post2').style.borderColor = "red";
-              }else{
-                document.getElementById('post2').style.borderColor = "green";
-              }
-              if(team.posts.post2.description===''){
-                isFormOk = false;
-                document.getElementById('post2description').style.borderColor = "red";
-              }else{
-                document.getElementById('post2description').style.borderColor = "green";
-              } 
-            }else if(team.nrMembers === '4'){
-              if(team.posts.post1.name===''){
-                isFormOk =false;
-                document.getElementById('post1').style.borderColor = "red";
-              }else{
-                document.getElementById('post1').style.borderColor = "green";
-              }
-              if(team.posts.post1.description===''){
-                isFormOk = false;
-                document.getElementById('post1description').style.borderColor = "red";
-              }else{
-                document.getElementById('post1description').style.borderColor = "green";
-              } 
-              if(team.posts.post2.name===''){
-                isFormOk =false;
-                document.getElementById('post2').style.borderColor = "red";
-              }else{
-                document.getElementById('post2').style.borderColor = "green";
-              }
-              if(team.posts.post2.description===''){
-                isFormOk = false;
-                document.getElementById('post2description').style.borderColor = "red";
-              }else{
-                document.getElementById('post2description').style.borderColor = "green";
-              }if(team.posts.post3.name===''){
-                isFormOk =false;
-                document.getElementById('post3').style.borderColor = "red";
-              }else{
-                document.getElementById('post3').style.borderColor = "green";
-              }
-              if(team.posts.post3.description===''){
-                isFormOk = false;
-                document.getElementById('post3description').style.borderColor = "red";
-              }else{
-                document.getElementById('post3escription').style.borderColor = "green";
-              } 
-            }*/
+            }
             if(isFormOk)
               socket.emit('register team', team);
         }
@@ -293,17 +172,6 @@
         
       });
 
-      function change(){
-        var e = document.getElementById("selNumber");
-        var strUser = e.options[e.selectedIndex].text;
-        if(strUser === '2'){
-          document.getElementById("jobs").innerHTML = '<hr class="my-4"><h4>Post #1</h4><label>Post Name</label><input type="text" class="form-control" id="post1" placeholder="Job name"><label>Post detailed description</label><input type="text" class="form-control" id="post1description" placeholder="Job description">'
-        }else if(strUser === '3'){
-          document.getElementById("jobs").innerHTML = '<hr class="my-4"><h4>Post #1</h4><label>Post Name</label><input type="text" class="form-control" id="post1" placeholder="Job name"><label>Post detailed description</label><input type="text" class="form-control" id="post1description" placeholder="Job description"><hr class="my-4"><h4>Post #2</h4><label>Post Name</label><input type="text" class="form-control" id="post2" placeholder="Job name"><label>Post detailed description</label><input type="text" class="form-control" id="post2description" placeholder="Job description">'
-        }else{
-            document.getElementById("jobs").innerHTML = '<hr class="my-4"><h4>Post #1</h4><label>Post Name</label><input type="text" class="form-control" id="post1" placeholder="Job name"><label>Post detailed description</label><input type="text" class="form-control" id="post1description" placeholder="Job description"><hr class="my-4"><h4>Post #2</h4><label>Post Name</label><input type="text" class="form-control" id="post2" placeholder="Job name"><label>Post detailed description</label><input type="text" class="form-control" id="post2description" placeholder="Job description"><hr class="my-4"><h4>Post #3</h4><label>Post Name</label><input type="text" class="form-control" id="post3" placeholder="Job name"><label>Post detailed description</label><input type="text" class="form-control" id="post3description" placeholder="Job description">'
-        }
-      };
 
       (function() {
         document.getElementById("android").onclick = function() { 
