@@ -4,10 +4,21 @@
   <head>
     <% include ../partials/head %>
     <link href="search-bar.css" rel="stylesheet">
+    <link href="button-style.css" rel="stylesheet" type="text/css">
     <style type="text/css">
       .jumbotron{
         box-shadow: 2px 8px 16px -8px black;
         padding: 2%;
+      }
+      .btn{
+        background-color: #343a40; 
+        border-color: #343a40; 
+        color: #00e500;
+      }
+      .btn:hover{
+        background-color: #343a40; 
+        border-color: #00e500; 
+        color: #00e500;
       }
     </style>
   </head>
@@ -18,8 +29,61 @@
     <% include ../partials/header.ejs %>
     <% } %>
     <% include ../partials/footer %>
-    <script>
-
+    <div class="container"> 
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="jumbotron" style="margin-top: 10px;">
+              <h2><b><%= project.NAME %> - project for Hackaton <%= project.HACKATON %></b></h2>
+              <hr class="my-4">
+              <label for="comment" project's Purpose</label>
+              <h3><%= project.SUMMARY %></h3>
+            </div>
+            <div class="row">
+              <div class="col-6">
+                <div class="jumbotron" style="margin-top: 10px; height: 90%;">
+                  <h3><b>More details</b></h3>
+                  <hr class="my-4">
+                  <label for="comment">Commitment</label>
+                  <h4><%= project.COMMITMENT %></h4>
+                  <label for="comment">Platforms</label>
+                  <h4><%= project.PLATFORMS %></h4>
+                  <label for="comment">Platform details</label>
+                  <h4><%= project.PLATFORM_DETAILS %></h4>
+                  <label for="comment">Stage</label>
+                  <h4><%= project.STAGE %></h4>
+                  <label for="comment">Budget</label>
+                  <h4><%= project.BUDGET %></h4>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="jumbotron" style="margin-top: 10px; height: 90%;">
+                  <h3><b>Development details</b></h3>
+                  <hr class="my-4">
+                  <label for="comment">Has funding?</label>
+                  <% if(project.FUNDING==='0'){ %>
+                  <h4><b>NO</b></h4>
+                  <% }else{ %>
+                  <h4><b>YES</b></h4>
+                  <% } %>
+                  <label for="comment">Founder</label>
+                  <h4><%= project.FOUNDER %></h4>
+                  <label for="comment">Country for development</label>
+                  <h4><%= project.NATIONAL %></h4>
+                  <label for="comment">Press the button to join the project</label><br>  
+                  <button class="btn" id="join" style="width: 25%; height: 15%; font-size: 200%; margin-left: 5%;"><b>Join</b></button>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+    <script type="text/javascript">
+      $("#join").on('click', function () {
+        alert('A request was sent to the leader. Please wait for confirmation')
+        window.location.replace("/");
+      });
+    </script>
   </body>
 
 </html>

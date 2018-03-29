@@ -181,7 +181,7 @@ app.get('/settings', function(req, res){
     res.render('pages/settings', {tab:'4'});
   }
   else{
-    res.redirect('/');
+    res.redirect('/login');
   }
 });
 app.get('/projects', function(req, res){
@@ -197,7 +197,7 @@ app.get('/projects', function(req, res){
     });
   }
   else{
-    res.redirect('/');
+    res.redirect('/login');
   }
 });
 app.get('/teams', function(req, res){
@@ -213,7 +213,7 @@ app.get('/teams', function(req, res){
       });
   }
   else{
-    res.redirect('/');
+    res.redirect('/login');
   }
 });
 
@@ -222,7 +222,7 @@ app.get('/createProject', function(req, res){
     res.render('pages/create-project', {tab:'2'});
   }
   else{
-    res.redirect('/');
+    res.redirect('/login');
   }
 });
 
@@ -231,7 +231,7 @@ app.get('/createTeam', function(req, res){
     res.render('pages/create-team', {tab:'3'});
   }
   else{
-    res.redirect('/');
+    res.redirect('/login');
   }
 });
 
@@ -249,15 +249,20 @@ app.get('/:page', function(req, res){
 });
 
 app.get('/projects/:project', function(req, res){
+  if(!req.cookies.username) res.redirect('/login');
   con.query("SELECT * FROM projects WHERE NAME = ? LIMIT 1", [req.params.project], function (err, result, fields) {
       if (err) throw err;
-      if(result[0])    
+      if(result[0]) {
+        result[0].PLATFORMS = getPlatformString(JSON.parse(result[0].PLATFORMS))   
         res.render('pages/project-page', {email:req.cookies.username, tab:'2', project:result[0]});
+      }
       else res.send('Error 404 project not found with the name '+req.params.project);
   });
 });
 
 app.get('/teams/:team', function(req, res){
+  if(!req.cookies.username)
+    res.redirect('/login');
  con.query("SELECT * FROM teams WHERE NAME = ? LIMIT 1", [req.params.team], function (err, result, fields) {
       if (err) throw err;
       if(result[0]){   
