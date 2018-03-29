@@ -171,7 +171,7 @@ io.on('connection', function(socket) {
         var isValid = true;
         for(var i in notifications){
           if(reqtest===JSON.stringify(notifications[i])){
-            socket.emit('request join team', {status:"already requested"});
+            socket.emit('request join project', {status:"already requested"});
             console.log("failed to send request, already exists");
             isValid = false;
             break;
