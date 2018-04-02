@@ -60,10 +60,10 @@
                   <label for="comment">Founder</label>
                   <h5><%= team.LEADER %></h5>
                   <label for="comment">Other Members:</label>
-                  <% if(!team.POST){ %>
-                  <h5>none</h5>
-                  <% }else{ %>
+                  <% if(team.POSTS){ %>
                   <h5><%= team.POSTS %></h5>
+                  <% }else{ %>
+                  <h5>none</h5>
                   <% } %>
                   <% if(email!=team.LEADER){ %>
                   <label for="comment">Press the button to join the team</label><br>  

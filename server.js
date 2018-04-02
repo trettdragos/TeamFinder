@@ -246,6 +246,25 @@ app.get('/dashboard', function(req, res) {
     });
 });
 
+app.get('/dashboard/:searchTerm', function(req, res){
+  var searchFor = '%'+req.params.searchTerm+'%';
+  con.query("SELECT * FROM projects WHERE NAME LIKE ?",[searchFor], function(err, projects, fields){
+      if(err) throw err;
+      for(i in projects){
+        projects[i].PLATFORMS = getPlatformString(JSON.parse(projects[i].PLATFORMS));
+      }
+      con.query("SELECT * FROM teams WHERE NAME LIKE ?", [searchFor], function(err, teams, fields){
+        if(err) throw err;
+        for(i in teams){
+          teams[i].PLATFORMS = getPlatformString(JSON.parse(teams[i].PLATFORMS));
+        }
+        var list = teams.concat(projects);
+        list.reverse();
+        res.render('pages/index.ejs', {email:req.cookies.username, tab:'1', posts:list});
+      });
+    });
+});
+
 app.get('/login', function(req, res){
   res.render('pages/login');
 });
@@ -254,9 +273,16 @@ app.get('/logout', function(req, res){
     res.render('pages/logout');
 });
 
-app.get('/settings', function(req, res){
+app.get('/account', function(req, res){
   if(req.cookies.username){
-    res.render('pages/settings', {tab:'4'});
+    var serachFor = '%'+req.cookies.username+'%';
+    con.query("SELECT * FROM projects WHERE COLLABORATORS LIKE ?", [serachFor], function(err, projects, fields){
+      if(err) throw err;
+      con.query("SELECT * FROM teams WHERE POSTS LIKE ?", [serachFor], function(errTeams, teams, fields2){
+        if(errTeams) throw errTeams;
+        res.render('pages/account', {tab:'4', email:req.cookies.username, projects:projects, teams:teams});
+      });
+    });
   }
   else{
     res.redirect('/login');
