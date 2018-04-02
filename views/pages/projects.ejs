@@ -21,7 +21,11 @@
         <div class="col-lg-12 text-center">
           <div class="jumbotron" style="padding: 1%;">
             <div class="input-group" id="adv-search">
-                <input type="text" class="form-control" placeholder="Search for projects" />
+              <% if(term===''){ %>
+                <input type="text" id="searchTerm" class="form-control" placeholder="Search for projects" />
+              <% }else{ %>
+              <input type="text" id="searchTerm" class="form-control" placeholder=<%= term %> />
+              <% } %>
                 <div class="input-group-btn">
                     <div class="btn-group" role="group">
                         <button type="button" class="btn" style="border-radius: 0px 5px 5px 0px;"><i class="fas fa-search"></i></span></button>
@@ -52,6 +56,14 @@
       jQuery(function($){
         var socket = io.connect();
 
+      });
+      $('#searchTerm').keypress(function (e) {
+        if (e.which == 13) {
+          window.location.href = '/projectsSearch/'+$("input").val();
+        }
+      });
+      $('#searchBtn').click(function(){
+        window.location.href = '/projectsSearch/'+$("input").val();
       });
     </script>
 

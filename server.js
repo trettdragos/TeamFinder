@@ -241,7 +241,7 @@ app.get('/dashboard', function(req, res) {
         }
         var list = teams.concat(projects);
         list.reverse();
-        res.render('pages/index.ejs', {email:req.cookies.username, tab:'1', posts:list});
+        res.render('pages/index.ejs', {email:req.cookies.username, tab:'1', posts:list, term:''});
       });
     });
 });
@@ -260,7 +260,7 @@ app.get('/dashboard/:searchTerm', function(req, res){
         }
         var list = teams.concat(projects);
         list.reverse();
-        res.render('pages/index.ejs', {email:req.cookies.username, tab:'1', posts:list});
+        res.render('pages/index.ejs', {email:req.cookies.username, tab:'1', posts:list, term:req.params.searchTerm});
       });
     });
 });
@@ -297,7 +297,7 @@ app.get('/projects', function(req, res){
       }
       var list = projects;
       list.reverse();
-      res.render('pages/projects.ejs', {email:req.cookies.username, tab:'2', posts:list});
+      res.render('pages/projects.ejs', {email:req.cookies.username, tab:'2', posts:list, term:''});
     });
   }
   else{
@@ -313,7 +313,7 @@ app.get('/teams', function(req, res){
         }
         var list = teams;
         list.reverse();
-        res.render('pages/teams', {email:req.cookies.username, tab:'3', posts:list});
+        res.render('pages/teams', {email:req.cookies.username, tab:'3', posts:list, term:''});
       });
   }
   else{
@@ -374,6 +374,32 @@ app.get('/teams/:team', function(req, res){
         res.render('pages/team-page', {email:req.cookies.username, tab:'3', team:result[0]});
       }
       else res.send('Error 404 team not found with the name '+req.params.team);
+  });
+});
+
+app.get('/teamsSearch/:searchTerm', function(req, res){
+  if(!req.cookies.username)
+    res.redirect('/login');
+  var searchFor = '%'+req.params.searchTerm+'%';
+ con.query("SELECT * FROM teams WHERE NAME LIKE ?", [searchFor], function (err, result, fields) {
+      if (err) throw err;
+      for(i in result){
+        result[i].PLATFORMS = getPlatformString(JSON.parse(result[i].PLATFORMS));
+      }
+      res.render('pages/teams', {email:req.cookies.username, tab:'3', posts:result, term:req.params.searchTerm});
+  });
+});
+
+app.get('/projectsSearch/:searchTerm', function(req, res){
+  if(!req.cookies.username)
+    res.redirect('/login');
+  var searchFor = '%'+req.params.searchTerm+'%';
+ con.query("SELECT * FROM projects WHERE NAME LIKE ?", [searchFor], function (err, result, fields) {
+      if (err) throw err;
+      for(i in result){
+        result[i].PLATFORMS = getPlatformString(JSON.parse(result[i].PLATFORMS));
+      }
+      res.render('pages/teams', {email:req.cookies.username, tab:'3', posts:result, term:req.params.searchTerm});
   });
 });
 
