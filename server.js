@@ -5,6 +5,9 @@ var mysql = require('mysql');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var server = require('http').createServer(app);
+var Worker = require("tiny-worker");
+Worker.setRange(2, 20);
+
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey('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');
 var io = require('socket.io').listen(server, {
@@ -34,8 +37,14 @@ io.on('connection', function(socket) {
         if (err) throw err;
         if(result[0]){
           if(result[0].CONFIRMED=='1'){
+            var newNotif = false;
+            var not = JSON.parse(result[0].NOTIFICATION);
+            for(i in not){
+              if(not[i].vis=="false")
+                newNotif = true;
+            }
             console.log("auth succesfull with user: "+user.email);
-            socket.emit('auth login', {status:"succesfull", email:user.email});
+            socket.emit('auth login', {status:"succesfull", email:user.email, notifications:JSON.stringify(result[0].NOTIFICATION), newNotif:newNotif});
           }else{
             socket.emit('auth login', {status:"account not verified", email:user.email})
           }
@@ -121,11 +130,17 @@ io.on('connection', function(socket) {
       if(err) throw err;
       if(result){
         var notifications = JSON.parse(result[0].NOTIFICATION);
+        var id = req.username+req.teamName;
+        id = id.replace('/','');
+        id = id.replace('@', '');
+        id = id.replace('.', '');
+        id = id.replace(/\s/g, '');
         var newReq = {
           "user": req.username,
           "vis": "false",
           "type": "team",
-          "name": req.teamName
+          "name": req.teamName,
+          "id": id
         };
         var reqtest= JSON.stringify(newReq);
         var isValid = true;
@@ -161,11 +176,17 @@ io.on('connection', function(socket) {
       if(err) throw err;
       if(result){
         var notifications = JSON.parse(result[0].NOTIFICATION);
+        var id = req.username+req.projectName;
+        id = id.replace('/','');
+        id = id.replace('@', '');
+        id = id.replace('.', '');
+        id = id.replace(/\s/g, '');
         var newReq = {
           "user": req.username,
           "vis": "false",
-          "type": "projet",
-          "name": req.projectName
+          "type": "project",
+          "name": req.projectName,
+          "id": id
         };
         var reqtest= JSON.stringify(newReq);
         var isValid = true;
@@ -193,6 +214,82 @@ io.on('connection', function(socket) {
         }        
       }
     });
+  });
+
+  socket.on('answer request', function(req){
+    console.log("leader "+req.leader);
+        con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ?", [req.leader], function(err, result){
+          if(err) throw err;
+          console.log(req.leader);
+          var stringNotif = result[0].NOTIFICATION;
+          var notif = JSON.parse(stringNotif);
+          for(i in notif){
+            if(notif[i].id===req.id){
+              notif[i].vis = "true";
+            }
+          }
+          stringNotif = JSON.stringify(notif);
+          con.query("UPDATE accounts SET NOTIFICATION = ? WHERE EMAIL = ?", [stringNotif, req.leader], function(err2, result2){
+            if(err2) throw err2;
+            if(result2.affectedRows!=0){
+              console.log('updated notifications for leader');
+              if(req.status==="accept"){
+                var table = req.type+'s';
+                var col;
+                if(table === 'projects')
+                  col = 'COLLABORATORS';
+                else col = 'POSTS';
+                con.query("SELECT "+col+" FROM "+table+" WHERE NAME = ?", [req.name], function(err3, result3){
+                    if(err3) throw err3;
+                    var coll;
+                    if(col=='POSTS')
+                    coll = result3[0].POSTS;
+                    else coll = result3[0].COLLABORATORS;
+                    coll = coll+req.requester+', ';
+                    con.query("UPDATE "+table+" SET "+col+" = ? WHERE NAME = ?", [coll, req.name], function(err4, result4){
+                      if(err4) throw err4;
+                      if(result4.affectedRows!=0){
+                        console.log('added requester as colaborator');
+                        socket.emit('answer request', {status:'succesfull'});
+                      }
+                    });
+                });
+              }
+            }
+          });
+        });
+  });
+
+  socket.on('listener', function(data){//currently not working
+    var worker = new Worker(function(){
+      postMessage(process.debugPort); 
+      self.onmessage = function(event) {
+        var wasSent = false;
+        var mysql = require('mysql');//var globale inaccesibile, require nu fucntioneaza in tiny-worker, threadul probabil da crash aici
+        postMessage('shit workin');
+        var con = mysql.createConnection({
+          host: "localhost",
+          user: "root",
+          password: "",
+          database: "TeamFinder"
+        });
+        while(!wasSent){
+          con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ?", [event.data.email], function(err, result){
+            if(err) throw err;
+            if(JSON.stringify(result[0].NOTIFICATION) !== JSON.stringify(event.data.notifications)){
+              wasSent = true;
+              postMessage(JSON.stringify(result[0].NOTIFICATION));
+            }
+          });
+        }   
+        
+      };
+    });
+    worker.onmessage = function(event) {
+      console.log("Worker said : " + event.data);
+      worker.terminate();
+    };
+    worker.postMessage(data);
   });
 
   socket.on('disconnect', function () {
@@ -280,7 +377,10 @@ app.get('/account', function(req, res){
       if(err) throw err;
       con.query("SELECT * FROM teams WHERE POSTS LIKE ?", [serachFor], function(errTeams, teams, fields2){
         if(errTeams) throw errTeams;
-        res.render('pages/account', {tab:'4', email:req.cookies.username, projects:projects, teams:teams});
+        con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ?", [req.cookies.username], function(err3, result, fields3){
+          if(err3) throw err3;
+          res.render('pages/account', {tab:'4', email:req.cookies.username, projects:projects, teams:teams, notifications:JSON.parse(result[0].NOTIFICATION)});
+        });
       });
     });
   }

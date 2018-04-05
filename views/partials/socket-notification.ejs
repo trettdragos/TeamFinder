@@ -1,0 +1,9 @@
+<script type="text/javascript">
+	var socket = io.connect();
+	socket.emit('listener', {email:$.cookie('username'), notifications:$.cookie('notifications')});
+	socket.on('listener', function(notification){
+		alert('new notification '+notification);
+		$.cookie('notifications', notification, {expires: 14, path: '/'});
+		socket.emit('listener', {email:$.cookie('username'), notifications:$.cookie('notifications')});
+	});
+</script>

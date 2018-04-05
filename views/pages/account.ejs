@@ -30,7 +30,15 @@
           <div class="jumbotron">
             <h3><b><%= email %></b></h3>
             <hr class="my-4">
-            <h4>Notifications:</h4> 
+            <h4>Notifications:</h4>
+            <hr class="my-4">
+
+            <% for(i in notifications){ %>
+            <% if(notifications[i].vis==="false"){ %>
+            <div style="align-content: inline;">
+              <h4><a href="" class="btn" id="accept<%= notifications[i].id %>">Accept</a> <a href="" class="btn" id="refuse<%= notifications[i].id %>" >Refuse</a> User <b><%= notifications[i].user %></b> wants to join <%= notifications[i].type %> : <%= notifications[i].name %></h4>
+            </div>
+            <% }} %>
           </div>
         </div>
       </div>
@@ -81,10 +89,16 @@
     <% include ../partials/footer %>
     
     <script>
-      jQuery(function($){
         var socket = io.connect();
-
-      });
+        <% for(i in notifications){ %>
+          <% if(notifications[i].vis==="false"){ %>
+          $('#accept<%= notifications[i].id %>').on('click', function(){
+            socket.emit('answer request', {status:'accept', id:'<%= notifications[i].id %>', type:'<%= notifications[i].type %>', name:'<%= notifications[i].name %>', requester:'<%= notifications[i].user %>', leader:$.cookie('username')});
+          });
+          $('#refuse<%= notifications[i].id %>').on('click', function(){
+            socket.emit('answer request', {status:'refuse', id:'<%= notifications[i].id %>', type:'<%= notifications[i].type %>', name:'<%= notifications[i].name %>', requester:'<%= notifications[i].user %>', leader:$.cookie('username')});
+          });
+        <% }} %>
     </script>
 
   </body>

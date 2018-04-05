@@ -12,6 +12,7 @@
   "author": "Trett Dragos",
   "license": "ISC",
   "dependencies": {
+    "@sendgrid/mail": "^6.2.1",
     "connect-redis": "^3.3.3",
     "cookie-parser": "^1.4.3",
     "cookie-session": "^2.0.0-beta.3",
@@ -29,6 +30,8 @@
     "socket.io": "^2.0.4",
     "socket.io-bundle": "^0.1.2",
     "socket.io-passport": "^0.1.1",
+    "tiny-worker": "^2.1.2",
+    "webworker-threads": "file:webworker-threads",
     "xss": "^0.3.7"
   }
 }

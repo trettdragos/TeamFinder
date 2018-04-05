@@ -63,10 +63,6 @@
     <% include ../partials/footer %>
     
     <script>
-      jQuery(function($){
-        var socket = io.connect();
-
-      });
       $('#searchTerm').keypress(function (e) {
         if (e.which == 13) {
           window.location.href = '/teamsSearch/'+$("input").val();

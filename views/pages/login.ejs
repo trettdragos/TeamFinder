@@ -38,6 +38,8 @@
         socket.on('auth login', function(res){
             if(res.status == "succesfull"){
                 $.cookie('username', res.email, { expires: 14, path: '/' });
+                $.cookie('notifications', JSON.stringify(res.notifications), {expires: 14, path: '/'});
+                $.cookie('newNotif', res.newNotif, {expires: 14, path: '/'});
                 window.location.href = '/dashboard';
             }else if(res.status == "account not verified"){
                 $('#error').empty();

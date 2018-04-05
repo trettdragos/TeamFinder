@@ -70,9 +70,8 @@
     </div>
 
     <% include ../partials/footer %>
-    <script>
 
-      var socket = io.connect();
+    <script>
       $('#city').empty();
       $('#searchTerm').keypress(function (e) {
         if (e.which == 13) {
