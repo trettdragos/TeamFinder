@@ -9,7 +9,6 @@ var Worker = require("tiny-worker");
 Worker.setRange(2, 20);
 
 const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey('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');
 var io = require('socket.io').listen(server, {
     log: false,
     agent: false,
