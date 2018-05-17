@@ -166,7 +166,7 @@
       jQuery(function($){
         socket.on('register team', function(data){
           if(data.status==='succesfull')
-            window.location.href = '/projects';
+            window.location.href = '/teams';
           else alert(data.status); 
         });
         

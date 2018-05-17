@@ -64,7 +64,7 @@ io.on('connection', function(socket) {
         }
         else{
           console.log("registering user: "+user.name+" with the email: "+user.email);
-          con.query("INSERT INTO accounts (ID, USERNAME, EMAIL, PASSWORD, LINKEDIN, GITHUB, SKILLS, CONFIRMED) VALUES (?, ?, ?, ?, ?, ?, ?, '0')", [0, user.name, user.email, user.password, user.linkedin, user.github, JSON.stringify(user.skills)], function (err, result) {
+          con.query("INSERT INTO accounts (ID, USERNAME, EMAIL, PASSWORD, LINKEDIN, GITHUB, SKILLS, CONFIRMED, NOTIFICATION) VALUES (?, ?, ?, ?, ?, ?, ?, '0', '[]')", [0, user.name, user.email, user.password, user.linkedin, user.github, JSON.stringify(user.skills)], function (err, result) {
             if (err) throw err;
             socket.emit('auth register', {status:"succesfull", email:user.email});
             var msg = {
@@ -91,7 +91,7 @@ io.on('connection', function(socket) {
         }
         else{
           console.log("register team: "+ result[0]);
-          con.query("INSERT INTO teams (ID, NAME, SUMMARY, HACKATON, SECTION, START_DATE, END_DATE, PLATFORMS, NR_MEMBERS, POSTS, LEADER) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, team.name, team.summary, team.hackaton, team.section, team.startDate, team.endDate, JSON.stringify(team.platforms), team.nrMembers, JSON.stringify(team.posts), team.leader], function (err, result) {
+          con.query("INSERT INTO teams (ID, NAME, SUMMARY, HACKATON, SECTION, START_DATE, END_DATE, PLATFORMS, NR_MEMBERS, POSTS, LEADER) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, team.name, team.summary, team.hackaton, team.section, team.startDate, team.endDate, JSON.stringify(team.platforms), team.nrMembers, '', team.leader], function (err, result) {
             if (err){
               socket.emit('register team', {status:JSON.stringify(err)});
             } 
@@ -323,6 +323,10 @@ app.get('/', function(req, res) {
     res.render('pages/about.ejs');
 });
 
+app.get('/register-confirmed', function(req, res) {
+    res.render('pages/register-confirmed.ejs');
+});
+
 app.get('/dashboard', function(req, res) {
 
     con.query("SELECT * FROM projects LIMIT 25", function(err, projects, fields){
@@ -371,10 +375,11 @@ app.get('/logout', function(req, res){
 
 app.get('/account', function(req, res){
   if(req.cookies.username){
-    var serachFor = '%'+req.cookies.username+'%';
-    con.query("SELECT * FROM projects WHERE COLLABORATORS LIKE ?", [serachFor], function(err, projects, fields){
+    var searchFor = '%'+req.cookies.username+'%';
+    console.log(searchFor);
+    con.query("SELECT * FROM projects WHERE COLLABORATORS LIKE ? OR FOUNDER = ?", [searchFor, req.cookies.username], function(err, projects, fields){
       if(err) throw err;
-      con.query("SELECT * FROM teams WHERE POSTS LIKE ?", [serachFor], function(errTeams, teams, fields2){
+      con.query("SELECT * FROM teams WHERE POSTS LIKE ? OR LEADER = ?", [searchFor, req.cookies.username], function(errTeams, teams, fields2){
         if(errTeams) throw errTeams;
         con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ?", [req.cookies.username], function(err3, result, fields3){
           if(err3) throw err3;

@@ -68,11 +68,11 @@
     <% include ../partials/footer %>
     
     <script>
-        var socket = io.connect('localhost:3000');
+        var socket = io.connect();
         socket.on('auth register', function(res){
             if(res.status == "succesfull"){
                 //$.cookie('username', res.email, { expires: 14, path: '/' });
-                window.location.href = '/';
+                window.location.href = '/register-confirmed';
             }else{
                 document.getElementById("email").style.borderColor="red";
                 alert(res.status);
