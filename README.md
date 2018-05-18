@@ -26,7 +26,3 @@
 - separare proiecte/echipe active de cele inactive/folosite
 - adaugare logo
 - poze de profil utilizatori
-
-### Alte cacaturi
-
-mi s-a sugerat sa fac aplicatia utilizabila pentru orice fel de proiect, nu doar de informatica. Orice fel de proiect de la start-upuri pana la a construi o masina cu cineva. Usor de adaptat ce avem curent, pareri? **@TeodorVecerdi: Ok**
