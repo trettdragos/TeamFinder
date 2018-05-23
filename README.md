@@ -4,8 +4,8 @@
 
 ### Structura
 
-- inlocuirea metodelor socket.io cu metode .POST de la express app
-- restructurarea paginilor pe routes
+- ~~inlocuirea metodelor socket.io cu metode get de la express app~~
+- ~~restructurarea paginilor pe routes~~
 - implementare securitate(login, register, cookies si tokens pentru orice comunicare cu serverul in cazul userului logat)
 
 ### Functionalitati de importanta primara
@@ -26,7 +26,7 @@
 - separare proiecte/echipe active de cele inactive/folosite
 - adaugare logo
 - poze de profil utilizatori
-- problema cu fisierele din /public cand esti pe linkuri care nu sunt imediat langa root (de ex /projects/create)
+- ~~problema cu fisierele din /public cand esti pe linkuri care nu sunt imediat langa root (de ex /projects/create)~~
 
 # Mare
 prima noapte pt avans 340 bcr
