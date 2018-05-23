@@ -46,4 +46,4 @@ router.get('/auth', function (req, res) {
 //     res.render('pages/register-confirmed.ejs');
 // });
 
-module.exports = router;
+module.exports = {url: '/login', router: router};

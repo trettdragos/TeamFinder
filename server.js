@@ -180,22 +180,14 @@ io.on('connection', function (socket) {
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-let verification = require('./routes/verification');
-let home = require('./routes/home');
-let register = require('./routes/register');
-let login = require('./routes/login');
-let projects = require('./routes/projects');
-let teams = require('./routes/teams');
-let dashboard = require('./routes/dashboard');
-app.use('/verification', verification);
-app.use('/', home);
-app.use('/register', register);
-app.use('/login', login);
-app.use('/projects', projects);
-app.use('/teams', teams);
-app.use('/dashboard', dashboard);
+let routes = require('./routes');
+routes.forEach(item => app.use(item.url, item.router));
 app.get('/logout', function (req, res) {
     res.render('pages/logout');
+});
+
+app.get('/*', (req, res) => {
+    res.render('pages/404.ejs', {page: req.url.substr(0)})
 });
 
 server.listen(3000);

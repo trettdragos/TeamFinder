@@ -111,7 +111,6 @@ function getPlatformString(platforms) {
         pl = pl + 'Web BackEnd';
     }
     return pl;
-    console.log(pl);
 }
 
-module.exports = router;
+module.exports = {url: '/projects', router: router};

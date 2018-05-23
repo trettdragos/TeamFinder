@@ -1,8 +1,8 @@
 let express = require('express');
 let router = express.Router();
-var mysql = require('mysql');
+let mysql = require('mysql');
 
-var con = mysql.createConnection({
+let con = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "",
@@ -10,11 +10,11 @@ var con = mysql.createConnection({
 });
 
 router.get('/:accountToken', function(req, res){
-	var sql = "UPDATE accounts SET CONFIRMED = '1' WHERE email = ?";
+	let sql = "UPDATE accounts SET CONFIRMED = '1' WHERE email = ?";
   con.query(sql, [req.params.accountToken], function (err, result) {
     if (err) throw err;
     res.render('pages/verified-confirmation');
   });
 });
 
-module.exports = router;
+module.exports = {url: '/verification', router: router};

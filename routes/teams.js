@@ -119,4 +119,4 @@ function getPlatformString(platforms) {
     console.log(pl);
 }
 
-module.exports = router;
+module.exports = {url: '/teams', router: router};

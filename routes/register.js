@@ -46,4 +46,4 @@ router.get('/auth', function (req, res) {
     });
 });
 
-module.exports = router;
+module.exports = {url: '', router: router};
