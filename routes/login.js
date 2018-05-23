@@ -10,7 +10,10 @@ let con = mysql.createConnection({
 });
 
 router.get('/', function (req, res) {
-    res.render('pages/login.ejs');
+    if (req.cookies.username)
+        res.redirect('/account');
+    else
+        res.render('pages/login.ejs');
 });
 
 router.get('/auth', function (req, res) {
