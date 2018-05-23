@@ -74,7 +74,7 @@
          auth();    
         });
         function auth(){  
-            var user = {
+            let user = {
                 email:document.getElementById("email").value,
                 password:document.getElementById("password").value,
                 name:document.getElementById('fullName').value,
@@ -92,7 +92,7 @@
                     otherName:document.getElementById('other').value
                 }
             }
-            var ok = true;
+            let ok = true;
             if(user.email===''){
                 document.getElementById("email").style.borderColor="red";
                 ok = false;
