@@ -182,15 +182,19 @@
         }
         isFormOk = true;
         if(isFormOk)
-          socket.emit('register project', project);
+          $.ajax({
+                        data:project,
+                        type: 'GET',
+                        url: 'http://localhost:3000/register-project',                      
+                        success: function(res) {
+                            console.log(res.status);
+                            if(res.status==='succesfull')
+                              window.location.href = '/projects';
+                            else alert(res.status); 
+                        }
+                    });
+          //socket.emit('register project', project);
       }
-      jQuery(function($){
-        socket.on('register project', function(data){
-          if(data.status==='succesfull')
-            window.location.href = '/projects';
-          else alert(data.status); 
-        });
-      });
       (function() {
         document.getElementById("android").onclick = function() { 
             if(android == false){

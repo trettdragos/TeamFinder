@@ -156,21 +156,24 @@
               document.getElementById('Platform').style.color = "green";
             }
             if(isFormOk)
-              socket.emit('register team', team);
+              $.ajax({
+                        data:team,
+                        type: 'GET',
+                        url: 'http://localhost:3000/register-team',                      
+                        success: function(res) {
+                            console.log(res.status);
+                            if(res.status==='succesfull')
+                              window.location.href = '/teams';
+                            else alert(res.status); 
+                        }
+                    });
+              //socket.emit('register team', team);
         }
         $("#form").keyup(function(event) {
             if (event.keyCode === 13) {
                 $("#submit").click();
             }
         });
-      jQuery(function($){
-        socket.on('register team', function(data){
-          if(data.status==='succesfull')
-            window.location.href = '/teams';
-          else alert(data.status); 
-        });
-        
-      });
 
 
       (function() {

@@ -34,25 +34,33 @@
       }
     </script>
     <script>
+        
         var socket = io.connect();
-        socket.on('auth login', function(res){
-            if(res.status == "succesfull"){
-                $.cookie('username', res.email, { expires: 14, path: '/' });
-                $.cookie('notifications', JSON.stringify(res.notifications), {expires: 14, path: '/'});
-                $.cookie('newNotif', res.newNotif, {expires: 14, path: '/'});
-                window.location.href = '/dashboard';
-            }else if(res.status == "account not verified"){
-                $('#error').empty();
-                $('#error').append('Account not verified. Please confirm your email');
-            }else{
-                document.getElementById("email").style.borderColor="red";
-                document.getElementById("password").style.borderColor="red";
-                $('#error').empty();
-                $('#error').append('Email or Password incorect!');
-            }
-        });
         function auth() {
-            socket.emit('auth login', {email:document.getElementById('email').value, password:document.getElementById('password').value})
+            $.ajax({
+                        data:{email:document.getElementById('email').value, password:document.getElementById('password').value},
+                        type: 'GET',
+                        url: 'http://localhost:3000/auth-login',                      
+                        success: function(res) {
+                            console.log(res.status);
+                            if(res.status == "succesfull"){
+                                $.cookie('username', res.email, { expires: 14, path: '/' });
+                                $.cookie('notifications', JSON.stringify(res.notifications), {expires: 14, path: '/'});
+                                $.cookie('newNotif', res.newNotif, {expires: 14, path: '/'});
+                                window.location.href = '/dashboard';
+                            }else if(res.status == "account not verified"){
+                                $('#error').empty();
+                                $('#error').append('Account not verified. Please confirm your email');
+                            }else{
+                                document.getElementById("email").style.borderColor="red";
+                                document.getElementById("password").style.borderColor="red";
+                                $('#error').empty();
+                                $('#error').append('Email or Password incorect!');
+                            }
+                            //console.log(JSON.stringify(data));
+                        }
+                    });
+            //socket.emit('auth login', {email:document.getElementById('email').value, password:document.getElementById('password').value})
         }
         $("#form").keyup(function(event) {
             if (event.keyCode === 13) {

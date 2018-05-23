@@ -5,8 +5,6 @@ var mysql = require('mysql');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var server = require('http').createServer(app);
-var Worker = require("tiny-worker");
-Worker.setRange(2, 20);
 
 const sgMail = require('@sendgrid/mail');
 var io = require('socket.io').listen(server, {
@@ -29,10 +27,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 
-io.on('connection', function(socket) {
-  console.log('Client connected...'+socket.id);
-  socket.on('auth login',function (user) {
-      con.query("SELECT * FROM accounts WHERE EMAIL = ? AND PASSWORD = ? LIMIT 1", [user.email, user.password], function (err, result, fields) {
+app.get('/auth-login', function(req, res){
+  user = req.query;
+  con.query("SELECT * FROM accounts WHERE EMAIL = ? AND PASSWORD = ? LIMIT 1", [user.email, user.password], function (err, result, fields) {
         if (err) throw err;
         if(result[0]){
           if(result[0].CONFIRMED=='1'){
@@ -43,51 +40,56 @@ io.on('connection', function(socket) {
                 newNotif = true;
             }
             console.log("auth succesfull with user: "+user.email);
-            socket.emit('auth login', {status:"succesfull", email:user.email, notifications:JSON.stringify(result[0].NOTIFICATION), newNotif:newNotif});
+            res.send({status:"succesfull", email:user.email, notifications:JSON.stringify(result[0].NOTIFICATION), newNotif:newNotif});
           }else{
-            socket.emit('auth login', {status:"account not verified", email:user.email})
+            res.send({status:"account not verified", email:user.email})
           }
         }
         else{
           console.log("auth failed for user: "+user.email);
-          socket.emit('auth login', {status:"failed", email:user.email});
+          res.send({status:"faileded", email:user.email});
         }
-      });
   });
-  socket.on('auth register', function(user){
-    console.log("checking if user: "+user.email+" is already in the db...")
+});
+
+app.get('/auth-register', function(req, res){
+  user = req.query;
+  console.log(user)
+  console.log("checking if user: "+user.email+" is already in the db...")
     con.query("SELECT * FROM accounts WHERE EMAIL = ? LIMIT 1", [user.email], function (err, result, fields) {
         if (err) throw err;
         if(result[0]){
           console.log("user with email "+user.email+" already exists");
-          socket.emit('auth register', {status:"Email already used.", email:user.email});
+          res.send({status:"Email already used.", email:user.email});
         }
         else{
           console.log("registering user: "+user.name+" with the email: "+user.email);
-          con.query("INSERT INTO accounts (ID, USERNAME, EMAIL, PASSWORD, LINKEDIN, GITHUB, SKILLS, CONFIRMED, NOTIFICATION) VALUES (?, ?, ?, ?, ?, ?, ?, '0', '[]')", [0, user.name, user.email, user.password, user.linkedin, user.github, JSON.stringify(user.skills)], function (err, result) {
+          //schimba CONFIRMED la 0 imediat repun pe picioare sendgrid
+          con.query("INSERT INTO accounts (ID, USERNAME, EMAIL, PASSWORD, LINKEDIN, GITHUB, SKILLS, CONFIRMED, NOTIFICATION) VALUES (?, ?, ?, ?, ?, ?, ?, '1', '[]')", [0, user.name, user.email, user.password, user.linkedin, user.github, JSON.stringify(user.skills)], function (err, result) {
             if (err) throw err;
-            socket.emit('auth register', {status:"succesfull", email:user.email});
-            var msg = {
+            res.send({status:"succesfull"});
+            /*var msg = {
               to: 'trettdragos@gmail.com',
               from: 'register@hacksquad.com',
               subject: 'Please verify your email',
               text: 'and easy to do anywhere, even with Node.js',
               html: '<a href="localhost:3000/verification/'+user.email+'">localhost:3000/verification/'+user.email+'</a>',
             };
-            sgMail.send(msg);
-          console.log('sent verification email to '+user.email);
+            sgMail.send(msg);*/
+            console.log('sent verification email to '+user.email);
         });
       }
     });
-  });
+});
 
-  socket.on('register team', function(team){
-    console.log('checking if team...'+team.name+ ' is in db');
+app.get('/register-team', function(req, res){
+  team = req.query;
+  console.log('checking if team...'+team.name+ ' is in db');
     con.query("SELECT * FROM teams WHERE NAME = ? LIMIT 1", [team.name], function (err, result, fields) {
         if (err) throw err;
         if(result[0]){
           console.log("team failed to register: "+team.name);
-          socket.emit('register team', {status:"failed, team already exists"});
+          res.send({status:"failed, team already exists"});
         }
         else{
           console.log("register team: "+ result[0]);
@@ -96,32 +98,36 @@ io.on('connection', function(socket) {
               socket.emit('register team', {status:JSON.stringify(err)});
             } 
             console.log('registered team '+team.name+' successful');
-            socket.emit('register team', {status:"succesfull"});
+            res.send({status:"succesfull"});
           });
         }
       });
-  });
+});
 
-  socket.on('register project', function(project){
-    console.log('checking if project...'+project.name+ ' is in db');
+app.get('/register-project', function(req, res){
+  project = req.query;
+  console.log('checking if project...'+project.name+ ' is in db');
     con.query("SELECT * FROM projects WHERE NAME = ? LIMIT 1", [project.name], function (err, result, fields) {
         if (err) throw err;
         if(result[0]){
           console.log("project failed to register: "+project.name);
-          socket.emit('register project', {status:"failed, project already exists"});
+          res.send({status:"failed, project already exists"});
         }
         else{
           console.log("register project: "+ result[0]);
           con.query("INSERT INTO projects (ID, NAME, SUMMARY, COMMITMENT, PLATFORMS, PLATFORM_DETAILS, STAGE, BUDGET, FUNDING, NATIONAL, FOUNDER) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, project.name, project.summary, project.commitment, JSON.stringify(project.platforms), project.platformDetails, project.stage, project.budget, project.funding, project.national, project.founder], function (err, result) {
             if (err){
-              socket.emit('register project', {status:JSON.stringify(err)});
+              res.send({status:JSON.stringify(err)});
             } 
             console.log('registered project '+project.name+' successful');
-            socket.emit('register project', {status:"succesfull"});
+            res.send({status:"succesfull"});
           });
         }
       });
-  });
+});
+
+io.on('connection', function(socket) {
+  console.log('Client connected...'+socket.id);
 
   socket.on('request join team', function(req){
     console.log("client "+ req.username + " requested to join team "+ req.teamName +" of user "+req.leader+ " with token "+ req.token);
@@ -257,38 +263,6 @@ io.on('connection', function(socket) {
             }
           });
         });
-  });
-
-  socket.on('listener', function(data){//currently not working
-    var worker = new Worker(function(){
-      postMessage(process.debugPort); 
-      self.onmessage = function(event) {
-        var wasSent = false;
-        var mysql = require('mysql');//var globale inaccesibile, require nu fucntioneaza in tiny-worker, threadul probabil da crash aici
-        postMessage('shit workin');
-        var con = mysql.createConnection({
-          host: "localhost",
-          user: "root",
-          password: "",
-          database: "TeamFinder"
-        });
-        while(!wasSent){
-          con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ?", [event.data.email], function(err, result){
-            if(err) throw err;
-            if(JSON.stringify(result[0].NOTIFICATION) !== JSON.stringify(event.data.notifications)){
-              wasSent = true;
-              postMessage(JSON.stringify(result[0].NOTIFICATION));
-            }
-          });
-        }   
-        
-      };
-    });
-    worker.onmessage = function(event) {
-      console.log("Worker said : " + event.data);
-      worker.terminate();
-    };
-    worker.postMessage(data);
   });
 
   socket.on('disconnect', function () {

@@ -26,3 +26,6 @@
 - separare proiecte/echipe active de cele inactive/folosite
 - adaugare logo
 - poze de profil utilizatori
+
+# Mare
+prima noapte pt avans 340 bcr

@@ -69,15 +69,7 @@
     
     <script>
         var socket = io.connect();
-        socket.on('auth register', function(res){
-            if(res.status == "succesfull"){
-                //$.cookie('username', res.email, { expires: 14, path: '/' });
-                window.location.href = '/register-confirmed';
-            }else{
-                document.getElementById("email").style.borderColor="red";
-                alert(res.status);
-            }
-        });
+
         $("#submit").on('click', function () {
          auth();    
         });
@@ -128,7 +120,21 @@
                 document.getElementById("passwordCheck").style.borderColor="green";
             }
             if(ok==true){
-                socket.emit('auth register', user);
+                $.ajax({
+                        data:user,
+                        type: 'GET',
+                        url: 'http://localhost:3000/auth-register',                      
+                        success: function(res) {
+                            console.log(res.status);
+                            if(res.status == "succesfull"){
+                                window.location.href = '/register-confirmed';
+                            }else{
+                                document.getElementById("email").style.borderColor="red";
+                                // /alert(res.status);
+                            }
+                        }
+                    });
+                //socket.emit('auth register', user);
             }
         }
         $("#form").keyup(function(event) {
