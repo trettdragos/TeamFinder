@@ -27,178 +27,134 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 
-app.get('/auth-login', function(req, res){
-  user = req.query;
-  con.query("SELECT * FROM accounts WHERE EMAIL = ? AND PASSWORD = ? LIMIT 1", [user.email, user.password], function (err, result, fields) {
+app.get('/auth-login', function (req, res) {
+    user = req.query;
+    con.query("SELECT * FROM accounts WHERE EMAIL = ? AND PASSWORD = ? LIMIT 1", [user.email, user.password], function (err, result, fields) {
         if (err) throw err;
-        if(result[0]){
-          if(result[0].CONFIRMED=='1'){
-            var newNotif = false;
-            var not = JSON.parse(result[0].NOTIFICATION);
-            for(i in not){
-              if(not[i].vis=="false")
-                newNotif = true;
+        if (result[0]) {
+            if (result[0].CONFIRMED == '1') {
+                var newNotif = false;
+                var not = JSON.parse(result[0].NOTIFICATION);
+                for (i in not) {
+                    if (not[i].vis == "false")
+                        newNotif = true;
+                }
+                console.log("auth succesfull with user: " + user.email);
+                res.send({
+                    status: "succesfull",
+                    email: user.email,
+                    notifications: JSON.stringify(result[0].NOTIFICATION),
+                    newNotif: newNotif
+                });
+            } else {
+                res.send({status: "account not verified", email: user.email})
             }
-            console.log("auth succesfull with user: "+user.email);
-            res.send({status:"succesfull", email:user.email, notifications:JSON.stringify(result[0].NOTIFICATION), newNotif:newNotif});
-          }else{
-            res.send({status:"account not verified", email:user.email})
-          }
         }
-        else{
-          console.log("auth failed for user: "+user.email);
-          res.send({status:"faileded", email:user.email});
+        else {
+            console.log("auth failed for user: " + user.email);
+            res.send({status: "faileded", email: user.email});
         }
-  });
+    });
 });
 
-app.get('/auth-register', function(req, res){
-  user = req.query;
-  console.log(user)
-  console.log("checking if user: "+user.email+" is already in the db...")
+app.get('/auth-register', function (req, res) {
+    user = req.query;
+    console.log(user)
+    console.log("checking if user: " + user.email + " is already in the db...")
     con.query("SELECT * FROM accounts WHERE EMAIL = ? LIMIT 1", [user.email], function (err, result, fields) {
         if (err) throw err;
-        if(result[0]){
-          console.log("user with email "+user.email+" already exists");
-          res.send({status:"Email already used.", email:user.email});
+        if (result[0]) {
+            console.log("user with email " + user.email + " already exists");
+            res.send({status: "Email already used.", email: user.email});
         }
-        else{
-          console.log("registering user: "+user.name+" with the email: "+user.email);
-          //schimba CONFIRMED la 0 imediat repun pe picioare sendgrid
-          con.query("INSERT INTO accounts (ID, USERNAME, EMAIL, PASSWORD, LINKEDIN, GITHUB, SKILLS, CONFIRMED, NOTIFICATION) VALUES (?, ?, ?, ?, ?, ?, ?, '1', '[]')", [0, user.name, user.email, user.password, user.linkedin, user.github, JSON.stringify(user.skills)], function (err, result) {
-            if (err) throw err;
-            res.send({status:"succesfull"});
-            /*var msg = {
-              to: 'trettdragos@gmail.com',
-              from: 'register@hacksquad.com',
-              subject: 'Please verify your email',
-              text: 'and easy to do anywhere, even with Node.js',
-              html: '<a href="localhost:3000/verification/'+user.email+'">localhost:3000/verification/'+user.email+'</a>',
-            };
-            sgMail.send(msg);*/
-            console.log('sent verification email to '+user.email);
-        });
+        else {
+            console.log("registering user: " + user.name + " with the email: " + user.email);
+            //schimba CONFIRMED la 0 imediat repun pe picioare sendgrid
+            con.query("INSERT INTO accounts (ID, USERNAME, EMAIL, PASSWORD, LINKEDIN, GITHUB, SKILLS, CONFIRMED, NOTIFICATION) VALUES (?, ?, ?, ?, ?, ?, ?, '1', '[]')", [0, user.name, user.email, user.password, user.linkedin, user.github, JSON.stringify(user.skills)], function (err, result) {
+                if (err) throw err;
+                res.send({status: "succesfull"});
+                /*var msg = {
+                  to: 'trettdragos@gmail.com',
+                  from: 'register@hacksquad.com',
+                  subject: 'Please verify your email',
+                  text: 'and easy to do anywhere, even with Node.js',
+                  html: '<a href="localhost:3000/verification/'+user.email+'">localhost:3000/verification/'+user.email+'</a>',
+                };
+                sgMail.send(msg);*/
+                console.log('sent verification email to ' + user.email);
+            });
+        }
     });
 });
 
-app.get('/register-team', function(req, res){
-  team = req.query;
-  console.log('checking if team...'+team.name+ ' is in db');
+app.get('/register-team', function (req, res) {
+    team = req.query;
+    console.log('checking if team...' + team.name + ' is in db');
     con.query("SELECT * FROM teams WHERE NAME = ? LIMIT 1", [team.name], function (err, result, fields) {
         if (err) throw err;
-        if(result[0]){
-          console.log("team failed to register: "+team.name);
-          res.send({status:"failed, team already exists"});
+        if (result[0]) {
+            console.log("team failed to register: " + team.name);
+            res.send({status: "failed, team already exists"});
         }
-        else{
-          console.log("register team: "+ result[0]);
-          con.query("INSERT INTO teams (ID, NAME, SUMMARY, HACKATON, SECTION, START_DATE, END_DATE, PLATFORMS, NR_MEMBERS, POSTS, LEADER) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, team.name, team.summary, team.hackaton, team.section, team.startDate, team.endDate, JSON.stringify(team.platforms), team.nrMembers, '', team.leader], function (err, result) {
-            if (err){
-              socket.emit('register team', {status:JSON.stringify(err)});
-            } 
-            console.log('registered team '+team.name+' successful');
-            res.send({status:"succesfull"});
-          });
+        else {
+            console.log("register team: " + result[0]);
+            con.query("INSERT INTO teams (ID, NAME, SUMMARY, HACKATON, SECTION, START_DATE, END_DATE, PLATFORMS, NR_MEMBERS, POSTS, LEADER) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, team.name, team.summary, team.hackaton, team.section, team.startDate, team.endDate, JSON.stringify(team.platforms), team.nrMembers, '', team.leader], function (err, result) {
+                if (err) {
+                    socket.emit('register team', {status: JSON.stringify(err)});
+                }
+                console.log('registered team ' + team.name + ' successful');
+                res.send({status: "succesfull"});
+            });
         }
-      });
+    });
 });
 
-app.get('/register-project', function(req, res){
-  project = req.query;
-  console.log('checking if project...'+project.name+ ' is in db');
+app.get('/register-project', function (req, res) {
+    project = req.query;
+    console.log('checking if project...' + project.name + ' is in db');
     con.query("SELECT * FROM projects WHERE NAME = ? LIMIT 1", [project.name], function (err, result, fields) {
         if (err) throw err;
-        if(result[0]){
-          console.log("project failed to register: "+project.name);
-          res.send({status:"failed, project already exists"});
+        if (result[0]) {
+            console.log("project failed to register: " + project.name);
+            res.send({status: "failed, project already exists"});
         }
-        else{
-          console.log("register project: "+ result[0]);
-          con.query("INSERT INTO projects (ID, NAME, SUMMARY, COMMITMENT, PLATFORMS, PLATFORM_DETAILS, STAGE, BUDGET, FUNDING, NATIONAL, FOUNDER) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, project.name, project.summary, project.commitment, JSON.stringify(project.platforms), project.platformDetails, project.stage, project.budget, project.funding, project.national, project.founder], function (err, result) {
-            if (err){
-              res.send({status:JSON.stringify(err)});
-            } 
-            console.log('registered project '+project.name+' successful');
-            res.send({status:"succesfull"});
-          });
+        else {
+            console.log("register project: " + result[0]);
+            con.query("INSERT INTO projects (ID, NAME, SUMMARY, COMMITMENT, PLATFORMS, PLATFORM_DETAILS, STAGE, BUDGET, FUNDING, NATIONAL, FOUNDER) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, project.name, project.summary, project.commitment, JSON.stringify(project.platforms), project.platformDetails, project.stage, project.budget, project.funding, project.national, project.founder], function (err, result) {
+                if (err) {
+                    res.send({status: JSON.stringify(err)});
+                }
+                console.log('registered project ' + project.name + ' successful');
+                res.send({status: "succesfull"});
+            });
         }
-      });
+    });
 });
 
-io.on('connection', function(socket) {
-  console.log('Client connected...'+socket.id);
-
-  socket.on('request join team', function(req){
-    console.log("client "+ req.username + " requested to join team "+ req.teamName +" of user "+req.leader+ " with token "+ req.token);
-    con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ? LIMIT 1", [req.leader], function(err, result, fields) {
-      if(err) throw err;
-      if(result){
-        var notifications = JSON.parse(result[0].NOTIFICATION);
-        var id = req.username+req.teamName;
-        id = id.replace('/','');
-        id = id.replace('@', '');
-        id = id.replace('.', '');
-        id = id.replace(/\s/g, '');
-        var newReq = {
-          "user": req.username,
-          "vis": "false",
-          "type": "team",
-          "name": req.teamName,
-          "id": id
-        };
-        var reqtest= JSON.stringify(newReq);
-        var isValid = true;
-        for(var i in notifications){
-          if(reqtest===JSON.stringify(notifications[i])){
-            socket.emit('request join team', {status:"already requested"});
-            console.log("failed to send request, already exists");
-            isValid = false;
-            break;
-          }
-        }
-        if(isValid){
-          notifications.push(newReq);
-          var notifTxt = JSON.stringify(notifications);
-          con.query("UPDATE accounts SET NOTIFICATION = ? WHERE EMAIL = ?" , [notifTxt, req.leader], function(err, result){
-            if (err) throw err;
-            if (result[0]) {
-                console.log("project failed to register: " + project.name);
-                socket.emit('register project', {status: "failed, project already exists"});
-            }
-            else {
-                console.log("register project: " + result[0]);
-                con.query("INSERT INTO projects (ID, NAME, SUMMARY, COMMITMENT, PLATFORMS, PLATFORM_DETAILS, STAGE, BUDGET, FUNDING, NATIONAL, FOUNDER) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, project.name, project.summary, project.commitment, JSON.stringify(project.platforms), project.platformDetails, project.stage, project.budget, project.funding, project.national, project.founder], function (err, result) {
-                    if (err) {
-                        socket.emit('register project', {status: JSON.stringify(err)});
-                    }
-                    console.log('registered project ' + project.name + ' successful');
-                    socket.emit('register project', {status: "succesfull"});
-                });
-            }
-        });
-    });
+io.on('connection', function (socket) {
+    console.log('Client connected...' + socket.id);
 
     socket.on('request join team', function (req) {
         console.log("client " + req.username + " requested to join team " + req.teamName + " of user " + req.leader + " with token " + req.token);
         con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ? LIMIT 1", [req.leader], function (err, result, fields) {
             if (err) throw err;
             if (result) {
-                let notifications = JSON.parse(result[0].NOTIFICATION);
-                let id = req.username + req.teamName;
+                var notifications = JSON.parse(result[0].NOTIFICATION);
+                var id = req.username + req.teamName;
                 id = id.replace('/', '');
                 id = id.replace('@', '');
                 id = id.replace('.', '');
                 id = id.replace(/\s/g, '');
-                let newReq = {
+                var newReq = {
                     "user": req.username,
                     "vis": "false",
                     "type": "team",
                     "name": req.teamName,
                     "id": id
                 };
-                let reqtest = JSON.stringify(newReq);
-                let isValid = true;
-                for (let i in notifications) {
+                var reqtest = JSON.stringify(newReq);
+                var isValid = true;
+                for (var i in notifications) {
                     if (reqtest === JSON.stringify(notifications[i])) {
                         socket.emit('request join team', {status: "already requested"});
                         console.log("failed to send request, already exists");
@@ -208,71 +164,124 @@ io.on('connection', function(socket) {
                 }
                 if (isValid) {
                     notifications.push(newReq);
-                    let notifTxt = JSON.stringify(notifications);
+                    var notifTxt = JSON.stringify(notifications);
                     con.query("UPDATE accounts SET NOTIFICATION = ? WHERE EMAIL = ?", [notifTxt, req.leader], function (err, result) {
                         if (err) throw err;
-                        if (result.affectedRows == 0) {
-                            socket.emit('request join team', {status: "failed"});
-                            console.log('failed to register request to team leader ' + req.leader + " from user " + req.username + " in team " + req.teamName);
-                        } else {
-                            console.log('succesfully registered request to team leader ' + req.leader + " from user " + req.username + " in team " + req.teamName);
-                            socket.emit('request join team', {status: "succesfull"});
+                        if (result[0]) {
+                            console.log("project failed to register: " + project.name);
+                            socket.emit('register project', {status: "failed, project already exists"});
+                        }
+                        else {
+                            console.log("register project: " + result[0]);
+                            con.query("INSERT INTO projects (ID, NAME, SUMMARY, COMMITMENT, PLATFORMS, PLATFORM_DETAILS, STAGE, BUDGET, FUNDING, NATIONAL, FOUNDER) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, project.name, project.summary, project.commitment, JSON.stringify(project.platforms), project.platformDetails, project.stage, project.budget, project.funding, project.national, project.founder], function (err, result) {
+                                if (err) {
+                                    socket.emit('register project', {status: JSON.stringify(err)});
+                                }
+                                console.log('registered project ' + project.name + ' successful');
+                                socket.emit('register project', {status: "succesfull"});
+                            });
                         }
                     });
                 }
             }
         });
-    });
 
-    socket.on('request join project', function (req) {
-        console.log("client " + req.username + " requested to join project " + req.projectName + " of user " + req.leader + " with token " + req.token);
-        con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ? LIMIT 1", [req.leader], function (err, result, fields) {
-            if (err) throw err;
-            if (result) {
-                let notifications = JSON.parse(result[0].NOTIFICATION);
-                let id = req.username + req.projectName;
-                id = id.replace('/', '');
-                id = id.replace('@', '');
-                id = id.replace('.', '');
-                id = id.replace(/\s/g, '');
-                let newReq = {
-                    "user": req.username,
-                    "vis": "false",
-                    "type": "project",
-                    "name": req.projectName,
-                    "id": id
-                };
-                let reqtest = JSON.stringify(newReq);
-                let isValid = true;
-                for (let i in notifications) {
-                    if (reqtest === JSON.stringify(notifications[i])) {
-                        socket.emit('request join project', {status: "already requested"});
-                        console.log("failed to send request, already exists");
-                        isValid = false;
-                        break;
+        socket.on('request join team', function (req) {
+            console.log("client " + req.username + " requested to join team " + req.teamName + " of user " + req.leader + " with token " + req.token);
+            con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ? LIMIT 1", [req.leader], function (err, result, fields) {
+                if (err) throw err;
+                if (result) {
+                    let notifications = JSON.parse(result[0].NOTIFICATION);
+                    let id = req.username + req.teamName;
+                    id = id.replace('/', '');
+                    id = id.replace('@', '');
+                    id = id.replace('.', '');
+                    id = id.replace(/\s/g, '');
+                    let newReq = {
+                        "user": req.username,
+                        "vis": "false",
+                        "type": "team",
+                        "name": req.teamName,
+                        "id": id
+                    };
+                    let reqtest = JSON.stringify(newReq);
+                    let isValid = true;
+                    for (let i in notifications) {
+                        if (reqtest === JSON.stringify(notifications[i])) {
+                            socket.emit('request join team', {status: "already requested"});
+                            console.log("failed to send request, already exists");
+                            isValid = false;
+                            break;
+                        }
+                    }
+                    if (isValid) {
+                        notifications.push(newReq);
+                        let notifTxt = JSON.stringify(notifications);
+                        con.query("UPDATE accounts SET NOTIFICATION = ? WHERE EMAIL = ?", [notifTxt, req.leader], function (err, result) {
+                            if (err) throw err;
+                            if (result.affectedRows == 0) {
+                                socket.emit('request join team', {status: "failed"});
+                                console.log('failed to register request to team leader ' + req.leader + " from user " + req.username + " in team " + req.teamName);
+                            } else {
+                                console.log('succesfully registered request to team leader ' + req.leader + " from user " + req.username + " in team " + req.teamName);
+                                socket.emit('request join team', {status: "succesfull"});
+                            }
+                        });
                     }
                 }
-                if (isValid) {
-                    notifications.push(newReq);
-                    let notifTxt = JSON.stringify(notifications);
-                    con.query("UPDATE accounts SET NOTIFICATION = ? WHERE EMAIL = ?", [notifTxt, req.leader], function (err, result) {
-                        if (err) throw err;
-                        if (result.affectedRows == 0) {
-                            socket.emit('request join project', {status: "failed"});
-                            console.log('failed to register request to team leader ' + req.leader + " from user " + req.username + " in team " + req.teamName);
-                        } else {
-                            console.log('succesfully registered request to team leader ' + req.leader + " from user " + req.username + " in team " + req.teamName);
-                            socket.emit('request join project', {status: "succesfull"});
+            });
+        });
+
+        socket.on('request join project', function (req) {
+            console.log("client " + req.username + " requested to join project " + req.projectName + " of user " + req.leader + " with token " + req.token);
+            con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ? LIMIT 1", [req.leader], function (err, result, fields) {
+                if (err) throw err;
+                if (result) {
+                    let notifications = JSON.parse(result[0].NOTIFICATION);
+                    let id = req.username + req.projectName;
+                    id = id.replace('/', '');
+                    id = id.replace('@', '');
+                    id = id.replace('.', '');
+                    id = id.replace(/\s/g, '');
+                    let newReq = {
+                        "user": req.username,
+                        "vis": "false",
+                        "type": "project",
+                        "name": req.projectName,
+                        "id": id
+                    };
+                    let reqtest = JSON.stringify(newReq);
+                    let isValid = true;
+                    for (let i in notifications) {
+                        if (reqtest === JSON.stringify(notifications[i])) {
+                            socket.emit('request join project', {status: "already requested"});
+                            console.log("failed to send request, already exists");
+                            isValid = false;
+                            break;
                         }
-                    });
+                    }
+                    if (isValid) {
+                        notifications.push(newReq);
+                        let notifTxt = JSON.stringify(notifications);
+                        con.query("UPDATE accounts SET NOTIFICATION = ? WHERE EMAIL = ?", [notifTxt, req.leader], function (err, result) {
+                            if (err) throw err;
+                            if (result.affectedRows == 0) {
+                                socket.emit('request join project', {status: "failed"});
+                                console.log('failed to register request to team leader ' + req.leader + " from user " + req.username + " in team " + req.teamName);
+                            } else {
+                                console.log('succesfully registered request to team leader ' + req.leader + " from user " + req.username + " in team " + req.teamName);
+                                socket.emit('request join project', {status: "succesfull"});
+                            }
+                        });
+                    }
                 }
-            }
+            });
+        });
+
+        socket.on('disconnect', function () {
+            console.log("Client disconected..." + socket.id);
         });
     });
-
-  socket.on('disconnect', function () {
-      console.log("Client disconected..."+ socket.id);
-  });
 });
 
 function getPlatformString(platforms) {
@@ -481,7 +490,12 @@ app.get('/teamsSearch/:searchTerm', function (req, res) {
         for (i in result) {
             result[i].PLATFORMS = getPlatformString(JSON.parse(result[i].PLATFORMS));
         }
-        res.render('pages/teams', {email: req.cookies.username, tab: '3', posts: result, term: req.params.searchTerm});
+        res.render('pages/teams', {
+            email: req.cookies.username,
+            tab: '3',
+            posts: result,
+            term: req.params.searchTerm
+        });
     });
 });
 
@@ -494,7 +508,12 @@ app.get('/projectsSearch/:searchTerm', function (req, res) {
         for (i in result) {
             result[i].PLATFORMS = getPlatformString(JSON.parse(result[i].PLATFORMS));
         }
-        res.render('pages/teams', {email: req.cookies.username, tab: '3', posts: result, term: req.params.searchTerm});
+        res.render('pages/teams', {
+            email: req.cookies.username,
+            tab: '3',
+            posts: result,
+            term: req.params.searchTerm
+        });
     });
 });
 
