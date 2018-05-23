@@ -123,7 +123,7 @@
                 $.ajax({
                         data:user,
                         type: 'GET',
-                        url: 'http://localhost:3000/auth-register',                      
+                        url: 'http://localhost:3000/register/auth',
                         success: function(res) {
                             console.log(res.status);
                             if(res.status == "succesfull"){

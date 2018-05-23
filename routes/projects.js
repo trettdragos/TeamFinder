@@ -26,6 +26,28 @@ router.get('/', function (req, res) {
     }
 });
 
+router.get('/search', function (req, res) {
+    res.redirect('/projects');
+});
+
+router.get('/search/:searchTerm', function (req, res) {
+    if (!req.cookies.username)
+        res.redirect('/login');
+    let searchFor = '%' + req.params.searchTerm + '%';
+    con.query("SELECT * FROM projects WHERE NAME LIKE ?", [searchFor], function (err, result, fields) {
+        if (err) throw err;
+        for (i in result) {
+            result[i].PLATFORMS = getPlatformString(JSON.parse(result[i].PLATFORMS));
+        }
+        res.render('pages/projects', {
+            email: req.cookies.username,
+            tab: '2',
+            posts: result,
+            term: req.params.searchTerm
+        });
+    });
+});
+
 router.get('/create', function (req, res) {
     if (req.cookies.username) {
         res.render('pages/create-project', {tab: '2'});
@@ -35,14 +57,32 @@ router.get('/create', function (req, res) {
     }
 });
 
+router.get('/register', function (req, res) {
+    project = req.query;
+    console.log('checking if project...' + project.name + ' is in db');
+    con.query("SELECT * FROM projects WHERE NAME = ? LIMIT 1", [project.name], function (err, result, fields) {
+        if (err) throw err;
+        if (result[0]) {
+            console.log("project failed to register: " + project.name);
+            res.send({status: "failed, project already exists"});
+        }
+        else {
+            console.log("register project: " + result[0]);
+            con.query("INSERT INTO projects (ID, NAME, SUMMARY, COMMITMENT, PLATFORMS, PLATFORM_DETAILS, STAGE, BUDGET, FUNDING, NATIONAL, FOUNDER) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, project.name, project.summary, project.commitment, JSON.stringify(project.platforms), project.platformDetails, project.stage, project.budget, project.funding, project.national, project.founder], function (err, result) {
+                if (err) {
+                    res.send({status: JSON.stringify(err)});
+                }
+                console.log('registered project ' + project.name + ' successful');
+                res.send({status: "succesfull"});
+            });
+        }
+    });
+});
+
 router.get('/:project', function (req, res) {
     if (!req.cookies.username)
         res.redirect('/login');
 
-    if(req.params.project == 'create') {
-        console.log("TEST CACA /:project instead of /create")
-        return;
-    }
     con.query("SELECT * FROM projects WHERE NAME = ? LIMIT 1", [req.params.project], function (err, result, fields) {
         if (err) throw err;
         if (result[0]) {

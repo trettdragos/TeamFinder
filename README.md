@@ -26,6 +26,7 @@
 - separare proiecte/echipe active de cele inactive/folosite
 - adaugare logo
 - poze de profil utilizatori
+- problema cu fisierele din /public cand esti pe linkuri care nu sunt imediat langa root (de ex /projects/create)
 
 # Mare
 prima noapte pt avans 340 bcr

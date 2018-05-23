@@ -35,11 +35,57 @@ router.get('/create', function (req, res) {
     }
 });
 
-router.get('/teams/:team', function (req, res) {
+router.get('/search', function (req, res) {
+    res.redirect('/teams');
+});
+
+router.get('/search/:searchTerm', function (req, res) {
+    if (!req.cookies.username)
+        res.redirect('/login');
+    let searchFor = '%' + req.params.searchTerm + '%';
+    con.query("SELECT * FROM teams WHERE NAME LIKE ?", [searchFor], function (err, result, fields) {
+        if (err) throw err;
+        for (i in result) {
+            result[i].PLATFORMS = getPlatformString(JSON.parse(result[i].PLATFORMS));
+        }
+        res.render('pages/teams', {
+            email: req.cookies.username,
+            tab: '3',
+            posts: result,
+            term: req.params.searchTerm
+        });
+    });
+});
+
+router.get('/register', function (req, res) {
+    team = req.query;
+    console.log('checking if team...' + team.name + ' is in db');
+    con.query("SELECT * FROM teams WHERE NAME = ? LIMIT 1", [team.name], function (err, result, fields) {
+        if (err) throw err;
+        if (result[0]) {
+            console.log("team failed to register: " + team.name);
+            res.send({status: "failed, team already exists"});
+        }
+        else {
+            console.log("register team: " + result[0]);
+            con.query("INSERT INTO teams (ID, NAME, SUMMARY, HACKATON, SECTION, START_DATE, END_DATE, PLATFORMS, NR_MEMBERS, POSTS, LEADER) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, team.name, team.summary, team.hackaton, team.section, team.startDate, team.endDate, JSON.stringify(team.platforms), team.nrMembers, '', team.leader], function (err, result) {
+                if (err) {
+                    socket.emit('register team', {status: JSON.stringify(err)});
+                }
+                console.log('registered team ' + team.name + ' successful');
+                res.send({status: "succesfull"});
+            });
+        }
+    });
+});
+
+router.get('/:team', function (req, res) {
     if (!req.cookies.username)
         res.redirect('/login');
 
-    if(req.params.team == 'create')
+    console.log('Access teams from page: ' + req.params.team);
+
+    if (req.params.team == 'create')
         return;
 
     con.query("SELECT * FROM teams WHERE NAME = ? LIMIT 1", [req.params.team], function (err, result, fields) {

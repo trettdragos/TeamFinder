@@ -40,7 +40,7 @@
             $.ajax({
                         data:{email:document.getElementById('email').value, password:document.getElementById('password').value},
                         type: 'GET',
-                        url: 'http://localhost:3000/auth-login',                      
+                        url: 'http://localhost:3000/login/auth',
                         success: function(res) {
                             console.log(res.status);
                             if(res.status == "succesfull"){
