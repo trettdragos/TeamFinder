@@ -180,6 +180,14 @@ io.on('connection', function (socket) {
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
+let security = require('./other/security');
+security.encryptPassword("test", (hash) => {
+   console.log(hash);
+   security.checkPassword("test", hash, (res) => {
+       console.log(res);
+   })
+});
+
 let routes = require('./routes');
 routes.forEach(item => app.use(item.url, item.router));
 app.get('/logout', function (req, res) {

@@ -1,6 +1,7 @@
 let express = require('express');
 let router = express.Router();
 let mysql = require('mysql');
+let security = require('../other/security');
 
 let con = mysql.createConnection({
     host: "localhost",
@@ -28,22 +29,25 @@ router.get('/auth', function (req, res) {
         }
         else {
             console.log("registering user: " + user.name + " with the email: " + user.email);
-            //schimba CONFIRMED la 0 imediat repun pe picioare sendgrid
-            con.query("INSERT INTO accounts (ID, USERNAME, EMAIL, PASSWORD, LINKEDIN, GITHUB, SKILLS, CONFIRMED, NOTIFICATION) VALUES (?, ?, ?, ?, ?, ?, ?, '1', '[]')", [0, user.name, user.email, user.password, user.linkedin, user.github, JSON.stringify(user.skills)], function (err, result) {
-                if (err) throw err;
-                res.send({status: "succesfull"});
-                /*var msg = {
-                  to: 'trettdragos@gmail.com',
-                  from: 'register@hacksquad.com',
-                  subject: 'Please verify your email',
-                  text: 'and easy to do anywhere, even with Node.js',
-                  html: '<a href="localhost:3000/verification/'+user.email+'">localhost:3000/verification/'+user.email+'</a>',
-                };
-                sgMail.send(msg);*/
-                console.log('sent verification email to ' + user.email);
+            /* Encrypt password */
+            security.encryptPassword(user.password, (hash) => {
+                //schimba CONFIRMED la 0 imediat repun pe picioare sendgrid
+                con.query("INSERT INTO accounts (ID, USERNAME, EMAIL, PASSWORD, LINKEDIN, GITHUB, SKILLS, CONFIRMED, NOTIFICATION) VALUES (?, ?, ?, ?, ?, ?, ?, '1', '[]')", [0, user.name, user.email, hash, user.linkedin, user.github, JSON.stringify(user.skills)], function (err, result) {
+                    if (err) throw err;
+                    res.send({status: "succesfull"});
+                    /*var msg = {
+                      to: 'trettdragos@gmail.com',
+                      from: 'register@hacksquad.com',
+                      subject: 'Please verify your email',
+                      text: 'and easy to do anywhere, even with Node.js',
+                      html: '<a href="localhost:3000/verification/'+user.email+'">localhost:3000/verification/'+user.email+'</a>',
+                    };
+                    sgMail.send(msg);*/
+                    console.log('sent verification email to ' + user.email);
+                });
             });
         }
     });
 });
 
-module.exports = {url: '', router: router};
+module.exports = {url: '/register', router: router};

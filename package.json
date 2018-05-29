@@ -4,7 +4,7 @@
   "description": "Web app for finding team",
   "main": "server.js",
   "scripts": {
-    "test": "node server.js"
+    "run": "node server.js"
   },
   "keywords": [
     "trett"
@@ -31,6 +31,7 @@
     "socket.io-bundle": "^0.1.2",
     "tiny-worker": "^2.1.2",
     "webworker-threads": "^0.7.13",
-    "xss": "^0.3.7"
+    "xss": "^0.3.7",
+    "bcrypt": "^2.0.1"
   }
 }
