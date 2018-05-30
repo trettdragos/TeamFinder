@@ -1,9 +1,13 @@
 <script type="text/javascript">
-	var socket = io.connect();
-	socket.emit('listener', {email:$.cookie('username'), notifications:$.cookie('notifications')});
-	socket.on('listener', function(notification){
-		alert('new notification '+notification);
-		$.cookie('notifications', notification, {expires: 14, path: '/'});
-		socket.emit('listener', {email:$.cookie('username'), notifications:$.cookie('notifications')});
-	});
+	if($.cookie('username')){
+		var socket = io.connect();
+		socket.on('request email', function(){
+			socket.emit('receive email', {email:$.cookie('username')});
+		});
+		socket.on('notification', function(notification){
+			alert('new notification '+notification);
+			//$.cookie('notifications', notification, {expires: 14, path: '/'});
+		});
+	}
+	
 </script>

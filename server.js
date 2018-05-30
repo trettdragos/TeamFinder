@@ -6,6 +6,8 @@ let cookieParser = require('cookie-parser');
 let bodyParser = require('body-parser');
 let server = require('http').createServer(app);
 
+let connectedUsers = {};
+let connectedSockets = {};
 let io = require('socket.io').listen(server, {
     log: false,
     agent: false,
@@ -26,6 +28,15 @@ app.use(cookieParser());
 
 io.on('connection', function (socket) {
     console.log('Client connected...' + socket.id);
+    //add user to connected list
+    socket.emit('request email');
+    socket.on('receive email', function(res){
+      if(res.email){
+        connectedUsers[res.email] = socket.id;
+        connectedSockets[socket.id] = res.email;
+        console.log(JSON.stringify(connectedUsers));
+      }
+    });
 
     socket.on('request join team', function (req) {
         console.log("client " + req.username + " requested to join team " + req.teamName + " of user " + req.leader + " with token " + req.token);
@@ -77,8 +88,8 @@ io.on('connection', function (socket) {
                     });
                 }
             }
+          });
         });
-
         socket.on('request join team', function (req) {
             console.log("client " + req.username + " requested to join team " + req.teamName + " of user " + req.leader + " with token " + req.token);
             con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ? LIMIT 1", [req.leader], function (err, result, fields) {
@@ -172,10 +183,12 @@ io.on('connection', function (socket) {
         });
 
         socket.on('disconnect', function () {
-            console.log("Client disconected..." + socket.id);
+            console.log("Client disconected..." + socket.id+" with email "+ connectedSockets[socket.id]);
+            delete connectedUsers[connectedSockets[socket.id]];
+            console.log(JSON.stringify(connectedUsers));
+            //remove user from conected list
         });
-    });
-});
+      });
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
