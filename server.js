@@ -37,59 +37,6 @@ io.on('connection', function (socket) {
         console.log(JSON.stringify(connectedUsers));
       }
     });
-
-    socket.on('request join team', function (req) {
-        console.log("client " + req.username + " requested to join team " + req.teamName + " of user " + req.leader + " with token " + req.token);
-        con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ? LIMIT 1", [req.leader], function (err, result, fields) {
-            if (err) throw err;
-            if (result) {
-                let notifications = JSON.parse(result[0].NOTIFICATION);
-                let id = req.username + req.teamName;
-                id = id.replace('/', '');
-                id = id.replace('@', '');
-                id = id.replace('.', '');
-                id = id.replace(/\s/g, '');
-                let newReq = {
-                    "user": req.username,
-                    "vis": "false",
-                    "type": "team",
-                    "name": req.teamName,
-                    "id": id
-                };
-                let reqtest = JSON.stringify(newReq);
-                let isValid = true;
-                for (let i in notifications) {
-                    if (reqtest === JSON.stringify(notifications[i])) {
-                        socket.emit('request join team', {status: "already requested"});
-                        console.log("failed to send request, already exists");
-                        isValid = false;
-                        break;
-                    }
-                }
-                if (isValid) {
-                    notifications.push(newReq);
-                    let notifTxt = JSON.stringify(notifications);
-                    con.query("UPDATE accounts SET NOTIFICATION = ? WHERE EMAIL = ?", [notifTxt, req.leader], function (err, result) {
-                        if (err) throw err;
-                        if (result[0]) {
-                            console.log("project failed to register: " + project.name);
-                            socket.emit('register project', {status: "failed, project already exists"});
-                        }
-                        else {
-                            console.log("register project: " + result[0]);
-                            con.query("INSERT INTO projects (ID, NAME, SUMMARY, COMMITMENT, PLATFORMS, PLATFORM_DETAILS, STAGE, BUDGET, FUNDING, NATIONAL, FOUNDER) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, project.name, project.summary, project.commitment, JSON.stringify(project.platforms), project.platformDetails, project.stage, project.budget, project.funding, project.national, project.founder], function (err, result) {
-                                if (err) {
-                                    socket.emit('register project', {status: JSON.stringify(err)});
-                                }
-                                console.log('registered project ' + project.name + ' successful');
-                                socket.emit('register project', {status: "succesfull"});
-                            });
-                        }
-                    });
-                }
-            }
-          });
-        });
         socket.on('request join team', function (req) {
             console.log("client " + req.username + " requested to join team " + req.teamName + " of user " + req.leader + " with token " + req.token);
             con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ? LIMIT 1", [req.leader], function (err, result, fields) {
@@ -108,6 +55,7 @@ io.on('connection', function (socket) {
                         "name": req.teamName,
                         "id": id
                     };
+                    io.sockets.connected[connectedUsers[req.leader]].emit('notification', JSON.stringify(newReq));
                     let reqtest = JSON.stringify(newReq);
                     let isValid = true;
                     for (let i in notifications) {
@@ -181,7 +129,49 @@ io.on('connection', function (socket) {
                 }
             });
         });
-
+        socket.on('answer request', function(req){
+    console.log("leader "+req.leader);
+        con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ?", [req.leader], function(err, result){
+          if(err) throw err;
+          console.log(req.leader);
+          var stringNotif = result[0].NOTIFICATION;
+          var notif = JSON.parse(stringNotif);
+          for(i in notif){
+            if(notif[i].id===req.id){
+              notif[i].vis = "true";
+            }
+          }
+          stringNotif = JSON.stringify(notif);
+          con.query("UPDATE accounts SET NOTIFICATION = ? WHERE EMAIL = ?", [stringNotif, req.leader], function(err2, result2){
+            if(err2) throw err2;
+            if(result2.affectedRows!=0){
+              console.log('updated notifications for leader');
+              if(req.status==="accept"){
+                var table = req.type+'s';
+                var col;
+                if(table === 'projects')
+                  col = 'COLLABORATORS';
+                else col = 'POSTS';
+                con.query("SELECT "+col+" FROM "+table+" WHERE NAME = ?", [req.name], function(err3, result3){
+                    if(err3) throw err3;
+                    var coll;
+                    if(col=='POSTS')
+                    coll = result3[0].POSTS;
+                    else coll = result3[0].COLLABORATORS;
+                    coll = coll+req.requester+', ';
+                    con.query("UPDATE "+table+" SET "+col+" = ? WHERE NAME = ?", [coll, req.name], function(err4, result4){
+                      if(err4) throw err4;
+                      if(result4.affectedRows!=0){
+                        console.log('added requester as colaborator');
+                        socket.emit('answer request', {status:'succesfull'});
+                      }
+                    });
+                });
+              }
+            }
+          });
+        });
+  });
         socket.on('disconnect', function () {
             console.log("Client disconected..." + socket.id+" with email "+ connectedSockets[socket.id]);
             delete connectedUsers[connectedSockets[socket.id]];
@@ -192,14 +182,6 @@ io.on('connection', function (socket) {
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
-
-let security = require('./other/security');
-security.encryptPassword("test", (hash) => {
-   console.log(hash);
-   security.checkPassword("test", hash, (res) => {
-       console.log(res);
-   })
-});
 
 let routes = require('./routes');
 routes.forEach(item => app.use(item.url, item.router));
