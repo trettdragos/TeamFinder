@@ -1,3 +1,4 @@
+<script src="/notify.js"></script>
 <script type="text/javascript">
 	if($.cookie('username')){
 		var socket = io.connect();
@@ -5,9 +6,7 @@
 			socket.emit('receive email', {email:$.cookie('username')});
 		});
 		socket.on('notification', function(notification){
-			alert('new notification '+notification);
-			//$.cookie('notifications', notification, {expires: 14, path: '/'});
+			$.notify("User "+notification.user+" has requested to join "+notification.type+" "+notification.name, "info");
 		});
 	}
-	
 </script>

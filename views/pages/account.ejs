@@ -89,7 +89,6 @@
     <% include ../partials/footer %>
     <% include ../partials/socket-notification.ejs %>
     <script>
-        var socket = io.connect();
         <% for(i in notifications){ %>
           <% if(notifications[i].vis==="false"){ %>
           $('#accept<%= notifications[i].id %>').on('click', function(){

@@ -55,7 +55,7 @@ io.on('connection', function (socket) {
                         "name": req.teamName,
                         "id": id
                     };
-                    io.sockets.connected[connectedUsers[req.leader]].emit('notification', JSON.stringify(newReq));
+                    io.sockets.connected[connectedUsers[req.leader]].emit('notification', newReq);
                     let reqtest = JSON.stringify(newReq);
                     let isValid = true;
                     for (let i in notifications) {
@@ -102,6 +102,7 @@ io.on('connection', function (socket) {
                         "name": req.projectName,
                         "id": id
                     };
+                    io.sockets.connected[connectedUsers[req.leader]].emit('notification', newReq);
                     let reqtest = JSON.stringify(newReq);
                     let isValid = true;
                     for (let i in notifications) {
