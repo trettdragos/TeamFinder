@@ -1,105 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
 
-  <head>
+<head>
     <% include ../partials/head %>
     <style type="text/css">
-      .jumbotron{
-        box-shadow: 2px 8px 16px -8px black;
-        padding: 1%;
-      }
-      .btn{
-        background-color: #343a40; 
-        border-color: #343a40; 
-        color: #00e500;
-      }
-      .btn:hover{
-        background-color: #343a40; 
-        border-color: #00e500; 
-        color: #00e500;
-      }
+        .jumbotron {
+            box-shadow: 2px 8px 16px -8px black;
+            padding: 1%;
+        }
+
+        .btn {
+            background-color: #343a40;
+            border-color: #343a40;
+            color: #00e500;
+        }
+
+        .btn:hover {
+            background-color: #343a40;
+            border-color: #00e500;
+            color: #00e500;
+        }
+
+        .profile {
+            /*height: 300px;*/
+            /*display: inline-block;*/
+            height: auto;
+        }
+
+        span.tags {
+            background: #1abc9c;
+            border-radius: 2px;
+            color: #f5f5f5;
+            font-weight: bold;
+            padding: 2px 4px;
+        }
+
+        .img-circle {
+            max-height: 200px;
+        }
     </style>
-  </head>
+</head>
 
-  <body>
-    <% include ../partials/header %>
-    
-    <div class="container">
-      <div class="row">
+<body>
+<% include ../partials/header %>
+
+<div class="container">
+    <div class="row">
         <div class="col-lg-12 text-left">
-          <div class="jumbotron">
-            <h3><b><%= email %></b></h3>
-            <hr class="my-4">
-            <h4>Notifications:</h4>
-            <hr class="my-4">
-
-            <% for(i in notifications){ %>
-            <% if(notifications[i].vis==="false"){ %>
-            <div style="align-content: inline;">
-              <h4><a href="" class="btn" id="accept<%= notifications[i].id %>">Accept</a> <a href="" class="btn" id="refuse<%= notifications[i].id %>" >Refuse</a> User <b><%= notifications[i].user %></b> wants to join <%= notifications[i].type %> : <%= notifications[i].name %></h4>
+            <div class="card">
+            <div class="row profile align-items-center">
+                <div class="col-12 col-lg-7 order-12 order-sm-12 order-md-12 order-lg-1">
+                    <h2><%=name%></h2>
+                    <p><strong>About: </strong> Web Designer / UI. </p>
+                    <p><strong>Email: </strong> <%=email%> </p>
+                    <p><strong>Skills: </strong>
+                        <span class="tags">html5</span>
+                        <span class="tags">css3</span>
+                        <span class="tags">jquery</span>
+                        <span class="tags">bootstrap3</span>
+                        <span class="tags">html5</span>
+                        <span class="tags">css3</span>
+                        <span class="tags">jquery</span>
+                        <span class="tags">bootstrap3</span>
+                        <span class="tags">html5</span>
+                        <span class="tags">css3</span>
+                        <span class="tags">jquery</span>
+                        <span class="tags">bootstrap3</span>
+                        <span class="tags">html5</span>
+                        <span class="tags">css3</span>
+                        <span class="tags">jquery</span>
+                        <span class="tags">bootstrap3</span>
+                    </p>
+                </div>
+                <div class="col-12 col-lg-5 order-1 order-sm-1 order-md-1 order-lg-12 text-center text-lg-right">
+                    <img src="<%=profile%>" alt=""
+                         class="img-circle img-responsive center-block">
+                </div>
             </div>
-            <% }} %>
-          </div>
+            </div>
+            <!--</div>-->
+            <!--</div>-->
+            <div class="jumbotron">
+                <h3><b><%= email %></b></h3>
+                <hr class="my-4">
+                <h4>Notifications:</h4>
+                <hr class="my-4">
+
+                <% for(i in notifications){ %>
+                <% if(notifications[i].vis === "false"){ %>
+                <div style="align-content: inline;">
+                    <h4><a href="" class="btn" id="accept<%= notifications[i].id %>">Accept</a> <a href=""
+                                                                                                   class="btn"
+                                                                                                   id="refuse<%= notifications[i].id %>">Refuse</a>
+                        User <b><%= notifications[i].user %></b> wants to join <%= notifications[i].type %>
+                        : <%= notifications[i].name %></h4>
+                </div>
+                <% }} %>
+            </div>
         </div>
-      </div>
-      <div class="row">
-        <div class="col-lg-12 text-left">
-          <div class="jumbotron">
-            <h4><b>Your Projects:</b></h4>
-          </div>
-        </div>
-      </div>
-      <% for(i in projects){ %>
-       <div class="row">
-        <div class="col-lg-12 text-left">
-          <div class="jumbotron">
-            <h4 class="display-6"><b><%= projects[i].NAME %></b></h4>
-            <hr class="my-4">
-            <h5><%= projects[i].SUMMARY %></h5>
-            <p class="lead">
-              <a class="btn btn-lg" href="/projects/<%= projects[i].NAME %>" role="button">Learn more</a>
-            </p>
-          </div>
-        </div>
-      </div>
-      <% } %>
-      <div class="row">
-        <div class="col-lg-12 text-left">
-          <div class="jumbotron">
-            <h4><b>Your Teams:</b></h4>
-          </div>
-        </div>
-      </div>
-      <% for(i in teams){ %>
-       <div class="row">
-        <div class="col-lg-12 text-left">
-          <div class="jumbotron">
-            <h4 class="display-6"><b><%= teams[i].NAME %></b></h4>
-            <hr class="my-4">
-            <h5><%= teams[i].SUMMARY %></h5>
-            <p class="lead">
-              <a class="btn btn-lg" href="/teams/<%= teams[i].NAME %>" role="button">Learn more</a>
-            </p>
-          </div>
-        </div>
-      </div>
-      <% } %>
     </div>
+    <div class="row">
+        <div class="col-lg-12 text-left">
+            <div class="jumbotron">
+                <h4><b>Your Projects:</b></h4>
+            </div>
+        </div>
+    </div>
+    <% for(i in projects){ %>
+    <div class="row">
+        <div class="col-lg-12 text-left">
+            <div class="jumbotron">
+                <h4 class="display-6"><b><%= projects[i].NAME %></b></h4>
+                <hr class="my-4">
+                <h5><%= projects[i].SUMMARY %></h5>
+                <p class="lead">
+                    <a class="btn btn-lg" href="/projects/<%= projects[i].NAME %>" role="button">Learn more</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    <% } %>
+    <div class="row">
+        <div class="col-lg-12 text-left">
+            <div class="jumbotron">
+                <h4><b>Your Teams:</b></h4>
+            </div>
+        </div>
+    </div>
+    <% for(i in teams){ %>
+    <div class="row">
+        <div class="col-lg-12 text-left">
+            <div class="jumbotron">
+                <h4 class="display-6"><b><%= teams[i].NAME %></b></h4>
+                <hr class="my-4">
+                <h5><%= teams[i].SUMMARY %></h5>
+                <p class="lead">
+                    <a class="btn btn-lg" href="/teams/<%= teams[i].NAME %>" role="button">Learn more</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    <% } %>
+</div>
 
-    <% include ../partials/footer %>
-    <% include ../partials/socket-notification.ejs %>
-    <script>
-        <% for(i in notifications){ %>
-          <% if(notifications[i].vis==="false"){ %>
-          $('#accept<%= notifications[i].id %>').on('click', function(){
-            socket.emit('answer request', {status:'accept', id:'<%= notifications[i].id %>', type:'<%= notifications[i].type %>', name:'<%= notifications[i].name %>', requester:'<%= notifications[i].user %>', leader:$.cookie('username')});
-          });
-          $('#refuse<%= notifications[i].id %>').on('click', function(){
-            socket.emit('answer request', {status:'refuse', id:'<%= notifications[i].id %>', type:'<%= notifications[i].type %>', name:'<%= notifications[i].name %>', requester:'<%= notifications[i].user %>', leader:$.cookie('username')});
-          });
-        <% }} %>
-    </script>
+<% include ../partials/footer %>
+<% include ../partials/socket-notification.ejs %>
+<script>
+    <% for(i in notifications){ %>
+    <% if(notifications[i].vis === "false"){ %>
+    $('#accept<%= notifications[i].id %>').on('click', function () {
+        socket.emit('answer request', {
+            status: 'accept',
+            id: '<%= notifications[i].id %>',
+            type: '<%= notifications[i].type %>',
+            name: '<%= notifications[i].name %>',
+            requester: '<%= notifications[i].user %>',
+            leader: $.cookie('username')
+        });
+    });
+    $('#refuse<%= notifications[i].id %>').on('click', function () {
+        socket.emit('answer request', {
+            status: 'refuse',
+            id: '<%= notifications[i].id %>',
+            type: '<%= notifications[i].type %>',
+            name: '<%= notifications[i].name %>',
+            requester: '<%= notifications[i].user %>',
+            leader: $.cookie('username')
+        });
+    });
+    <% }} %>
+</script>
 
-  </body>
+</body>
 
 </html>

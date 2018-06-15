@@ -17,10 +17,12 @@ router.get('/', function (req, res) {
             if (err) throw err;
             con.query("SELECT * FROM teams WHERE POSTS LIKE ? OR LEADER = ?", [searchFor, req.cookies.username], function (errTeams, teams, fields2) {
                 if (errTeams) throw errTeams;
-                con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ?", [req.cookies.username], function (err3, result, fields3) {
+                con.query("SELECT * FROM accounts WHERE EMAIL = ?", [req.cookies.username], function (err3, result, fields3) {
                     if (err3) throw err3;
                     res.render('pages/account', {
+                        profile: "https://identicon-api.herokuapp.com/"+req.cookies.username+"/512?format=png",
                         tab: '4',
+                        name: result[0].USERNAME,
                         email: req.cookies.username,
                         projects: projects,
                         teams: teams,
