@@ -11,7 +11,7 @@ let con = mysql.createConnection({
 
 router.get('/', function (req, res) {
     if (req.cookies.username) {
-        con.query("SELECT * FROM projects LIMIT 25", function (err, projects, fields) {
+        con.query("SELECT * FROM projects WHERE ACTIVE=1 LIMIT 25", function (err, projects, fields) {
             if (err) throw err;
             for (i in projects) {
                 projects[i].PLATFORMS = getPlatformString(JSON.parse(projects[i].PLATFORMS));
@@ -68,7 +68,7 @@ router.get('/register', function (req, res) {
         }
         else {
             console.log("register project: " + result[0]);
-            con.query("INSERT INTO projects (ID, NAME, SUMMARY, COMMITMENT, PLATFORMS, PLATFORM_DETAILS, STAGE, BUDGET, FUNDING, NATIONAL, FOUNDER) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, project.name, project.summary, project.commitment, JSON.stringify(project.platforms), project.platformDetails, project.stage, project.budget, project.funding, project.national, project.founder], function (err, result) {
+            con.query("INSERT INTO projects (ID, NAME, SUMMARY, COMMITMENT, PLATFORMS, PLATFORM_DETAILS, STAGE, BUDGET, FUNDING, NATIONAL, FOUNDER, ACTIVE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, project.name, project.summary, project.commitment, JSON.stringify(project.platforms), project.platformDetails, project.stage, project.budget, project.funding, project.national, project.founder, 1], function (err, result) {
                 if (err) {
                     res.send({status: JSON.stringify(err)});
                 }
@@ -76,6 +76,14 @@ router.get('/register', function (req, res) {
                 res.send({status: "succesfull"});
             });
         }
+    });
+});
+
+router.get('/finish', function(req, res){
+    project = req.query.name;
+    con.query("UPDATE projects SET ACTIVE=0 WHERE NAME=?", [project], function(err, result){
+        if(err) throw err;
+        res.send({status:"succesfull"});
     });
 });
 
