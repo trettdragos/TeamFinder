@@ -31,8 +31,17 @@ router.get('/auth', function (req, res) {
             console.log("registering user: " + user.name + " with the email: " + user.email);
             /* Encrypt password */
             security.encryptPassword(user.password, (hash) => {
+                console.log(user.skills);
+                console.log(JSON.stringify(user.skills));
+                let profile = {
+                    "GITHUB": user.github,
+                    "LINKEDIN": user.linkedin,
+                    "SKILLS": user.skills,
+                    "ABOUT": "",
+                    "PROFILE_PICTURE": ""
+                };
                 //schimba CONFIRMED la 0 imediat repun pe picioare sendgrid
-                con.query("INSERT INTO accounts (ID, USERNAME, EMAIL, PASSWORD, LINKEDIN, GITHUB, SKILLS, CONFIRMED, NOTIFICATION) VALUES (?, ?, ?, ?, ?, ?, ?, '1', '[]')", [0, user.name, user.email, hash, user.linkedin, user.github, JSON.stringify(user.skills)], function (err, result) {
+                con.query("INSERT INTO accounts (ID, USERNAME, EMAIL, PASSWORD, PROFILE, CONFIRMED, NOTIFICATION) VALUES (?, ?, ?, ?, ?, '1', '[]')", [0, user.name, user.email, hash, JSON.stringify(profile)], function (err, result) {
                     if (err) throw err;
                     res.send({status: "succesfull"});
                     /*var msg = {

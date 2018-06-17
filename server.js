@@ -1,4 +1,5 @@
 let express = require('express');
+let logger = require('morgan');
 let app = express();
 let path = require('path');
 let mysql = require('mysql');
@@ -25,6 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
+app.use(logger('dev'));
 
 io.on('connection', function (socket) {
     console.log('Client connected...' + socket.id);
@@ -189,11 +191,13 @@ routes.forEach(item => app.use(item.url, item.router));
 app.get('/logout', function (req, res) {
     res.render('pages/logout');
 });
-
 app.get('/*', (req, res) => {
-    res.render('pages/404.ejs', {page: req.url.substr(0)})
+    res.render('pages/404.ejs', {
+        message_main: "The page you're looking for could not be found (404)",
+        message_redirect: `Click <a href=\"/\">here</a> to go back to home`,
+        message_page: "Requested page: " +req.url.substr(0)
+    })
 });
 
 server.listen(3000);
-
-console.log('port: 3000');
+console.log('Server listening on port: 3000');

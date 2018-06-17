@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <% include ../partials/head.ejs %>
+    <style type="text/css">
+        .jumbotron {
+            box-shadow: 2px 8px 16px -8px black;
+            padding: 1%;
+        }
+
+        .profile {
+            /*height: 300px;*/
+            /*display: inline-block;*/
+            height: auto;
+        }
+
+        span.tags {
+            background: #ffffff;
+            border-radius: 2px;
+            color: #000;
+            font-weight: bold;
+            padding: 2px 4px;
+        }
+
+        span.tags.teal {
+            background: #1abc9c;
+            color: #f5f5f5
+        }
+
+        span.tags.red {
+            background: #e52d27;
+            color: #f5f5f5
+        }
+
+        .img-circle {
+            max-height: 200px;
+        }
+
+        .link-unstyled, .link-unstyled:link, .link-unstyled:hover {
+            color: inherit;
+            text-decoration: inherit;
+        }
+    </style>
+</head>
+
+<body>
+<% include ../partials/header %>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12 text-left">
+            <div class="card">
+                <div class="row profile align-items-center">
+                    <div class="col-12 col-lg-7 order-11 order-sm-11 order-md-11 order-lg-1">
+                        <h2><%= name %></h2>
+
+                        <% if (profile.ABOUT) {%>
+                        <p><strong>About: </strong> <%= profile.ABOUT %> </p>
+                        <% } %>
+                        <p><strong>Email: </strong> <%= email %> </p>
+
+                        <% if (profile.SKILLS.length > 0) {%>
+                        <p><strong>Skills: </strong>
+                            <% profile.SKILLS.forEach((skill) => { %>
+                            <span class="tags teal"><%= skill %></span>
+                            <% }) %>
+                        </p>
+                        <% } %>
+                        <% if (profile.GITHUB || profile.LINKEDIN) {%>
+                        <p><strong>Links: </strong>
+                            <% if(profile.GITHUB) { %>
+                            <span class="tags red"><a class="link-unstyled" href="<%= profile.GITHUB %>" target="_blank">GITHUB
+                                    <i class="fab fa-lg fa-github-square" style="font-weight: normal;"></i></a></span>
+                            <% } %>
+                            <% if(profile.LINKEDIN) { %>
+                            <span class="tags red"><a class="link-unstyled" href="<%= profile.LINKEDIN %>" target="_blank">LINKEDIN
+                                    <i class="fab fa-lg fa-linkedin" style="font-weight: normal;"></i></a></span>
+                            <% } %>
+                        </p>
+                        <% } %>
+
+                    </div>
+                    <div class="col-12 col-lg-5 order-1 order-sm-1 order-md-1 order-lg-11 text-center text-lg-right">
+                        <img src="<% if(profile.PROFILE_PICTURE){ %> <%= profile.PROFILE_PICTURE %> <% } else { %>https://identicon-api.herokuapp.com/<%= email %>/512?format=png<% } %>"
+                             alt=""
+                             class="img-circle img-responsive center-block">
+                    </div>
+
+                    <% if(username == email) { %>
+                    <div class="col-12 order-12">
+                        <a class="btn btn-block btn-primary" href="/profile/edit">Edit profile</a>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+            <% if(username == email) { %>
+            <div class="jumbotron">
+                <h4>Notifications:</h4>
+                <hr class="my-4">
+                <% for(i in notifications){ %>
+                <% if(notifications[i].vis === "false"){ %>
+                <div>
+                    <h4><a href="" class="btn" id="accept<%= notifications[i].id %>">Accept</a>
+                        <a href="" class="btn" id="refuse<%= notifications[i].id %>">Refuse</a>
+                        User <b><%= notifications[i].user %></b> wants to join <%= notifications[i].type %>
+                        : <%= notifications[i].name %></h4>
+                </div>
+                <% }} %>
+            </div>
+            <% } %>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 text-left">
+            <div class="jumbotron">
+                <h4><b>
+                        <% if(username == email){ %>
+                        Your
+                        <% } else { %>
+                        <%= name %>'s
+                        <% } %>
+                        Projects:</b></h4>
+            </div>
+        </div>
+    </div>
+    <% for(i in projects){ %>
+    <div class="row">
+        <div class="col-lg-12 text-left">
+            <div class="jumbotron">
+                <h4 class="display-6"><b><%= projects[i].NAME %></b></h4>
+                <hr class="my-4">
+                <h5><%= projects[i].SUMMARY %></h5>
+                <p class="lead">
+                    <a class="btn btn-lg" href="/projects/<%= projects[i].NAME %>" role="button">Learn more</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    <% } %>
+    <div class="row">
+        <div class="col-lg-12 text-left">
+            <div class="jumbotron">
+                <h4><b>
+                        <% if(username == email){ %>
+                        Your
+                        <% } else { %>
+                        <%= name %>'s
+                        <% } %>
+                        Teams:</b></h4>
+            </div>
+        </div>
+    </div>
+    <% for(i in teams){ %>
+    <div class="row">
+        <div class="col-lg-12 text-left">
+            <div class="jumbotron">
+                <h4 class="display-6"><b><%= teams[i].NAME %></b></h4>
+                <hr class="my-4">
+                <h5><%= teams[i].SUMMARY %></h5>
+                <p class="lead">
+                    <a class="btn btn-lg" href="/teams/<%= teams[i].NAME %>" role="button">Learn more</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    <% } %>
+</div>
+
+<% include ../partials/footer %>
+<script>
+    <% for(i in notifications){ %>
+    <% if(notifications[i].vis === "false"){ %>
+    $('#accept<%= notifications[i].id %>').on('click', function () {
+        socket.emit('answer request', {
+            status: 'accept',
+            id: '<%= notifications[i].id %>',
+            type: '<%= notifications[i].type %>',
+            name: '<%= notifications[i].name %>',
+            requester: '<%= notifications[i].user %>',
+            leader: $.cookie('username')
+        });
+    });
+    $('#refuse<%= notifications[i].id %>').on('click', function () {
+        socket.emit('answer request', {
+            status: 'refuse',
+            id: '<%= notifications[i].id %>',
+            type: '<%= notifications[i].type %>',
+            name: '<%= notifications[i].name %>',
+            requester: '<%= notifications[i].user %>',
+            leader: $.cookie('username')
+        });
+    });
+    <% }} %>
+</script>
+
+</body>
+
+</html>

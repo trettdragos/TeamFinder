@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <% include ../partials/head %>
+    <style type="text/css">
+        .jumbotron {
+            box-shadow: 2px 8px 16px -8px black;
+            padding: 1%;
+        }
+
+        .btn {
+            background-color: #343a40;
+            border-color: #343a40;
+            color: #00e500;
+        }
+
+        .btn:hover {
+            background-color: #343a40;
+            border-color: #00e500;
+            color: #00e500;
+        }
+
+        #changePasswordResponse, #changeLinksResponse {
+            opacity: 0;
+            display: none;
+            height: 0;
+        }
+
+        #changePasswordResponse.PROFILE-shown, #changeLinksResponse.PROFILE-shown {
+            opacity: 1;
+            display: block;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body>
+<% include ../partials/header %>
+<div class="container">
+    <br class="my-3">
+    <section class="forms">
+        <div class="container-fluid">
+            <!-- Page Header-->
+            <header>
+                <h1 class="display-3">Edit Profile </h1>
+            </header>
+            <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                    <div id="changeLinks" class="card rounded-0 align-self-center">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h1 class="text-orange display-5">Change links and about</h1>
+                        </div>
+                        <div id="changeLinksContent" class="card-body" role="tabpanel">
+                            <h1 id="changeLinksResponse">Internal Server Error</h1>
+                            <div class="row">
+                                <div class="col-md-12 mx-auto">
+                                    <form id="changeLinksForm">
+                                        <div class="md-form">
+                                            <input required type="text" name="about" id="about"
+                                                   class="form-control form-control-lg" value="<%=profile.ABOUT%>">
+                                            <label for="about">About</label>
+                                        </div>
+                                        <div class="md-form">
+                                            <i class="fab fa-github prefix"></i>
+                                            <input required type="text" name="githubLink" id="githubLink"
+                                                   class="form-control form-control-lg" value="<%=profile.GITHUB%>">
+                                            <label for="githubLink">GitHub Link</label>
+                                        </div>
+                                        <div class="md-form">
+                                            <i class="fab fa-linkedin prefix"></i>
+                                            <input required type="text" name="linkedinLink" id="linkedinLink"
+                                                   class="form-control form-control-lg" value="<%=profile.LINKEDIN%>">
+                                            <label for="linkedinLink">Linkedin Link</label>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="row pt-3">
+                                <div class="col-md-6 mx-auto">
+                                    <button class="btn btn-primary btn-lg btn-block" id="changeLinksButton">Apply
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                    <div id="changeProfilePicture" class="card rounded-0 align-self-center">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h1 class="text-orange display-5">Change Profile Picture</h1>
+                        </div>
+                        <div id="changeProfilePictureContent" class="card-body" role="tabpanel">
+                            <div class="row">
+                                <div class="col-md-12 mx-auto">
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <div class="PROFILE-profile-image d-block mx-auto">
+                                                <p>Current</p>
+                                                <img id="currentImage"
+                                                     src="<% if(profile.PROFILE_PICTURE){ %> <%= profile.PROFILE_PICTURE %> <% } else { %>https://identicon-api.herokuapp.com/<%= username %>/512?format=png<% } %>"
+                                                     alt="Current profile picture"
+                                                     class="img-fluid d-block mx-auto">
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="PROFILE-profile-image d-block mx-auto">
+                                                <p>Preview</p>
+                                                <img src="<% if(profile.PROFILE_PICTURE){ %> <%= profile.PROFILE_PICTURE %> <% } else { %>https://identicon-api.herokuapp.com/<%= username %>/512?format=png<% } %>"
+                                                     alt="Preview profile picture" id="previewImage"
+                                                     class="img-fluid d-block mx-auto">
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="input-file">
+                                                <div class="d-block mx-auto pt-3">
+                                                    <button class="btn btn-primary btn-lg btn-block" id="submitImage">
+                                                        Save
+                                                    </button>
+                                                </div>
+                                                <div class="d-block mx-auto pt-3">
+                                                    <button class="btn btn-primary btn-lg btn-block" id="resetImage">
+                                                        Reset
+                                                    </button>
+                                                </div>
+                                                <div class="d-block mx-auto pt-3">
+                                                    <button class="btn btn-primary btn-lg btn-block" id="chooseImage">
+                                                        Choose
+                                                        File
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row pt-3">
+                                <div class="col-md-6 mx-auto">
+                                    <button class="btn btn-primary btn-lg btn-block"
+                                            id="resetProfilePicture"
+                                            title="Resets the profile picture to the default picture you had when first creating the account">
+                                        Reset profile picture to default <abbr title=".">?</abbr></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                    <div id="changePassword" class="card rounded-0 align-self-center">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h1 class="text-orange display-5">Change Password</h1>
+                        </div>
+                        <div id="changePasswordContent" class="card-body" role="tabpanel">
+                            <h1 id="changePasswordResponse">Internal Server Error</h1>
+                            <div class="row">
+                                <div class="col-md-12 mx-auto">
+                                    <form id="changePasswordForm">
+                                        <div class="md-form">
+                                            <input required type="password" name="currentPassword" id="currentPassword"
+                                                   class="form-control form-control-lg">
+                                            <label for="currentPassword">Current Password</label>
+                                        </div>
+                                        <div class="md-form">
+                                            <input required type="password" name="newPassword" id="newPassword"
+                                                   class="form-control form-control-lg">
+                                            <label for="newPassword">New Password</label>
+                                        </div>
+                                        <div class="md-form">
+                                            <input required type="password" name="confirmNewPassword"
+                                                   id="confirmNewPassword" class="form-control form-control-lg">
+                                            <label for="confirmNewPassword">Confirm New Password</label>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="row pt-3">
+                                <div class="col-md-6 mx-auto">
+                                    <button class="btn btn-primary btn-lg btn-block" id="changePasswordButton">Apply
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+</div>
+
+<% include ../partials/footer.ejs %>
+
+<script>
+    let selected = false;
+
+    function ChangeProfilePictureHandler() {
+        $(".input-file").before(
+            function () {
+                if (!$(this).prev().hasClass('input-ghost')) {
+                    let element = $("<input type='file' id='selectImage' accept='image/*' data-max-size='50000' class='input-ghost imgur' style='visibility:hidden; height:0'>");
+                    element.attr("name", $(this).attr("name"));
+                    element.change(function () {
+                        element.next(element).find('input').val((element.val()).split('\\').pop());
+                    });
+                    $(this).find("button#chooseImage").click(function () {
+                        element.click();
+                        selected = true;
+                    });
+                    $(this).find("button#resetImage").click(function () {
+                        element.val(null);
+                        $(this).parents(".input-file").find('input').val('');
+                        $("#previewImage").attr('src', $('#currentImage').attr('src'));
+                        selected = false;
+                    });
+                    $(this).find('input').css("cursor", "pointer");
+                    $(this).find('input').mousedown(function () {
+                        $(this).parents('.input-file').prev().click();
+                        return false;
+                    });
+                    return element;
+                }
+            }
+        );
+    }
+
+    $(function () {
+
+
+        ChangeProfilePictureHandler();
+        $("#resetProfilePicture").on('click', function () {
+            $.ajax({
+                type: 'POST',
+                url: '/profile/update-profile',
+                data: {
+                    action: "RESET_PROFILE_PICTURE",
+                    body: null
+                }
+            }).done((response) => {
+                location.reload();
+            });
+        })
+        $('#selectImage').on('change', function () {
+            console.log('changed');
+            updatePreviewProfilePicture(this);
+        })
+        $('#submitImage').on("click", function () {
+            if (selected === false)
+                return;
+            let $fileInput = $('input[type=file]');
+
+            let $files = $fileInput.get(0).files;
+
+            if ($files.length) {
+                if ($files[0].size > $fileInput.data("max-size") * 1024) {
+                    console.log("Please select a smaller file");
+                    return false;
+                }
+                let apiUrl = 'https://api.imgur.com/3/image';
+                let apiKey = 'ded9a48e51f9ef7';
+
+                let settings = {
+                    async: true,
+                    crossDomain: true,
+                    processData: false,
+                    contentType: false,
+                    type: 'POST',
+                    url: apiUrl,
+                    headers: {
+                        Authorization: 'Client-ID ' + apiKey,
+                        Accept: 'application/json'
+                    },
+                    mimeType: 'multipart/form-data'
+                };
+
+                let formData = new FormData();
+                formData.append("image", $files[0]);
+                settings.data = formData;
+
+                $.ajax(settings).done(function (response) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/profile/update-profile',
+                        data: {
+                            action: "CHANGE_PROFILE_PICTURE",
+                            body: JSON.parse(response).data.link
+
+                        }
+                    }).done((response) => {
+                        location.reload();
+                    });
+                });
+            }
+        });
+
+        $('#changePasswordButton').on('click', function () {
+            if (!changePasswordValidator.form())
+                return;
+            $.ajax({
+                type: 'POST',
+                url: '/profile/update-profile',
+                data: {
+                    action: "CHANGE_PASSWORD",
+                    body: JSON.stringify(objectifyForm($("#changePasswordForm").serializeArray()))
+                }
+            }).done((response) => {
+                console.log(response);
+                response = JSON.parse(response);
+                $('#changePasswordResponse').text(response.message);
+                $('#changePasswordResponse').addClass('PROFILE-shown');
+                setTimeout(function () {
+                    $("#changePasswordResponse").removeClass('PROFILE-shown');
+                }, 5000);
+            });
+        })
+
+        $('#changeLinksButton').on('click', function () {
+            if (!changeLinksValidator.form())
+                return;
+            $.ajax({
+                type: 'POST',
+                url: '/profile/update-profile',
+                data: {
+                    action: "UPDATE_LINKS_AND_STATUS",
+                    body: JSON.stringify(objectifyForm($("#changeLinksForm").serializeArray()))
+                }
+            }).done((response) => {
+                console.log(response);
+                location.reload()
+            });
+        })
+
+        let changePasswordValidator = $("#changePasswordForm").validate({
+            rules: {
+                currentPassword: {
+                    required: true
+                },
+                newPassword: {
+                    required: true,
+                    notEqualTo: '#currentPassword'
+                },
+                confirmNewPassword: {
+                    required: true,
+                    equalTo: "#newPassword"
+                }
+            },
+            messages: {
+                currentPassword: {
+                    required: 'Current Password is required'
+                },
+                newPassword: {
+                    required: 'New Password is required',
+                    notEqualTo: 'New Password must be different than Current Password'
+                },
+                confirmNewPassword: {
+                    required: 'Confirm New Password is required',
+                    equalTo: 'Confirm New Password doesn\'t match New Password'
+                }
+            }
+        });
+        let changeLinksValidator = $("#changeLinksForm").validate({
+            rules: {
+                about: {
+                    required: true
+                },
+                githubLink: {
+                    required: true,
+                },
+                linkedinLink: {
+                    required: true,
+                }
+            },
+            messages: {
+                about: {
+                    required: 'About is required'
+                },
+                githubLink: {
+                    required: 'GitHub Link is required',
+                },
+                linkedinLink: {
+                    required: 'Linkedin Link is required',
+                }
+            }
+        });
+    })
+
+    function updatePreviewProfilePicture(input) {
+
+        if (input.files && input.files[0]) {
+            let reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('#previewImage').attr('src', e.target.result);
+            }
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function objectifyForm(formArray) {
+        let returnArray = {};
+        for (let i = 0; i < formArray.length; i++) {
+            returnArray[formArray[i]['name']] = formArray[i]['value'];
+        }
+        return returnArray;
+    }
+</script>
+</body>
+</html>

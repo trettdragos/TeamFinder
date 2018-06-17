@@ -12,8 +12,14 @@
         <h4 style="text-align: center; margin-bottom: 15px;"><b>Login to Your Account</b></h4>
             <form class="form-signin" id="form">
                 <p id="error" style="color: red;"></p>
-                <input type="email" id="email" class="form-control" placeholder="Email address" required autofocus style="margin-bottom: 10px;" name="email">
-                <input type="password" id="password" class="form-control" placeholder="Password" required style="margin-bottom: 10px" name="password">
+                <div class="md-form">
+                    <input type="email" id="email" class="form-control" required>
+                    <label for="email">Email</label>
+                </div>
+                <div class="md-form">
+                    <input type="password" id="password" class="form-control" required>
+                    <label for="password">Password</label>
+                </div>
                 <div id="remember" class="checkbox">
                     <label>
                         <input type="checkbox" value="remember-me" autocomplete="true" name="keepMeUp" checked="true"> Keep Me LoggedIn

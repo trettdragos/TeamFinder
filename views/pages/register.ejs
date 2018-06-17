@@ -1,148 +1,191 @@
 <!DOCTYPE html>
 <html lang="en">
 
-  <head>
+<head>
     <% include ../partials/head %>
-  </head>
+    <link href="/vendor/bootstrap-tagsinput/tagsinput.css" rel="stylesheet"/>
+</head>
 
-  <body>
-    <% include ../partials/login-register-header %>
-    <div class="container">
-      <div class="card card-container">
+<body>
+<% include ../partials/login-register-header %>
+<div class="container">
+    <div class="card card-container">
         <h4 style="text-align: center; margin-bottom: 15px;"><b>Register</b></h4>
-            <form class="form-signin" id="form">
-                <small class="text-center text-muted">Email*</small>
-                <input type="email" id="email" class="form-control" placeholder="Email address" required autofocus style="margin-bottom: 10px;" name="email">
-                <small class="text-center text-muted">Password*</small>
-                <input type="password" id="password" class="form-control" placeholder="Password" required style="margin-bottom: 10px" name="password">
-                <small class="text-center text-muted">Check Password*</small>
-                <input type="password" id="passwordCheck" class="form-control" placeholder="Check Password" required style="margin-bottom: 10px" name="passwordCheck">
-                <small class="text-center text-muted">Full Name*</small>
-                <input type="name" id="fullName" class="form-control" placeholder="Full Name" required autofocus style="margin-bottom: 10px;" name="fullName">
-                <small class="text-center text-muted">LinkedIn account</small>
-                <input type="link" id="linkedin" class="form-control" placeholder="LinkedIn Account" required autofocus style="margin-bottom: 10px;" name="linkedin">
-                <small class="text-center text-muted">GitHub account</small>
-                <input type="link" id="github" class="form-control" placeholder="GitHub Account" required autofocus style="margin-bottom: 10px;" name="github">
-                <small class="text-center text-muted">Please check what you desire to work</small>    
-                <div class="form-check" style="margin-bottom: 5px;">
-                    <input type="checkbox" class="form-check-input" id="webBackEnd">
-                <label class="form-check-label" for="exampleCheck1">Web Back End</label>
-                </div>
-                <div class="form-check" style="margin-bottom: 5px;">
-                    <input type="checkbox" class="form-check-input" id="webFrontEnd">
-                <label class="form-check-label" for="exampleCheck1">Web Front End</label>
-                </div>
-                <div class="form-check" style="margin-bottom: 5px;">
-                    <input type="checkbox" class="form-check-input" id="androidBackEnd">
-                <label class="form-check-label" for="exampleCheck1">Android Back End</label> 
-                </div>
-                <div class="form-check" style="margin-bottom: 5px;">
-                    <input type="checkbox" class="form-check-input" id="androidFrontEnd">
-                <label class="form-check-label" for="exampleCheck1">Android Front End</label>
-                </div>
-                <div class="form-check" style="margin-bottom: 5px;">
-                    <input type="checkbox" class="form-check-input" id="game">
-                <label class="form-check-label" for="exampleCheck1">Game Development</label>
-                </div>
-                <div class="form-check" style="margin-bottom: 5px;">
-                    <input type="checkbox" class="form-check-input" id="design">
-                <label class="form-check-label" for="exampleCheck1">Design</label>
-                </div>
-                <div class="form-check" style="margin-bottom: 5px;">
-                    <input type="checkbox" class="form-check-input" id="embeded">
-                <label class="form-check-label" for="exampleCheck1">Embeded</label>
-                </div>
-                <div class="form-check" style="margin-bottom: 5px;">
-                    <input type="checkbox" class="form-check-input" id="security">
-                <label class="form-check-label" for="exampleCheck1">Security</label>
-                </div>
-                <small class="text-center text-muted">Other, please specify</small>
-                <input type="link" id="other" class="form-control" placeholder="skill" required autofocus style="margin-bottom: 10px;" name="other">
-
-                <button class="btn btn-lg btn-block btn-register" type="button" id="submit">Register <i class="fas fa-user"></i></button>
-                <small class="text-center text-muted">* mandatory</small>
-            </form>
-            <div class="pt-1"><small class="text-center text-muted">Already have an account? <a href="/login" class="font-weight-bold link-unstyled">Log In</a> </small></div>
+        <form class="form-signin" id="form">
+            <div class="md-form">
+                <input type="email" id="email" name="email" class="form-control" required>
+                <label for="email">Email</label>
+            </div>
+            <div class="md-form">
+                <input type="password" id="password" name="password" class="form-control" required>
+                <label for="password">Password</label>
+            </div>
+            <div class="md-form">
+                <input type="password" id="passwordCheck" name="passwordCheck" class="form-control" required>
+                <label for="passwordCheck">Check Password</label>
+            </div>
+            <div class="md-form">
+                <input type="text" id="fullName" name="fullName" class="form-control" required>
+                <label for="fullName">Full Name</label>
+            </div>
+            <div class="md-form">
+                <i class="fab fa-github prefix"></i>
+                <input type="url" id="github" name="github" class="form-control">
+                <label for="github">GitHub Link</label>
+            </div>
+            <div class="md-form">
+                <i class="fab fa-linkedin prefix"></i>
+                <input type="url" id="linkedin" name="linkedin" class="form-control">
+                <label for="linkedin">LinkedIn Link</label>
+            </div>
+            <div class="md-form">
+                <label for="skillsInput">Skills</label>
+                <input type="text" id="skillsInput" class="form-control" data-role="tagsinput">
+            </div>
+            <button class="btn btn-lg btn-block btn-register" type="button" id="submit">Register <i
+                        class="fas fa-user"></i></button>
+        </form>
+        <div class="pt-1">
+            <small class="text-center text-muted">Already have an account? <a href="/login"
+                                                                              class="font-weight-bold link-unstyled">Log
+                    In</a></small>
         </div>
     </div>
-    <% include ../partials/footer %>
-    
-    <script>
-        var socket = io.connect();
+</div>
+<% include ../partials/footer %>
+<script src="/vendor/bootstrap-tagsinput/tagsinput.js"></script>
 
-        $("#submit").on('click', function () {
-         auth();    
-        });
-        function auth(){  
-            let user = {
-                email:document.getElementById("email").value,
-                password:document.getElementById("password").value,
-                name:document.getElementById('fullName').value,
-                linkedin:document.getElementById('linkedin').value,
-                github:document.getElementById('github').value,
-                skills:{
-                    webBackEnd:document.getElementById('webBackEnd').checked,
-                    webFrontEnd:document.getElementById('webFrontEnd').checked,
-                    androidBackEnd:document.getElementById('androidBackEnd').checked,
-                    androidFrontEnd:document.getElementById('androidFrontEnd').checked,
-                    game:document.getElementById('game').checked,
-                    design:document.getElementById('design').checked,
-                    embeded:document.getElementById('embeded').checked,
-                    security:document.getElementById('security').checked,
-                    otherName:document.getElementById('other').value
+<script>
+    var socket = io.connect();
+
+    $("#submit").on('click', function () {
+        if (!registerValidator.form())
+            return;
+        let user = {
+            email: document.getElementById("email").value,
+            password: document.getElementById("password").value,
+            name: document.getElementById('fullName').value,
+            linkedin: document.getElementById('linkedin').value,
+            github: document.getElementById('github').value,
+            skills: $("#skillsInput").tagsinput('items')
+        }
+        $.ajax({
+            data: user,
+            type: 'GET',
+            url: 'http://localhost:3000/register/auth',
+            success: function (res) {
+                console.log(res.status);
+                if (res.status == "succesfull") {
+                    window.location.href = '/register/confirmed';
+                } else {
+                    document.getElementById("email").style.borderColor = "red";
                 }
             }
-            let ok = true;
-            if(user.email===''){
-                document.getElementById("email").style.borderColor="red";
-                ok = false;
-            }else{
-                document.getElementById("email").style.borderColor="green";
+        });
+    });
+
+    let registerValidator = $("#form").validate({
+        rules: {
+            email: {
+                required: true,
+                email: true
+            },
+            password: {
+                required: true
+            },
+            passwordCheck: {
+                required: true,
+            },
+            fullName: {
+                required: true,
+            },
+            github: {
+                required: false,
+                url: true
+            },
+            linkedin: {
+                required: false,
+                url: true
             }
-            if(user.password===''){
-                document.getElementById("password").style.borderColor="red";
-                ok = false;
-            }else{
-                document.getElementById("password").style.borderColor="green";
-            }
-            if(user.name===''){
-                document.getElementById("fullName").style.borderColor="red";
-                ok = false;
-            }else{
-                document.getElementById("fullName").style.borderColor="green";
-            }
-            if(user.password!==document.getElementById('passwordCheck').value || user.password===''){
-                document.getElementById("password").style.borderColor="red";
-                document.getElementById("passwordCheck").style.borderColor="red";
-                ok = false;
-            }else{
-                document.getElementById("password").style.borderColor="green";
-                document.getElementById("passwordCheck").style.borderColor="green";
-            }
-            if(ok==true){
-                $.ajax({
-                        data:user,
-                        type: 'GET',
-                        url: 'http://localhost:3000/register/auth',
-                        success: function(res) {
-                            console.log(res.status);
-                            if(res.status == "succesfull"){
-                                window.location.href = '/register/confirmed';
-                            }else{
-                                document.getElementById("email").style.borderColor="red";
-                                // /alert(res.status);
-                            }
-                        }
-                    });
-                //socket.emit('auth register', user);
+        },
+        messages: {
+            email: {
+                required: "Email is required",
+                email: "Email must be a valid email"
+            },
+            password: {
+                required: "Password is required"
+            },
+            passwordCheck: {
+                required: "Check Password is required",
+            },
+            fullName: {
+                required: "Full Name is required",
+            },
+            github: {
+                url: "GitHub Link must be an URL"
+            },
+            linkedin: {
+                url: "LinkedIn Link must be an URL"
             }
         }
-        $("#form").keyup(function(event) {
-            if (event.keyCode === 13) {
-                auth();
-            }
-        });
-    </script>
-  </body>
+    });
+
+    function auth() {
+        let user = {
+            email: document.getElementById("email").value,
+            password: document.getElementById("password").value,
+            name: document.getElementById('fullName').value,
+            linkedin: document.getElementById('linkedin').value,
+            github: document.getElementById('github').value,
+            skills: $("#skillsInput").tagsinput('items')
+        }
+        let ok = true;
+        if (user.email === '') {
+            document.getElementById("email").style.borderColor = "red";
+            ok = false;
+        } else {
+            document.getElementById("email").style.borderColor = "green";
+        }
+        if (user.password === '') {
+            document.getElementById("password").style.borderColor = "red";
+            ok = false;
+        } else {
+            document.getElementById("password").style.borderColor = "green";
+        }
+        if (user.name === '') {
+            document.getElementById("fullName").style.borderColor = "red";
+            ok = false;
+        } else {
+            document.getElementById("fullName").style.borderColor = "green";
+        }
+        if (user.password !== document.getElementById('passwordCheck').value || user.password === '') {
+            document.getElementById("password").style.borderColor = "red";
+            document.getElementById("passwordCheck").style.borderColor = "red";
+            ok = false;
+        } else {
+            document.getElementById("password").style.borderColor = "green";
+            document.getElementById("passwordCheck").style.borderColor = "green";
+        }
+        if (ok == true) {
+            $.ajax({
+                data: user,
+                type: 'GET',
+                url: 'http://localhost:3000/register/auth',
+                success: function (res) {
+                    console.log(res.status);
+                    if (res.status == "succesfull") {
+                        window.location.href = '/register/confirmed';
+                    } else {
+                        document.getElementById("email").style.borderColor = "red";
+                        // /alert(res.status);
+                    }
+                }
+            });
+            //socket.emit('auth register', user);
+        }
+    }
+</script>
+</body>
 
 </html>

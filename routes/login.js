@@ -12,7 +12,7 @@ let con = mysql.createConnection({
 
 router.get('/', function (req, res) {
     if (req.cookies.username)
-        res.redirect('/account');
+        res.redirect('/profile');
     else
         res.render('pages/login.ejs');
 });
