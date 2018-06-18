@@ -101,7 +101,7 @@
     <script type="text/javascript">
       var userip;
     </script>
-    <script type="text/javascript" src="https://l2.io/ip.js?var=userip"></script>
+
     <script>
       var socket = io.connect();
       var android = false;
@@ -199,7 +199,6 @@
                     });
           //socket.emit('register project', project);
       }
-      (function() {
         document.getElementById("android").onclick = function() { 
             if(android == false){
               document.getElementById("android").style.backgroundColor = '#00A86B';
@@ -245,7 +244,6 @@
                webBack = false;
             }
         };
-      })();
     </script>
 
   </body>
