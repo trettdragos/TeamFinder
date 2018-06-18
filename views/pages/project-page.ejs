@@ -58,7 +58,7 @@
                   <h4><b>Development details</b></h4>
                   <hr class="my-4">
                   <label for="comment">Has funding?</label>
-                  <% if(project.FUNDING==='0'){ %>
+                  <% if(project.FUNDING==='false' || project.FUNDING==='0'){ %>
                   <h5><b>NO</b></h5>
                   <% }else{ %>
                   <h5><b>YES</b></h5>
@@ -82,7 +82,7 @@
                   <button class="btn" id="join" style="width: 150px; height: 15%; font-size: 200%; margin-left: 5%; margin-top: 5%;"><b>Join</b></button></center>
                   <% }else if(project.ACTIVE==1){ %>
                   <h5>Press the button below to stop searching for The Perfect Team</h5>
-                  <button class="btn" id="finish" style="width: 300px; height: 15%; font-size: 200%; margin-left: 5%; margin-top: 5%;"><b>Finish searching</b>
+                    <button class="btn" id="edit" style="width: 300px; height: 15%; font-size: 200%; margin-left: 5%; margin-top: 5%;"><b>Edit Project</b></button>
                   </button>
                   <% }else{ %>
                   <h5><b>This project was marked as inactive<br> (no longer searching for participants)</b></h5>
@@ -111,20 +111,11 @@
         });
 
       });
-      $("#finish").on('click', function () {
-        project={name:document.getElementById("project_name").innerHTML};
-        $.ajax({
-                        data:project,
-                        type: 'GET',
-                        url: 'http://localhost:3000/projects/finish',
-                        success: function(res) {
-                            console.log(res.status);
-                            if(res.status==='succesfull')
-                              window.location.href = '/projects/'+project.name;
-                            else alert(res.status); 
-                        }
-        });
-      });
+      
+      $("#edit").on('click', function(){
+        name = document.getElementById("project_name").innerHTML;
+        window.location.href='/projects/edit/'+name;
+      })
     </script>
   </body>
 

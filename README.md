@@ -28,3 +28,4 @@
 - ~~poze de profil utilizatori~~
 - ~~problema cu fisierele din /public cand esti pe linkuri care nu sunt imediat langa root (de ex /projects/create)~~
 - accesarea proiectelor si echipelor printr-un id (ex `/projects/bWEgZnV0`)
+- schimbare cheie pentru sendGrid(repair email confirmation)

@@ -87,6 +87,14 @@ router.get('/finish', function(req, res){
     });
 });
 
+router.get('/update', function(req, res){
+    project = req.query;
+    con.query("UPDATE projects SET SUMMARY=?, COMMITMENT=?, STAGE=?, BUDGET=?, FUNDING=? WHERE NAME=?", [project.summary, project.commitment, project.stage, project.budget, project.funding, project.name], function(err, result){
+        if(err) throw err;
+        res.send({status:"succesfull"});
+    });
+});
+
 router.get('/:project', function (req, res) {
     if (!req.cookies.username)
         res.redirect('/login');
@@ -96,6 +104,20 @@ router.get('/:project', function (req, res) {
         if (result[0]) {
             result[0].PLATFORMS = getPlatformString(JSON.parse(result[0].PLATFORMS))
             res.render('pages/project-page', {email: req.cookies.username, tab: '2', project: result[0]});
+        }
+        else res.send('Error 404 project not found with the name ' + req.params.project);
+    });
+});
+
+router.get('/edit/:project', function (req, res) {
+    if (!req.cookies.username)
+        res.redirect('/login');
+
+    con.query("SELECT * FROM projects WHERE NAME = ? LIMIT 1", [req.params.project], function (err, result, fields) {
+        if (err) throw err;
+        if (result[0]) {
+            result[0].PLATFORMS = getPlatformString(JSON.parse(result[0].PLATFORMS))
+            res.render('pages/edit-project', {email: req.cookies.username, tab: '2', project: result[0]});
         }
         else res.send('Error 404 project not found with the name ' + req.params.project);
     });

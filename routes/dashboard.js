@@ -10,12 +10,12 @@ let con = mysql.createConnection({
 });
 
 router.get('/', function (req, res) {
-    con.query("SELECT * FROM projects LIMIT 25", function (err, projects, fields) {
+    con.query("SELECT * FROM projects WHERE ACTIVE=1 LIMIT 25", function (err, projects, fields) {
         if (err) throw err;
         for (i in projects) {
             projects[i].PLATFORMS = getPlatformString(JSON.parse(projects[i].PLATFORMS));
         }
-        con.query("SELECT * FROM teams LIMIT 25", function (err, teams, fields) {
+        con.query("SELECT * FROM teams WHERE ACTIVE=1 LIMIT 25", function (err, teams, fields) {
             if (err) throw err;
             for (i in teams) {
                 teams[i].PLATFORMS = getPlatformString(JSON.parse(teams[i].PLATFORMS));

@@ -11,7 +11,7 @@ let con = mysql.createConnection({
 
 router.get('/', function (req, res) {
     if (req.cookies.username) {
-        con.query("SELECT * FROM teams LIMIT 25", function (err, teams, fields) {
+        con.query("SELECT * FROM teams WHERE ACTIVE=1 LIMIT 25", function (err, teams, fields) {
             if (err) throw err;
             for (i in teams) {
                 teams[i].PLATFORMS = getPlatformString(JSON.parse(teams[i].PLATFORMS));
@@ -68,7 +68,7 @@ router.get('/register', function (req, res) {
         }
         else {
             console.log("register team: " + result[0]);
-            con.query("INSERT INTO teams (ID, NAME, SUMMARY, HACKATON, SECTION, START_DATE, END_DATE, PLATFORMS, NR_MEMBERS, POSTS, LEADER) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, team.name, team.summary, team.hackaton, team.section, team.startDate, team.endDate, JSON.stringify(team.platforms), team.nrMembers, '', team.leader], function (err, result) {
+            con.query("INSERT INTO teams (ID, NAME, SUMMARY, HACKATON, SECTION, START_DATE, END_DATE, PLATFORMS, NR_MEMBERS, POSTS, LEADER, ACTIVE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, team.name, team.summary, team.hackaton, team.section, team.startDate, team.endDate, JSON.stringify(team.platforms), team.nrMembers, '', team.leader, 1], function (err, result) {
                 if (err) {
                     socket.emit('register team', {status: JSON.stringify(err)});
                 }
@@ -76,6 +76,23 @@ router.get('/register', function (req, res) {
                 res.send({status: "succesfull"});
             });
         }
+    });
+});
+
+router.get('/finish', function(req, res){
+    team = req.query.name;
+    con.query("UPDATE teams SET ACTIVE=0 WHERE NAME=?", [team], function(err, result){
+        if(err) throw err;
+        res.send({status:"succesfull"});
+    });
+});
+
+router.get('/update', function(req, res){
+    team = req.query;
+    console.log("this is the update: "+JSON.stringify(team));
+    con.query("UPDATE teams SET SUMMARY=?, HACKATON=?, SECTION=?, START_DATE=?, END_DATE=? WHERE NAME=?", [team.summary, team.hackaton, team.section, team.startDate, team.endDate, team.name], function(err, result){
+        if(err) throw err;
+        res.send({status:"succesfull"});
     });
 });
 
@@ -93,6 +110,25 @@ router.get('/:team', function (req, res) {
         if (result[0]) {
             result[0].PLATFORMS = getPlatformString(JSON.parse(result[0].PLATFORMS))
             res.render('pages/team-page', {email: req.cookies.username, tab: '3', team: result[0]});
+        }
+        else res.send('Error 404 team not found with the name ' + req.params.team);
+    });
+});
+
+router.get('/edit/:team', function (req, res) {
+    if (!req.cookies.username)
+        res.redirect('/login');
+
+    console.log('Access teams from page: ' + req.params.team);
+
+    if (req.params.team == 'create')
+        return;
+
+    con.query("SELECT * FROM teams WHERE NAME = ? LIMIT 1", [req.params.team], function (err, result, fields) {
+        if (err) throw err;
+        if (result[0]) {
+            result[0].PLATFORMS = getPlatformString(JSON.parse(result[0].PLATFORMS))
+            res.render('pages/edit-team', {email: req.cookies.username, tab: '3', team: result[0]});
         }
         else res.send('Error 404 team not found with the name ' + req.params.team);
     });

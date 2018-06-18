@@ -33,7 +33,7 @@
         <div class="row">
           <div class="col-lg-12">
             <div class="jumbotron" style="margin-top: 10px;">
-              <h4 id="titleTeam"><b><%= team.NAME %> - team for Hackaton <%= team.HACKATON %></b></h4>
+              <b><h4 id="titleTeam"><%= team.NAME %></h4></b>
               <hr class="my-4">
               <label for="comment">Team's Purpose</label>
               <h5><%= team.SUMMARY %></h5>
@@ -65,11 +65,15 @@
                   <% }else{ %>
                   <h5>none</h5>
                   <% } %>
-                  <% if(email!=team.LEADER){ %>
+                  <% if(email!=team.LEADER && team.ACTIVE==1){ %>
                   <label for="comment">Press the button to join the team</label><br>  
                   <button class="btn" id="join" style="width: 150px; height: 20%; font-size: 200%;"><b>Join</b></button>
-                  <% }else{ %>
-                  <h5>You are the Founder of this team</h5>
+                  <% }else if(team.ACTIVE==1 && team.LEADER==email){ %>
+                  <h5>Press the button below to stop searching for The Perfect Team</h5>
+                  <button class="btn" id="editBtn" style="width: 300px; height: 15%; font-size: 200%; margin-left: 5%; margin-top: 5%;"><b>Edit Team</b>
+                  </button>
+                  <% }else if(team.ACTIVE==0){ %>
+                  <h5><b>This project was marked as inactive<br> (no longer searching for participants)</b></h5>
                   <% } %>
                 </div>
               </div>
@@ -95,6 +99,24 @@
           }      
         });
 
+      });
+      $("#editBtn").on('click', function(){
+        let name = document.getElementById("titleTeam").innerHTML
+        window.location.href = "/teams/edit/"+name;
+      })
+      $("#finish").on('click', function () {
+        team={name:document.getElementById("titleTeam").innerHTML};
+        $.ajax({
+                        data:team,
+                        type: 'GET',
+                        url: 'http://localhost:3000/teams/finish',
+                        success: function(res) {
+                            console.log(res.status);
+                            if(res.status==='succesfull')
+                              window.location.href = '/teams/'+team.name;
+                            else alert(res.status); 
+                        }
+        });
       });
     </script>
   </body>

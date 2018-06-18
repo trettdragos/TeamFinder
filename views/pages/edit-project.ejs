@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <% include ../partials/head %>
+    <style type="text/css">
+        .jumbotron {
+            box-shadow: 2px 8px 16px -8px black;
+            padding: 1%;
+        }
+
+        .btn {
+            background-color: #343a40;
+            border-color: #343a40;
+            color: #00e500;
+        }
+
+        .btn:hover {
+            background-color: #343a40;
+            border-color: #00e500;
+            color: #00e500;
+        }
+
+        #changePasswordResponse, #changeLinksResponse {
+            opacity: 0;
+            display: none;
+            height: 0;
+        }
+
+        #changePasswordResponse.PROFILE-shown, #changeLinksResponse.PROFILE-shown {
+            opacity: 1;
+            display: block;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body>
+<% include ../partials/header %>
+<div class="container">
+    <br class="my-3">
+    <section class="forms">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                    <div id="changeLinks" class="card rounded-0 align-self-center">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h1 class="text-orange display-5">Edit Project <b id="project_name"><%=project.NAME%></b></h1>
+                        </div>
+                        <div id="changeLinksContent" class="card-body" role="tabpanel">
+                            <h1 id="changeLinksResponse">Internal Server Error</h1>
+                            <div class="row">
+                                <div class="col-md-12 mx-auto">
+                                    <form id="changeLinksForm">
+                                        <div class="form-group">
+                                            <label for="about">About</label>
+                                            <textarea class="form-control" rows="5" id="summary"><%=project.SUMMARY%></textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="exampleFormControlSelect1">Commitment, currently:<%=project.COMMITMENT%> </label>
+                                            <select class="form-control" id="commitmentLevel">
+                                                <option>Contractual</option>
+                                                <option>Part-time</option>
+                                                <option>Full-time</option>
+                                                <option>Co-founder</option>
+                                              </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="linkedinLink">Stage: <%=project.STAGE%></label>
+                                            <select class="form-control" id="stage">
+                                                <option>Ideea Stage</option>
+                                                <option>Prototype Already Build</option>
+                                                <option>Live-version available</option>
+                                              </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="linkedinLink">Budget Range: <%=project.BUDGET%></label>
+                                            <select class="form-control" id="budget">
+                                                <option>$0-$1,000</option>
+                                                <option>$1,000-$5,000</option>
+                                                <option>$5,000-$10,000</option>
+                                                <option>$10,000-$25,000</option>
+                                                <option>$25,000-$50,000</option>
+                                                <option>$50,000-$100,000</option>
+                                                <option>$100,000+</option>
+                                              </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="linkedinLink">Do you have funding</label>
+                                            <% if(project.FUNDING=='true' || project.FUNDING=='1'){ %>
+                                            <h4>Do you have funding? <input type="checkbox" id="funding" data-toggle="toggle" checked="checked"></h4>
+                                            <% }else{ %>
+                                            <h4>Do you have funding? <input type="checkbox" id="funding" data-toggle="toggle"></h4>
+                                            <% } %>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="row pt-3">
+                                <div class="col-md-6 mx-auto">
+                                    <button class="btn btn-primary btn-lg btn-block" id="applyBtn">Apply
+                                    </button>
+                                    <hr class="my-3">
+                                    <button class="btn btn-primary btn-lg btn-block" id="finish">Mark project as Inactive
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+    </section>
+</div>
+
+<% include ../partials/footer.ejs %>
+
+<script>
+    $('#applyBtn').on('click', function(){
+        var e1 = document.getElementById("commitmentLevel");
+        var commitmentLevel = e1.options[e1.selectedIndex].text;
+        var e2 = document.getElementById("stage");
+        var Stage = e2.options[e2.selectedIndex].text;
+        var e3 = document.getElementById("budget");
+        var Budget = e3.options[e3.selectedIndex].text;
+        var hasFunding;
+        if(document.getElementById("funding").checked){
+          hasFunding = true;
+        }else{
+            hasFunding = false;
+        }
+        project={
+            name:document.getElementById("project_name").innerHTML,
+            summary:document.getElementById("summary").value,
+            commitment:commitmentLevel,
+            stage:Stage,
+            budget:Budget,
+            funding:hasFunding
+        };
+        $.ajax({
+            data:project,
+            type:"GET",
+            url:"http://localhost:3000/projects/update",
+            success: function(res){
+                console.log(res.status);
+                if(res.status==='succesfull')
+                    window.location.href = '/projects/'+project.name;
+                else alert(res.status); 
+            }
+        });
+    });
+    $("#finish").on('click', function () {
+        project={name:document.getElementById("project_name").innerHTML};
+        $.ajax({
+                        data:project,
+                        type: 'GET',
+                        url: 'http://localhost:3000/projects/finish',
+                        success: function(res) {
+                            console.log(res.status);
+                            if(res.status==='succesfull')
+                              window.location.href = '/projects/'+project.name;
+                            else alert(res.status); 
+                        }
+        });
+      });
+</script>
+</body>
+</html>
