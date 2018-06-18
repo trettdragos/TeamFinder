@@ -83,11 +83,11 @@
                             <% } %>
                         </div>
                         <div class="card-footer">
-                            <% if (email != team.LEADER && team.ACTIVE) { %>
+                            <% if (email != team.LEADER && team.ACTIVE && !joined) { %>
                             <button class="my-3 btn btn-lg btn-block font-weight-bold" id="join">Join</button>
-                            <% } else if (team.ACTIVE) { %>
+                            <% } else if (team.ACTIVE && email == team.LEADER) { %>
                             <button class="my-3 btn btn-lg btn-block font-weight-bold" id="editBtn">Edit Team</button>
-                            <% } else { %>
+                            <% } else if(!team.ACTIVE){ %>
                             <h5 class="font-weight-bold">This project was marked as inactive<br> (no longer searching for participants)</h5>
                             <% } %>
                         </div>
