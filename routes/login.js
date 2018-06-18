@@ -26,18 +26,21 @@ router.get('/auth', function (req, res) {
             security.checkPassword(user.password, result[0].PASSWORD, (passwordMatches) => {
                 if (passwordMatches) {
                     if (result[0].CONFIRMED == '1') {
-                        var newNotif = false;
-                        var not = JSON.parse(result[0].NOTIFICATION);
+                        let newNotif = false;
+                        let not = JSON.parse(result[0].NOTIFICATION);
                         for (i in not) {
                             if (not[i].vis == "false")
                                 newNotif = true;
                         }
                         console.log("auth succesfull with user: " + user.email);
-                        res.send({
-                            status: "succesfull",
-                            email: user.email,
-                            notifications: JSON.stringify(result[0].NOTIFICATION),
-                            newNotif: newNotif
+                        require('../other/security').generateCookieToken(user.email, (token) => {
+                            res.send({
+                                status: "succesfull",
+                                token: token,
+                                email: user.email,
+                                notifications: JSON.stringify(result[0].NOTIFICATION),
+                                newNotif: newNotif
+                            });
                         });
                     } else {
                         res.send({status: "account not verified", email: user.email})

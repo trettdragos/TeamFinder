@@ -7,7 +7,7 @@
 </head>
 
 <body>
-<% include ../partials/login-register-header %>
+<% include ../partials/login-register-header.ejs %>
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-6">
@@ -56,7 +56,15 @@
     </div>
 
 </div>
-<% include ../partials/footer %>
+<% include ../partials/footer.ejs %>
+<script>
+    let user = $.cookie('username');
+    if (user) {
+        $('#list').append('<li class="nav-item"><a class="nav-link" href="/dashboard">Search <i class="fas fa-home"></i></a></li><li class="nav-item"><a class="nav-link" href="/projects">Projects <i class="fas fa-user"></i></a></li><li class="nav-item"><a class="nav-link" href="/settings">Settings <i class="fas fa-cogs"></i></a></li><li class="nav-item"><a class="nav-link" id="logout" href="/logout">Logout <i class="fas fa-sign-out-alt"></i></a></li>');
+    } else {
+        $('#list').append('<li class="nav-item"><a class="nav-link" href="/dashboard">Search <i class="fas fa-home"></i></a></li><li class="nav-item"><a class="nav-link" id="logout" href="/register">Sign Up <i class="fas fa-user-plus"></i></a></li><li class="nav-item"><a class="nav-link" id="logout" href="/login">Login <i class="fas fa-sign-in-alt"></i></a></li>');
+    }
+</script>
 <script src="/vendor/bootstrap-tagsinput/tagsinput.js"></script>
 
 <script>

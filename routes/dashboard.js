@@ -22,7 +22,7 @@ router.get('/', function (req, res) {
             }
             let list = teams.concat(projects);
             list.reverse();
-            res.render('pages/index.ejs', {email: req.cookies.username, tab: '1', posts: list, term: ''});
+            res.render('pages/dashboard.ejs', {email: req.cookies.username, tab: '1', posts: list, term: ''});
         });
     });
 });
@@ -41,7 +41,7 @@ router.get('/:searchTerm', function (req, res) {
             }
             let list = teams.concat(projects);
             list.reverse();
-            res.render('pages/index.ejs', {
+            res.render('pages/dashboard.ejs', {
                 email: req.cookies.username,
                 tab: '1',
                 posts: list,

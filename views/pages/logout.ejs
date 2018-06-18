@@ -20,9 +20,12 @@
 
 <script>
     $.removeCookie('username');
+    $.removeCookie('token');
+    $.removeCookie('notifications');
+    $.removeCookie('newNotif');
     setTimeout(function () {
         window.location.href = '/login';
-    }, 5000);
+    }, <%-time%>);
 </script>
 </body>
 

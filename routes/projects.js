@@ -9,6 +9,18 @@ let con = mysql.createConnection({
     database: "TeamFinder"
 });
 
+router.get('/*', (req, res, next) => {
+    if (!req.cookies.username || !req.cookies.token) {
+        res.redirect('/login');
+    } else if (req.cookies.username) {
+        require('../other/security').verifyCookieToken(req.cookies.username, req.cookies.token, (result) => {
+            if (!result)
+                res.redirect('/logout?skip=true');
+            else next();
+        })
+    }
+});
+
 router.get('/', function (req, res) {
     if (req.cookies.username) {
         con.query("SELECT * FROM projects WHERE ACTIVE=1 LIMIT 25", function (err, projects, fields) {
@@ -105,7 +117,13 @@ router.get('/:project', function (req, res) {
             result[0].PLATFORMS = getPlatformString(JSON.parse(result[0].PLATFORMS))
             res.render('pages/project-page', {email: req.cookies.username, tab: '2', project: result[0]});
         }
-        else res.send('Error 404 project not found with the name ' + req.params.project);
+        else {
+            res.render('pages/404.ejs', {
+                message_main: "The project you're looking for does not exist (404)",
+                message_redirect: `Click <a href=\"/projects\">here</a> to go back`,
+                message_page: "Requested project: " + req.params.project
+            });
+        }
     });
 });
 

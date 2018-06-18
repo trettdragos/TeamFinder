@@ -189,7 +189,11 @@ app.set('view engine', 'ejs');
 let routes = require('./routes');
 routes.forEach(item => app.use(item.url, item.router));
 app.get('/logout', function (req, res) {
-    res.render('pages/logout');
+    console.log(req.query.skip);
+    if(req.query.skip)
+        res.render('pages/logout', {time: 1});
+    else
+        res.render('pages/logout', {time: 5000});
 });
 app.get('/*', (req, res) => {
     res.render('pages/404.ejs', {

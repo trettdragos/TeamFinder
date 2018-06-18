@@ -9,6 +9,18 @@ let con = mysql.createConnection({
     database: "TeamFinder"
 });
 
+router.get('/*', (req, res, next) => {
+    if (!req.cookies.username || !req.cookies.token) {
+        res.redirect('/login');
+    } else if (req.cookies.username) {
+        require('../other/security').verifyCookieToken(req.cookies.username, req.cookies.token, (result) => {
+            if (!result)
+                res.redirect('/logout?skip=true');
+            else next();
+        })
+    }
+});
+
 router.get('/', (req, res) => {
     res.redirect('/profile/' + req.cookies.username);
 });
@@ -40,19 +52,19 @@ router.get('/:account_id', (req, res) => {
                         message_redirect: `Click <a href=\"/profile\">here</a> to go to your profile`,
                         message_page: "Requested profile: " + req.params.account_id
                     });
-                    return;
+                } else {
+                    res.render('pages/profile', {
+                        username: req.cookies.username,
+                        // profile: "https://identicon-api.herokuapp.com/"+req.params.account_id+"/512?format=png",
+                        tab: '4',
+                        name: result[0].USERNAME,
+                        email: req.params.account_id,
+                        projects: projects,
+                        teams: teams,
+                        profile: JSON.parse(result[0].PROFILE),
+                        notifications: JSON.parse(result[0].NOTIFICATION)
+                    });
                 }
-                res.render('pages/profile', {
-                    username: req.cookies.username,
-                    // profile: "https://identicon-api.herokuapp.com/"+req.params.account_id+"/512?format=png",
-                    tab: '4',
-                    name: result[0].USERNAME,
-                    email: req.params.account_id,
-                    projects: projects,
-                    teams: teams,
-                    profile: JSON.parse(result[0].PROFILE),
-                    notifications: JSON.parse(result[0].NOTIFICATION)
-                });
             });
         });
     });
@@ -62,7 +74,7 @@ router.post('/update-profile', (req, res) => {
     let xss = require('xss');
     let security = require('../other/security');
     let req_data = JSON.parse(xss(JSON.stringify(req.body)));
-    switch( req_data.action ) {
+    switch (req_data.action) {
         case 'CHANGE_PASSWORD': {
             let data = JSON.parse(req_data.body);
             con.query('SELECT PASSWORD FROM accounts WHERE EMAIL = ?', [req.cookies.username], (err, db_res) => {
@@ -85,11 +97,11 @@ router.post('/update-profile', (req, res) => {
         case 'CHANGE_PROFILE_PICTURE': {
             let data = req_data.body;
             con.query('SELECT * FROM accounts WHERE EMAIL = ?', [req.cookies.username], (db_err, db_res) => {
-                if(db_err) throw db_err;
+                if (db_err) throw db_err;
                 let db_data = JSON.parse(db_res[0].PROFILE);
                 db_data.PROFILE_PICTURE = data;
                 con.query('UPDATE accounts SET PROFILE = ? WHERE EMAIL = ?', [JSON.stringify(db_data), req.cookies.username], (db_err_2, db_res_2) => {
-                    if(db_err_2) throw db_err_2;
+                    if (db_err_2) throw db_err_2;
                     res.end(JSON.stringify({code: 200, message: "Profile picture successfully changed!"}));
                 })
             });
@@ -97,11 +109,11 @@ router.post('/update-profile', (req, res) => {
         }
         case 'RESET_PROFILE_PICTURE': {
             con.query('SELECT * FROM accounts WHERE EMAIL = ?', [req.cookies.username], (db_err, db_res) => {
-                if(db_err) throw db_err;
+                if (db_err) throw db_err;
                 let db_data = JSON.parse(db_res[0].PROFILE);
                 db_data.PROFILE_PICTURE = '';
                 con.query('UPDATE accounts SET PROFILE = ? WHERE EMAIL = ?', [JSON.stringify(db_data), req.cookies.username], (db_err_2, db_res_2) => {
-                    if(db_err_2) throw db_err_2;
+                    if (db_err_2) throw db_err_2;
                     res.end(JSON.stringify({code: 200, message: "Profile picture successfully reset!"}));
                 })
             });
@@ -110,13 +122,13 @@ router.post('/update-profile', (req, res) => {
         case 'UPDATE_LINKS_AND_STATUS': {
             let data = JSON.parse(req_data.body);
             con.query('SELECT * FROM accounts WHERE EMAIL = ?', [req.cookies.username], (db_err, db_res) => {
-                if(db_err) throw db_err;
+                if (db_err) throw db_err;
                 let db_data = JSON.parse(db_res[0].PROFILE);
                 db_data.GITHUB = data.githubLink;
                 db_data.LINKEDIN = data.linkedinLink;
                 db_data.ABOUT = data.about;
                 con.query('UPDATE accounts SET PROFILE = ? WHERE EMAIL = ?', [JSON.stringify(db_data), req.cookies.username], (db_err_2, db_res_2) => {
-                    if(db_err_2) throw db_err_2;
+                    if (db_err_2) throw db_err_2;
                     res.end(JSON.stringify({code: 200, message: "Profile picture successfully reset!"}));
                 })
             });
@@ -130,11 +142,11 @@ router.post('/change-profile-picture', (req, res) => {
     let data = JSON.parse(xss(JSON.stringify(req.body)));
 
     con.query('SELECT * FROM accounts WHERE EMAIL = ?', [req.cookies.username], (db_err, db_res) => {
-        if(db_err) throw db_err;
+        if (db_err) throw db_err;
         let db_data = JSON.parse(db_res[0].PROFILE);
         db_data.PROFILE_PICTURE = data.url;
         con.query('UPDATE accounts SET PROFILE = ? WHERE EMAIL = ?', [JSON.stringify(db_data), req.cookies.username], (db_err_2, db_res_2) => {
-            if(db_err_2) throw db_err_2;
+            if (db_err_2) throw db_err_2;
             res.end(JSON.stringify({code: 200, message: "Profile picture successfully changed!"}));
         })
     });

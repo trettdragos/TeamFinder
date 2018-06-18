@@ -1,16 +1,15 @@
 # TeamFinder
 
-## Tasks List
+## Task list
 
 ### Structura
 
 - [x] <strike>inlocuirea metodelor socket.io cu metode get de la express app</strike>
 - [x] <strike>restructurarea paginilor pe routes</strike>
-- [ ] implementare securitate(login, register, cookies si tokens pentru orice comunicare cu serverul in cazul userului logat)
-    - [ ] Login
-    - [ ] Register
-    - [ ] Cookie
-    - [ ] Token pentru orice comunicare cu serverul (Asta mi se pare inutila - @TeodorVecerdi)
+- [x] <strike>implementare securitate(login, register, cookies si tokens pentru orice comunicare cu serverul in cazul userului logat)</strike>
+    - [x] <strike>Login</strike>
+    - [x] <strike>Register</strike>
+    - [x] <strike>Token pentru orice comunicare cu serverul</strike>
 
 ### Functionalitati de importanta primara
 
