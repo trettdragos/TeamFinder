@@ -110,7 +110,7 @@ io.on('connection', function (socket) {
                         "type": "project",
                         "name": req.projectName,
                         "id": id
-                    }
+                    };
                     io.sockets.connected[connectedUsers[req.leader]].emit('notification', newReq);
                     let reqtest = JSON.stringify(newReq);
                     let reqAltTest = JSON.stringify(newAltReq);

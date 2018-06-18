@@ -6,6 +6,16 @@
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.standalone.min.css"
           rel="stylesheet" type="text/css"/>
+    <style>
+        .toggled {
+            background-color: #00A86B !important;
+            color: white !important;
+        }
+        .toggled:hover {
+            background-color: #00b875 !important;
+            color: white !important;
+        }
+    </style>
 </head>
 
 <body>
@@ -23,7 +33,7 @@
                     <hr class="my-4">
                     <div class="form-group">
                         <label for="comment">Team's Purpose</label>
-                        <small id="summarise" class="form-text text-muted"><i class="fas fa-info-circle"></i>What are
+                        <small id="summarise" class="form-text text-muted"><i class="fas fa-info-circle mr-2"></i>What are
                             you creating the team for?
                         </small>
                         <textarea class="form-control" rows="5" id="purpose"></textarea>
@@ -55,23 +65,23 @@
                     <div class="form-group">
                         <h4 id="Platform">What Platform Will Your Project Be Built On?</h4>
                         <div class="form-check form-check-inline">
-                            <input class="btn btn-lg" style="width: 175px; height:75px; margin-bottom: 5px;"
-                                   type="button" id="android" value="Andoird">
+                            <input class="btn btn-lg platform-toggle-button" style="width: 175px; height:75px; margin-bottom: 5px;"
+                                   type="button" id="android" value="Android">
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="btn btn-lg" style="width: 175px; height:75px; margin-bottom: 5px;"
+                            <input class="btn btn-lg platform-toggle-button" style="width: 175px; height:75px; margin-bottom: 5px;"
                                    type="button" id="ios" value="iOS">
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="btn btn-lg" style="width: 175px; height:75px; margin-bottom: 5px;"
+                            <input class="btn btn-lg platform-toggle-button" style="width: 175px; height:75px; margin-bottom: 5px;"
                                    type="button" id="desktop" value="Desktop">
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="btn btn-lg" style="width: 175px; height:75px; margin-bottom: 5px;"
+                            <input class="btn btn-lg platform-toggle-button" style="width: 175px; height:75px; margin-bottom: 5px;"
                                    type="button" id="webFrontEnd" value="Web Front End">
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="btn btn-lg" style="width: 175px; height:75px; margin-bottom: 5px;"
+                            <input class="btn btn-lg platform-toggle-button" style="width: 175px; height:75px; margin-bottom: 5px;"
                                    type="button" id="webBackEnd" value="Web Back End">
                         </div>
                     </div>
@@ -101,19 +111,26 @@
     });
 </script>
 <script>
-    var socket = io.connect();
-    var android = false;
-    var ios = false;
-    var desktop = false;
-    var webFront = false;
-    var webBack = false;
+    $(function() {
+        console.log('loaded');
+        $('.platform-toggle-button').on('click', function() {
+            if($(this).hasClass('toggled')) $(this).removeClass('toggled');
+            else $(this).addClass('toggled');
+        });
+    })
+    let socket = io.connect();
+    let android = false;
+    let ios = false;
+    let desktop = false;
+    let webFront = false;
+    let webBack = false;
     $("#submit").on('click', function () {
         submitTeam();
     });
 
     function submitTeam() {
 
-        var team = {
+        let team = {
             name: document.getElementById('teamName').value,
             summary: document.getElementById('purpose').value,
             resource_link: $('#resource_link').val(),
@@ -132,7 +149,7 @@
             posts: '',
             leader: $.cookie('username')
         }
-        var isFormOk = true;
+        let isFormOk = true;
         if (team.name === '') {
             isFormOk = false;
             document.getElementById('teamName').style.borderColor = "red";
@@ -195,53 +212,6 @@
             $("#submit").click();
         }
     });
-
-
-    document.getElementById("android").onclick = function () {
-        if (android == false) {
-            document.getElementById("android").style.backgroundColor = '#00A86B';
-            android = true;
-        } else {
-            document.getElementById("android").style.backgroundColor = '#343a40';
-            android = false;
-        }
-    };
-    document.getElementById("ios").onclick = function () {
-        if (ios == false) {
-            document.getElementById("ios").style.backgroundColor = '#00A86B';
-            ios = true;
-        } else {
-            document.getElementById("ios").style.backgroundColor = '#343a40';
-            ios = false;
-        }
-    };
-    document.getElementById("desktop").onclick = function () {
-        if (desktop == false) {
-            document.getElementById("desktop").style.backgroundColor = '#00A86B';
-            desktop = true;
-        } else {
-            document.getElementById("desktop").style.backgroundColor = '#343a40';
-            desktop = false;
-        }
-    };
-    document.getElementById("webFrontEnd").onclick = function () {
-        if (webFront == false) {
-            document.getElementById("webFrontEnd").style.backgroundColor = '#00A86B';
-            webFront = true;
-        } else {
-            document.getElementById("webFrontEnd").style.backgroundColor = '#343a40';
-            webFront = false;
-        }
-    };
-    document.getElementById("webBackEnd").onclick = function () {
-        if (webBack == false) {
-            document.getElementById("webBackEnd").style.backgroundColor = '#00A86B';
-            webBack = true;
-        } else {
-            document.getElementById("webBackEnd").style.backgroundColor = '#343a40';
-            webBack = false;
-        }
-    };
 </script>
 
 </body>

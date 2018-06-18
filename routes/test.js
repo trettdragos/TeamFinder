@@ -27,12 +27,12 @@ router.get('/email', (req, res) => {
 });
 
 router.get('/cookie-token', (req, res) => {
-    require('../other/security').generateCookieToken('teo.vecerdi@gmail.com', (token) => res.send(`Input: teo.vecerdi@gmail.com<br>Expected output:<br>&nbsp;&nbsp;&nbsp;74278ec6598d65961460ce1c0b58d30fd34db9ea5f5869d6f1b896a904b063d8d61a9424dff2be7330321b800ffff3ae6f11b035b193ad025841186a5bc0a3cf<br>Actual output:<br>&nbsp;&nbsp;&nbsp;${token}`));
+    require('../other/security').generateCookieToken('teo.vecerdi@gmail.com', (token) => res.send(`Input:<br>&nbsp;&nbsp;&nbsp;teo.vecerdi@gmail.com<br>Expected output:<br>&nbsp;&nbsp;&nbsp;74278ec6598d65961460ce1c0b58d30fd34db9ea5f5869d6f1b896a904b063d8d61a9424dff2be7330321b800ffff3ae6f11b035b193ad025841186a5bc0a3cf<br>Actual output:<br>&nbsp;&nbsp;&nbsp;${token}`));
 });
 
 router.get('/verify-cookie-token', (req, res) => {
     require('../other/security').verifyCookieToken('teo.vecerdi@gmail.com', '74278ec6598d65961460ce1c0b58d30fd34db9ea5f5869d6f1b896a904b063d8d61a9424dff2be7330321b800ffff3ae6f11b035b193ad025841186a5bc0a3cf', (valid) => {
-        res.send(`Inputs:<br>&nbsp;&nbsp;&nbsp;teo.vecerdi@gmail.com<br>&nbsp;&nbsp;&nbsp;74278ec6598d65961460ce1c0b58d30fd34db9ea5f5869d6f1b896a904b063d8d61a9424dff2be7330321b800ffff3ae6f11b035b193ad025841186a5bc0a3cf<br>Expected output:<br>&nbsp;&nbsp;&nbsp;true<br>Actual output:<br>&nbsp;&nbsp;&nbsp;${valid}`)
+        res.send(`Input:<br>&nbsp;&nbsp;&nbsp;teo.vecerdi@gmail.com<br>&nbsp;&nbsp;&nbsp;74278ec6598d65961460ce1c0b58d30fd34db9ea5f5869d6f1b896a904b063d8d61a9424dff2be7330321b800ffff3ae6f11b035b193ad025841186a5bc0a3cf<br>Expected output:<br>&nbsp;&nbsp;&nbsp;true<br>Actual output:<br>&nbsp;&nbsp;&nbsp;${valid}`)
     });
 });
 
