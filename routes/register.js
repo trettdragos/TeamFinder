@@ -35,22 +35,29 @@ router.get('/auth', function (req, res) {
             security.encryptPassword(user.password, (hash) => {
                 console.log(user.skills);
                 console.log(JSON.stringify(user.skills));
+                let skills = [];
+                if (user.skills) {
+                    skills = user.skills;
+                    console.log('ADDED SKILLS')
+                }
                 let profile = {
                     "GITHUB": user.github,
                     "LINKEDIN": user.linkedin,
-                    "SKILLS": user.skills,
+                    "SKILLS": skills,
                     "ABOUT": "",
                     "PROFILE_PICTURE": ""
                 };
                 //schimba CONFIRMED la 0 imediat repun pe picioare sendgrid
                 con.query("INSERT INTO accounts (ID, USERNAME, EMAIL, PASSWORD, PROFILE, CONFIRMED, NOTIFICATION) VALUES (?, ?, ?, ?, ?, '0', '[]')", [0, user.name, user.email, hash, JSON.stringify(profile)], function (err, result) {
                     if (err) throw err;
-                    var msg = {
+                    let email_template = require('../other/utils').emailTemplate;
+                    email_template = email_template.replace(new RegExp('{{LINK}}', 'g'), 'http://localhost:3000/verification/'+user.email);
+                    let msg = {
                       to: user.email,
                       from: 'register@hacksquad.com',
                       subject: 'Please verify your email',
                       text: 'and easy to do anywhere, even with Node.js',
-                      html: '<a href="localhost:3000/verification/'+user.email+'">localhost:3000/verification/'+user.email+'</a>',
+                      html: email_template,
                     };
                     sgMail.send(msg);
                     console.log('sent verification email to ' + user.email);
