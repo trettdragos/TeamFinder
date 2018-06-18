@@ -56,11 +56,12 @@
 <script src="/vendor/bootstrap-tagsinput/tagsinput.js"></script>
 
 <script>
-    var socket = io.connect();
 
     $("#submit").on('click', function () {
+        console.log("registering");
         if (!registerValidator.form())
             return;
+        console.log("seccond");
         let user = {
             email: document.getElementById("email").value,
             password: document.getElementById("password").value,

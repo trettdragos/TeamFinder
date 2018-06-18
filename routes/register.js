@@ -2,6 +2,8 @@ let express = require('express');
 let router = express.Router();
 let mysql = require('mysql');
 let security = require('../other/security');
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 let con = mysql.createConnection({
     host: "localhost",
@@ -41,18 +43,18 @@ router.get('/auth', function (req, res) {
                     "PROFILE_PICTURE": ""
                 };
                 //schimba CONFIRMED la 0 imediat repun pe picioare sendgrid
-                con.query("INSERT INTO accounts (ID, USERNAME, EMAIL, PASSWORD, PROFILE, CONFIRMED, NOTIFICATION) VALUES (?, ?, ?, ?, ?, '1', '[]')", [0, user.name, user.email, hash, JSON.stringify(profile)], function (err, result) {
+                con.query("INSERT INTO accounts (ID, USERNAME, EMAIL, PASSWORD, PROFILE, CONFIRMED, NOTIFICATION) VALUES (?, ?, ?, ?, ?, '0', '[]')", [0, user.name, user.email, hash, JSON.stringify(profile)], function (err, result) {
                     if (err) throw err;
-                    res.send({status: "succesfull"});
-                    /*var msg = {
-                      to: 'trettdragos@gmail.com',
+                    var msg = {
+                      to: user.email,
                       from: 'register@hacksquad.com',
                       subject: 'Please verify your email',
                       text: 'and easy to do anywhere, even with Node.js',
                       html: '<a href="localhost:3000/verification/'+user.email+'">localhost:3000/verification/'+user.email+'</a>',
                     };
-                    sgMail.send(msg);*/
+                    sgMail.send(msg);
                     console.log('sent verification email to ' + user.email);
+                    res.send({status: "succesfull"});
                 });
             });
         }
