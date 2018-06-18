@@ -98,6 +98,10 @@
     </form>
     <% include ../partials/footer %>
     <% include ../partials/socket-notification.ejs %>
+    <script type="text/javascript">
+      var userip;
+    </script>
+    <script type="text/javascript" src="https://l2.io/ip.js?var=userip"></script>
     <script>
       var socket = io.connect();
       var android = false;
