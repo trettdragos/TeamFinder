@@ -1,79 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 
-  <head>
-    <% include ../partials/head %>
-  </head>
+<head>
+    <% include ../partials/head.ejs %>
+</head>
 
-  <body>
-    <% include ../partials/login-register-header %>
-    <div class="container">
-      <div class="card card-container">
-        <h4 style="text-align: center; margin-bottom: 15px;"><b>Login to Your Account</b></h4>
-            <form class="form-signin" id="form">
-                <p id="error" style="color: red;"></p>
-                <div class="md-form">
-                    <input type="email" id="email" class="form-control" required>
-                    <label for="email">Email</label>
+<body>
+<% include ../partials/login-register-header.ejs %>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-6">
+            <div class="card">
+                <div class="card-body">
+                    <h4 style="text-align: center; margin-bottom: 15px;"><b>Login to Your Account</b></h4>
+                    <form class="form-signin" id="form">
+                        <p id="error" style="color: red;"></p>
+                        <div class="md-form">
+                            <input type="email" id="email" class="form-control" required>
+                            <label for="email">Email</label>
+                        </div>
+                        <div class="md-form">
+                            <input type="password" id="password" class="form-control" required>
+                            <label for="password">Password</label>
+                        </div>
+                        <div id="remember" class="checkbox">
+                            <label>
+                                <input type="checkbox" value="remember-me" autocomplete="true" name="keepMeUp" checked="true">
+                                Keep Me LoggedIn
+                            </label>
+                        </div>
+                        <button class="btn btn-lg btn-block btn-signin" type="button" onclick="auth()" id="submit"> Login <i
+                                    class="fas fa-sign-in-alt"></i></button>
+                    </form>
+                    <div class="pt-1">
+                        <small class="text-center text-muted">Don't have an account? <a href="/register"
+                                                                                        class="font-weight-bold link-unstyled">Register</a>
+                        </small>
+                    </div>
                 </div>
-                <div class="md-form">
-                    <input type="password" id="password" class="form-control" required>
-                    <label for="password">Password</label>
-                </div>
-                <div id="remember" class="checkbox">
-                    <label>
-                        <input type="checkbox" value="remember-me" autocomplete="true" name="keepMeUp" checked="true"> Keep Me LoggedIn
-                    </label>
-                </div>
-                <button class="btn btn-lg btn-block btn-signin" type="button" onclick="auth()" id="submit">  Login <i class="fas fa-sign-in-alt"></i></button>
-            </form>
-            <div class="pt-1"><small class="text-center text-muted">Don't have an account? <a href="/register" class="font-weight-bold link-unstyled">Register</a> </small></div>
+            </div>
         </div>
     </div>
-    <% include ../partials/footer %>
-    <script>
-      var user = $.cookie('username');
-      if(user){
+
+</div>
+<% include ../partials/footer.ejs %>
+<script>
+    let user = $.cookie('username');
+    if (user) {
         $('#list').append('<li class="nav-item"><a class="nav-link" href="/dashboard">Search <i class="fas fa-home"></i></a></li><li class="nav-item"><a class="nav-link" href="/projects">Projects <i class="fas fa-user"></i></a></li><li class="nav-item"><a class="nav-link" href="/settings">Settings <i class="fas fa-cogs"></i></a></li><li class="nav-item"><a class="nav-link" id="logout" href="/logout">Logout <i class="fas fa-sign-out-alt"></i></a></li>');
-      }else{
+    } else {
         $('#list').append('<li class="nav-item"><a class="nav-link" href="/dashboard">Search <i class="fas fa-home"></i></a></li><li class="nav-item"><a class="nav-link" id="logout" href="/register">Sign Up <i class="fas fa-user-plus"></i></a></li><li class="nav-item"><a class="nav-link" id="logout" href="/login">Login <i class="fas fa-sign-in-alt"></i></a></li>');
-      }
-    </script>
-    <script>
-        
-        var socket = io.connect();
-        function auth() {
-            $.ajax({
-                        data:{email:document.getElementById('email').value, password:document.getElementById('password').value},
-                        type: 'GET',
-                        url: 'http://localhost:3000/login/auth',
-                        success: function(res) {
-                            console.log(res.status);
-                            if(res.status == "succesfull"){
-                                $.cookie('username', res.email, { expires: 14, path: '/' });
-                                $.cookie('notifications', JSON.stringify(res.notifications), {expires: 14, path: '/'});
-                                $.cookie('newNotif', res.newNotif, {expires: 14, path: '/'});
-                                window.location.href = '/dashboard';
-                            }else if(res.status == "account not verified"){
-                                $('#error').empty();
-                                $('#error').append('Account not verified. Please confirm your email');
-                            }else{
-                                document.getElementById("email").style.borderColor="red";
-                                document.getElementById("password").style.borderColor="red";
-                                $('#error').empty();
-                                $('#error').append('Email or Password incorect!');
-                            }
-                            //console.log(JSON.stringify(data));
-                        }
-                    });
-            //socket.emit('auth login', {email:document.getElementById('email').value, password:document.getElementById('password').value})
-        }
-        $("#form").keyup(function(event) {
-            if (event.keyCode === 13) {
-                $("#submit").click();
+    }
+</script>
+<script>
+
+    let socket = io.connect();
+
+    function auth() {
+        $.ajax({
+            data: {
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            },
+            type: 'GET',
+            url: 'http://localhost:3000/login/auth',
+            success: function (res) {
+                console.log(res.status);
+                if (res.status == "succesfull") {
+                    $.cookie('username', res.email, {expires: 14, path: '/'});
+                    // $.cookie('token', res.token, {expires: 14, path: '/'});
+                    $.cookie('notifications', JSON.stringify(res.notifications), {expires: 14, path: '/'});
+                    $.cookie('newNotif', res.newNotif, {expires: 14, path: '/'});
+                    window.location.href = '/dashboard';
+                } else if (res.status == "account not verified") {
+                    $('#error').empty();
+                    $('#error').append('Account not verified. Please confirm your email');
+                } else {
+                    document.getElementById("email").style.borderColor = "red";
+                    document.getElementById("password").style.borderColor = "red";
+                    $('#error').empty();
+                    $('#error').append('Email or Password incorect!');
+                }
+                //console.log(JSON.stringify(data));
             }
         });
-    </script>
-  </body>
+        //socket.emit('auth login', {email:document.getElementById('email').value, password:document.getElementById('password').value})
+    }
+
+    $("#form").keyup(function (event) {
+        if (event.keyCode === 13) {
+            $("#submit").click();
+        }
+    });
+</script>
+</body>
 
 </html>

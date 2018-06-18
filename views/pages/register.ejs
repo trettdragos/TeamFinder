@@ -9,48 +9,52 @@
 <body>
 <% include ../partials/login-register-header %>
 <div class="container">
-    <div class="card card-container">
-        <h4 style="text-align: center; margin-bottom: 15px;"><b>Register</b></h4>
-        <form class="form-signin" id="form">
-            <div class="md-form">
-                <input type="email" id="email" name="email" class="form-control" required>
-                <label for="email">Email</label>
+    <div class="row justify-content-center">
+        <div class="col-6">
+            <div class="card">
+                <div class="card-body">
+                    <h4 style="text-align: center; margin-bottom: 15px;"><b>Register</b></h4>
+                    <form class="form-signin" id="form">
+                        <div class="md-form">
+                            <input type="email" id="email" name="email" class="form-control" required>
+                            <label for="email">Email</label>
+                        </div>
+                        <div class="md-form">
+                            <input type="password" id="password" name="password" class="form-control" required>
+                            <label for="password">Password</label>
+                        </div>
+                        <div class="md-form">
+                            <input type="password" id="passwordCheck" name="passwordCheck" class="form-control" required>
+                            <label for="passwordCheck">Check Password</label>
+                        </div>
+                        <div class="md-form">
+                            <input type="text" id="fullName" name="fullName" class="form-control" required>
+                            <label for="fullName">Full Name</label>
+                        </div>
+                        <div class="md-form">
+                            <i class="fab fa-github prefix"></i>
+                            <input type="url" id="github" name="github" class="form-control">
+                            <label for="github">GitHub Link</label>
+                        </div>
+                        <div class="md-form">
+                            <i class="fab fa-linkedin prefix"></i>
+                            <input type="url" id="linkedin" name="linkedin" class="form-control">
+                            <label for="linkedin">LinkedIn Link</label>
+                        </div>
+                        <div class="md-form">
+                            <label for="skillsInput">Skills</label>
+                            <input type="text" id="skillsInput" class="form-control" data-role="tagsinput">
+                        </div>
+                        <button class="btn btn-lg btn-block btn-register" type="button" id="submit">Register<i class="fas fa-user"></i></button>
+                    </form>
+                    <div class="pt-1">
+                        <small class="text-center text-muted">Already have an account? <a href="/login" class="font-weight-bold link-unstyled">Log In</a></small>
+                    </div>
+                </div>
             </div>
-            <div class="md-form">
-                <input type="password" id="password" name="password" class="form-control" required>
-                <label for="password">Password</label>
-            </div>
-            <div class="md-form">
-                <input type="password" id="passwordCheck" name="passwordCheck" class="form-control" required>
-                <label for="passwordCheck">Check Password</label>
-            </div>
-            <div class="md-form">
-                <input type="text" id="fullName" name="fullName" class="form-control" required>
-                <label for="fullName">Full Name</label>
-            </div>
-            <div class="md-form">
-                <i class="fab fa-github prefix"></i>
-                <input type="url" id="github" name="github" class="form-control">
-                <label for="github">GitHub Link</label>
-            </div>
-            <div class="md-form">
-                <i class="fab fa-linkedin prefix"></i>
-                <input type="url" id="linkedin" name="linkedin" class="form-control">
-                <label for="linkedin">LinkedIn Link</label>
-            </div>
-            <div class="md-form">
-                <label for="skillsInput">Skills</label>
-                <input type="text" id="skillsInput" class="form-control" data-role="tagsinput">
-            </div>
-            <button class="btn btn-lg btn-block btn-register" type="button" id="submit">Register <i
-                        class="fas fa-user"></i></button>
-        </form>
-        <div class="pt-1">
-            <small class="text-center text-muted">Already have an account? <a href="/login"
-                                                                              class="font-weight-bold link-unstyled">Log
-                    In</a></small>
         </div>
     </div>
+
 </div>
 <% include ../partials/footer %>
 <script src="/vendor/bootstrap-tagsinput/tagsinput.js"></script>

@@ -1,31 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 
-  <head>
-    <% include ../partials/head %>
-  </head>
+<head>
+    <% include ../partials/head.ejs %>
+</head>
 
-  <body>
-    <% include ../partials/empty-header %>
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-12 text-center">
-          <p class="lead">You have been disconected. Thank you for using Team Finder</p>
-          <ul class="list-unstyled">
+<body>
+<% include ../partials/empty-header.ejs %>
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <p class="lead">You have been disconected. Thank you for using Team Finder</p>
             <p>You will be redirected in 5 secconds...</p>
-            <p id="time"></p>
-          </ul>
         </div>
-      </div>
     </div>
+</div>
 
-    <% include ../partials/footer %>
+<% include ../partials/footer.ejs %>
 
-    <script>
-      $.removeCookie('username');
-      var delay = 1; 
-      setTimeout(function(){    window.location.href = '/login'; }, delay); 
-    </script>
-  </body>
+<script>
+    $.removeCookie('username');
+    setTimeout(function () {
+        window.location.href = '/login';
+    }, 5000);
+</script>
+</body>
 
 </html>
