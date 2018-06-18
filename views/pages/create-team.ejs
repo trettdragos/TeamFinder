@@ -1,229 +1,249 @@
 <!DOCTYPE html>
 <html lang="en">
 
-  <head>
+<head>
     <% include ../partials/head %>
-    
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.standalone.min.css" rel="stylesheet" type="text/css" />
-  </head>
 
-  <body>
-    <% include ../partials/header %>
-    <form>
-      <div class="container"> 
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.standalone.min.css"
+          rel="stylesheet" type="text/css"/>
+</head>
+
+<body>
+<% include ../partials/header %>
+<form>
+    <div class="container">
         <div class="row">
-          <div class="col-lg-12">
-            <div class="jumbotron" style="margin-top: 10px;">
-              <h2><b>Tell Us About Your Team</b></h2>
-              <div class="form-group">
-                <label for="project Name">Team Name</label>
-                <input type="text" class="form-control" id="teamName" placeholder="Enter team name">
-              </div>
-              <hr class="my-4">
-              <div class="form-group">
-                <label for="comment">Team's Purpose</label>
-                <small id="summarise" class="form-text text-muted"><i class="fas fa-info-circle"></i>What are you creating the team for?</small>
-                <textarea class="form-control" rows="5" id="purpose"></textarea>
-              </div>
+            <div class="col-lg-12">
+                <div class="jumbotron" style="margin-top: 10px;">
+                    <h2><b>Tell Us About Your Team</b></h2>
+                    <div class="form-group">
+                        <label for="project Name">Team Name</label>
+                        <input type="text" class="form-control" id="teamName" placeholder="Enter team name">
+                    </div>
+                    <hr class="my-4">
+                    <div class="form-group">
+                        <label for="comment">Team's Purpose</label>
+                        <small id="summarise" class="form-text text-muted"><i class="fas fa-info-circle"></i>What are
+                            you creating the team for?
+                        </small>
+                        <textarea class="form-control" rows="5" id="purpose"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="resource_link">Resource URL</label>
+                        <input title="Resource URL"
+                               placeholder="Example: https://www.github.com/your_account/your_repository/"
+                               class="form-control" id="resource_link"/>
+                    </div>
+                </div>
+                <div class="jumbotron" style="margin-top: 10px;">
+                    <div class="form-group">
+                        <div class="form-group">
+                            <label for="exampleFormControlSelect1">To what Hackaton do you intend to participate with
+                                your team?</label>
+                            <input type="text" class="form-control" id="hackaton" placeholder="Hackaton">
+                            <hr class="my-4">
+                            <label for="exampleFormControlSelect1">And section?</label>
+                            <input type="text" class="form-control" id="hackatonSection" placeholder="section">
+                            <hr class="my-4">
+                            <label for="exampleFormControlSelect1">Starting on...</label>
+                            <input type="text" class="form-control" id="datepickerStart" placeholder="DD/MM/YYYY">
+                            <label for="exampleFormControlSelect1">Ending on...</label>
+                            <input type="text" class="form-control" id="datepickerEnd" placeholder="DD/MM/YYYY">
+                        </div>
+                    </div>
+                    <hr class="my-4">
+                    <div class="form-group">
+                        <h4 id="Platform">What Platform Will Your Project Be Built On?</h4>
+                        <div class="form-check form-check-inline">
+                            <input class="btn btn-lg" style="width: 175px; height:75px; margin-bottom: 5px;"
+                                   type="button" id="android" value="Andoird">
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="btn btn-lg" style="width: 175px; height:75px; margin-bottom: 5px;"
+                                   type="button" id="ios" value="iOS">
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="btn btn-lg" style="width: 175px; height:75px; margin-bottom: 5px;"
+                                   type="button" id="desktop" value="Desktop">
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="btn btn-lg" style="width: 175px; height:75px; margin-bottom: 5px;"
+                                   type="button" id="webFrontEnd" value="Web Front End">
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="btn btn-lg" style="width: 175px; height:75px; margin-bottom: 5px;"
+                                   type="button" id="webBackEnd" value="Web Back End">
+                        </div>
+                    </div>
+                </div>
+                <div class="jumbotron" style="margin-top: 10px;">
+                    <center>
+                        <button class="btn btn-lg" id="submit" type="button"
+                                style="width: 150px; height: 75px; font-size: 200%;"><b>Submit</b></button>
+                    </center>
+                </div>
             </div>
-            <div class="jumbotron" style="margin-top: 10px;">
-              <div class="form-group">
-                <div class="form-group">
-                  <label for="exampleFormControlSelect1">To what Hackaton do you intend to participate with your team?</label>
-                  <input type="text" class="form-control" id="hackaton" placeholder="Hackaton">
-                  <hr class="my-4">
-                  <label for="exampleFormControlSelect1">And section?</label>
-                  <input type="text" class="form-control" id="hackatonSection" placeholder="section">
-                  <hr class="my-4">
-                  <label for="exampleFormControlSelect1">Starting on...</label>
-                  <input type="text" class="form-control" id="datepickerStart" placeholder="DD/MM/YYYY">
-                  <label for="exampleFormControlSelect1">Ending on...</label>
-                  <input type="text" class="form-control" id="datepickerEnd" placeholder="DD/MM/YYYY">
-                </div>
-              </div>
-              <hr class="my-4">
-              <div class="form-group">
-                <h4 id="Platform">What Platform Will Your Project Be Built On?</h4>
-                <div class="form-check form-check-inline">
-                  <input class="btn btn-lg" style="width: 175px; height:75px; margin-bottom: 5px;" type="button" id="android" value="Andoird">
-                </div>
-                <div class="form-check form-check-inline">
-                  <input class="btn btn-lg" style="width: 175px; height:75px; margin-bottom: 5px;" type="button" id="ios" value="iOS">
-                </div>
-                <div class="form-check form-check-inline">
-                  <input class="btn btn-lg" style="width: 175px; height:75px; margin-bottom: 5px;" type="button" id="desktop" value="Desktop">
-                </div>
-                <div class="form-check form-check-inline">
-                  <input class="btn btn-lg" style="width: 175px; height:75px; margin-bottom: 5px;" type="button" id="webFrontEnd" value="Web Front End">
-                </div>
-                <div class="form-check form-check-inline">
-                  <input class="btn btn-lg" style="width: 175px; height:75px; margin-bottom: 5px;" type="button" id="webBackEnd" value="Web Back End">
-                </div>
-              </div>
-            </div>
-            <div class="jumbotron" style="margin-top: 10px;">
-              <center>
-                <button class="btn btn-lg" id="submit" type="button" style="width: 150px; height: 75px; font-size: 200%;"><b>Submit</b></button>
-              </center>
-            </div>
-          </div>
         </div>
-      </div>
-    </form>
-    <% include ../partials/footer %>
-    <% include ../partials/socket-notification.ejs %>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js" type="text/javascript"></script>
-    <script>
-       $('#datepickerStart').datepicker({
-    format: 'dd/mm/yyyy',
-    startDate: '-3d'
-});
-       $('#datepickerEnd').datepicker({
-    format: 'dd/mm/yyyy',
-    startDate: '-3d'
-});
-    </script>
-      <script>
-        var socket = io.connect();
-      var android = false;
-      var ios = false;
-      var desktop = false;
-      var webFront = false;
-      var webBack = false;
-      $("#submit").on('click', function () {
-         submitTeam();    
-        });
-      function submitTeam() {
-          
-            var team = {
-              name:document.getElementById('teamName').value,
-              summary:document.getElementById('purpose').value,
-              hackaton:document.getElementById('hackaton').value,
-              section:document.getElementById('hackatonSection').value,
-              startDate:document.getElementById('datepickerStart').value,
-              endDate:document.getElementById('datepickerEnd').value,
-              platforms:{
-                Android:android,
-                iOS:ios,
-                Desktop:desktop,
-                WebFront:webFront,
-                webBack:webBack
-              },
-              nrMembers:1,
-              posts:'',
-              leader:$.cookie('username')
-            }
-            var isFormOk = true;
-            if(team.name===''){
-              isFormOk = false;
-              document.getElementById('teamName').style.borderColor = "red";
-            }else{
-              document.getElementById('teamName').style.borderColor = "green";
-            }
-            if(team.summary===''){
-              isFormOk = false;
-              document.getElementById('purpose').style.borderColor = "red";
-            }else{
-              document.getElementById('purpose').style.borderColor = "green";
-            }
-            if(team.hackaton===''){
-              isFormOk = false;
-              document.getElementById('hackaton').style.borderColor = "red";
-            }else{
-              document.getElementById('hackaton').style.borderColor = "green";
-            }
-            if(team.section===''){
-              isFormOk = false;
-              document.getElementById('hackatonSection').style.borderColor = "red";
-            }else{
-              document.getElementById('hackatonSection').style.borderColor = "green";
-            }
-            if(team.startDate===''){
-              isFormOk = false;
-              document.getElementById('datepickerStart').style.borderColor = "red";
-            }else{
-              document.getElementById('datepickerStart').style.borderColor = "green";
-            }
-            if(team.endDate===''){
-              isFormOk = false;
-              document.getElementById('datepickerEnd').style.borderColor = "red";
-            }else{
-              document.getElementById('datepickerEnd').style.borderColor = "green";
-            }
-            if(!(ios ||  android || desktop || webBack || webFront)){
-              isFormOk = false;
-              document.getElementById('Platform').style.color = "red";
-            }else{
-              document.getElementById('Platform').style.color = "green";
-            }
-            if(isFormOk)
-              $.ajax({
-                        data:team,
-                        type: 'GET',
-                        url: 'http://localhost:3000/teams/register',
-                        success: function(res) {
-                            console.log(res.status);
-                            if(res.status==='succesfull')
-                              window.location.href = '/teams';
-                            else alert(res.status); 
-                        }
-                    });
-              //socket.emit('register team', team);
+    </div>
+</form>
+<% include ../partials/footer %>
+<% include ../partials/socket-notification.ejs %>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js"
+        type="text/javascript"></script>
+<script>
+    $('#datepickerStart').datepicker({
+        format: 'dd/mm/yyyy',
+        startDate: '-3d'
+    });
+    $('#datepickerEnd').datepicker({
+        format: 'dd/mm/yyyy',
+        startDate: '-3d'
+    });
+</script>
+<script>
+    var socket = io.connect();
+    var android = false;
+    var ios = false;
+    var desktop = false;
+    var webFront = false;
+    var webBack = false;
+    $("#submit").on('click', function () {
+        submitTeam();
+    });
+
+    function submitTeam() {
+
+        var team = {
+            name: document.getElementById('teamName').value,
+            summary: document.getElementById('purpose').value,
+            resource_link: $('#resource_link').val(),
+            hackaton: document.getElementById('hackaton').value,
+            section: document.getElementById('hackatonSection').value,
+            startDate: document.getElementById('datepickerStart').value,
+            endDate: document.getElementById('datepickerEnd').value,
+            platforms: {
+                Android: android,
+                iOS: ios,
+                Desktop: desktop,
+                WebFront: webFront,
+                webBack: webBack
+            },
+            nrMembers: 1,
+            posts: '',
+            leader: $.cookie('username')
         }
-        $("#form").keyup(function(event) {
-            if (event.keyCode === 13) {
-                $("#submit").click();
-            }
-        });
+        var isFormOk = true;
+        if (team.name === '') {
+            isFormOk = false;
+            document.getElementById('teamName').style.borderColor = "red";
+        } else {
+            document.getElementById('teamName').style.borderColor = "green";
+        }
+        if (team.summary === '') {
+            isFormOk = false;
+            document.getElementById('purpose').style.borderColor = "red";
+        } else {
+            document.getElementById('purpose').style.borderColor = "green";
+        }
+        if (team.hackaton === '') {
+            isFormOk = false;
+            document.getElementById('hackaton').style.borderColor = "red";
+        } else {
+            document.getElementById('hackaton').style.borderColor = "green";
+        }
+        if (team.section === '') {
+            isFormOk = false;
+            document.getElementById('hackatonSection').style.borderColor = "red";
+        } else {
+            document.getElementById('hackatonSection').style.borderColor = "green";
+        }
+        if (team.startDate === '') {
+            isFormOk = false;
+            document.getElementById('datepickerStart').style.borderColor = "red";
+        } else {
+            document.getElementById('datepickerStart').style.borderColor = "green";
+        }
+        if (team.endDate === '') {
+            isFormOk = false;
+            document.getElementById('datepickerEnd').style.borderColor = "red";
+        } else {
+            document.getElementById('datepickerEnd').style.borderColor = "green";
+        }
+        if (!(ios || android || desktop || webBack || webFront)) {
+            isFormOk = false;
+            document.getElementById('Platform').style.color = "red";
+        } else {
+            document.getElementById('Platform').style.color = "green";
+        }
+        if (isFormOk)
+            $.ajax({
+                data: team,
+                type: 'GET',
+                url: 'http://localhost:3000/teams/register',
+                success: function (res) {
+                    console.log(res.status);
+                    if (res.status === 'succesfull')
+                        window.location.href = '/teams';
+                    else alert(res.status);
+                }
+            });
+        //socket.emit('register team', team);
+    }
+
+    $("#form").keyup(function (event) {
+        if (event.keyCode === 13) {
+            $("#submit").click();
+        }
+    });
 
 
-        document.getElementById("android").onclick = function() { 
-            if(android == false){
-              document.getElementById("android").style.backgroundColor = '#00A86B';
-              android = true;
-            }else{
-               document.getElementById("android").style.backgroundColor =  '#343a40';
-               android = false;
-            }
-        };
-        document.getElementById("ios").onclick = function() { 
-             if(ios == false){
-              document.getElementById("ios").style.backgroundColor = '#00A86B';
-              ios = true;
-            }else{
-               document.getElementById("ios").style.backgroundColor =  '#343a40';
-               ios = false;
-            }
-        };
-        document.getElementById("desktop").onclick = function() { 
-             if(desktop == false){
-              document.getElementById("desktop").style.backgroundColor = '#00A86B';
-              desktop = true;
-            }else{
-               document.getElementById("desktop").style.backgroundColor =  '#343a40';
-               desktop = false;
-            }
-        };
-        document.getElementById("webFrontEnd").onclick = function() { 
-            if(webFront == false){
-              document.getElementById("webFrontEnd").style.backgroundColor = '#00A86B';
-              webFront = true;
-            }else{
-               document.getElementById("webFrontEnd").style.backgroundColor =  '#343a40';
-               webFront = false;
-            }
-        };
-        document.getElementById("webBackEnd").onclick = function() { 
-            if(webBack == false){
-              document.getElementById("webBackEnd").style.backgroundColor = '#00A86B';
-              webBack = true;
-            }else{
-               document.getElementById("webBackEnd").style.backgroundColor =  '#343a40';
-               webBack = false;
-            }
-        };
-    </script>
+    document.getElementById("android").onclick = function () {
+        if (android == false) {
+            document.getElementById("android").style.backgroundColor = '#00A86B';
+            android = true;
+        } else {
+            document.getElementById("android").style.backgroundColor = '#343a40';
+            android = false;
+        }
+    };
+    document.getElementById("ios").onclick = function () {
+        if (ios == false) {
+            document.getElementById("ios").style.backgroundColor = '#00A86B';
+            ios = true;
+        } else {
+            document.getElementById("ios").style.backgroundColor = '#343a40';
+            ios = false;
+        }
+    };
+    document.getElementById("desktop").onclick = function () {
+        if (desktop == false) {
+            document.getElementById("desktop").style.backgroundColor = '#00A86B';
+            desktop = true;
+        } else {
+            document.getElementById("desktop").style.backgroundColor = '#343a40';
+            desktop = false;
+        }
+    };
+    document.getElementById("webFrontEnd").onclick = function () {
+        if (webFront == false) {
+            document.getElementById("webFrontEnd").style.backgroundColor = '#00A86B';
+            webFront = true;
+        } else {
+            document.getElementById("webFrontEnd").style.backgroundColor = '#343a40';
+            webFront = false;
+        }
+    };
+    document.getElementById("webBackEnd").onclick = function () {
+        if (webBack == false) {
+            document.getElementById("webBackEnd").style.backgroundColor = '#00A86B';
+            webBack = true;
+        } else {
+            document.getElementById("webBackEnd").style.backgroundColor = '#343a40';
+            webBack = false;
+        }
+    };
+</script>
 
-  </body>
+</body>
 
 </html>

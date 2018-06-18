@@ -1,7 +1,7 @@
 <script src="/notify.js"></script>
 <script type="text/javascript">
 	if($.cookie('username')){
-		var socket = io.connect();
+		let socket = io.connect();
 		socket.on('request email', function(){
 			socket.emit('receive email', {email:$.cookie('username')});
 		});

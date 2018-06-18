@@ -57,6 +57,13 @@
                                             <textarea class="form-control" rows="5" id="summary"><%=project.SUMMARY%></textarea>
                                         </div>
                                         <div class="form-group">
+                                            <label for="resource_link">Resource URL</label>
+                                            <input title="Resource URL"
+                                                   value="<%=project.RESOURCE_LINK%>"
+                                                   placeholder="Example: https://www.github.com/your_account/your_repository/"
+                                                   class="form-control" id="resource_link"/>
+                                        </div>
+                                        <div class="form-group">
                                             <label for="exampleFormControlSelect1">Commitment, currently:<%=project.COMMITMENT%> </label>
                                             <select class="form-control" id="commitmentLevel">
                                                 <option>Contractual</option>
@@ -135,6 +142,7 @@
             name:document.getElementById("project_name").innerHTML,
             summary:document.getElementById("summary").value,
             commitment:commitmentLevel,
+            resource_link: $('#resource_link').val(),
             stage:Stage,
             budget:Budget,
             funding:hasFunding

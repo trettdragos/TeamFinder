@@ -68,7 +68,7 @@ router.get('/register', function (req, res) {
         }
         else {
             console.log("register project: " + result[0]);
-            con.query("INSERT INTO projects (ID, NAME, SUMMARY, COMMITMENT, PLATFORMS, PLATFORM_DETAILS, STAGE, BUDGET, FUNDING, NATIONAL, FOUNDER, ACTIVE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, project.name, project.summary, project.commitment, JSON.stringify(project.platforms), project.platformDetails, project.stage, project.budget, project.funding, project.national, project.founder, 1], function (err, result) {
+            con.query("INSERT INTO projects (ID, NAME, SUMMARY, COMMITMENT, PLATFORMS, PLATFORM_DETAILS, RESOURCE_LINK, STAGE, BUDGET, FUNDING, NATIONAL, FOUNDER, ACTIVE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, project.name, project.summary, project.commitment, JSON.stringify(project.platforms), project.platformDetails, project.resource_link, project.stage, project.budget, project.funding, project.national, project.founder, 1], function (err, result) {
                 if (err) {
                     res.send({status: JSON.stringify(err)});
                 }
@@ -89,7 +89,7 @@ router.get('/finish', function(req, res){
 
 router.get('/update', function(req, res){
     project = req.query;
-    con.query("UPDATE projects SET SUMMARY=?, COMMITMENT=?, STAGE=?, BUDGET=?, FUNDING=? WHERE NAME=?", [project.summary, project.commitment, project.stage, project.budget, project.funding, project.name], function(err, result){
+    con.query("UPDATE projects SET SUMMARY=?, RESOURCE_LINK=?, COMMITMENT=?, STAGE=?, BUDGET=?, FUNDING=? WHERE NAME=?", [project.summary, project.resource_link, project.commitment, project.stage, project.budget, project.funding, project.name], function(err, result){
         if(err) throw err;
         res.send({status:"succesfull"});
     });

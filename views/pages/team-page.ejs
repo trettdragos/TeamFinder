@@ -1,124 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
 
-  <head>
+<head>
     <% include ../partials/head %>
     <link href="search-bar.css" rel="stylesheet">
     <link href="button-style.css" rel="stylesheet" type="text/css">
     <style type="text/css">
-      .jumbotron{
-        box-shadow: 2px 8px 16px -8px black;
-        padding: 2%;
-      }
-      .btn{
-        background-color: #343a40; 
-        border-color: #343a40; 
-        color: #00e500;
-      }
-      .btn:hover{
-        background-color: #343a40; 
-        border-color: #00e500; 
-        color: #00e500;
-      }
+        .jumbotron {
+            box-shadow: 2px 8px 16px -8px black;
+            padding: 2%;
+        }
+
+        .btn {
+            background-color: #343a40;
+            border-color: #343a40;
+            color: #00e500;
+        }
+
+        .btn:hover {
+            background-color: #343a40;
+            border-color: #00e500;
+            color: #00e500;
+        }
     </style>
-  </head>
-  <body>
-    <% if(!email){ %>
-    <% include ../partials/dashboard-header.ejs %>
-    <% } else { %>
-    <% include ../partials/header.ejs %>
-    <% } %>
-    <% include ../partials/footer %>
-    <div class="container"> 
-        <div class="row">
-          <div class="col-lg-12">
-            <div class="jumbotron" style="margin-top: 10px;">
-              <b><h4 id="titleTeam"><%= team.NAME %></h4></b>
-              <hr class="my-4">
-              <label for="comment">Team's Purpose</label>
-              <h5><%= team.SUMMARY %></h5>
+</head>
+<body>
+<% if(!email){ %>
+<% include ../partials/dashboard-header.ejs %>
+<% } else { %>
+<% include ../partials/header.ejs %>
+<% } %>
+<% include ../partials/footer %>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card my-4">
+                <div class="card-body">
+                    <h4 class="font-weight-bold" id="titleTeam"><%= team.NAME %></h4>
+                    <hr class="my-4">
+                    <label for="comment">Team's Purpose</label>
+                    <h5><%= team.SUMMARY %></h5>
+                </div>
             </div>
             <div class="row">
-              <div class="col-6">
-                <div class="jumbotron" style="margin-top: 10px; height: 90%;">
-                  <h4><b>Hackaton - <%= team.HACKATON %></b></h4>
-                  <hr class="my-4">
-                  <label for="comment">Section</label>
-                  <h5><%= team.SECTION %></h5>
-                  <label for="comment">Start Date</label>
-                  <h5><%= team.START_DATE %></h5>
-                  <label for="comment">End Date</label>
-                  <h5><%= team.END_DATE %></h5>
-                  <label for="comment">Platforms</label>
-                  <h5><%= team.PLATFORMS %></h5>
+                <div class="col-12 col-lg-6">
+                    <div class="card" style="height: 100%;">
+                        <div class="card-body">
+                            <h4 class="font-weight-bold">Hackaton - <%= team.HACKATON %></h4>
+                            <hr class="my-4">
+                            <%
+                            let joined = false;
+                            let participants = team.POSTS.trim().substr(0, team.POSTS.length - 2).split(',');
+                            if (participants.includes(email) || email == team.LEADER) joined = true
+                            %>
+                            <% if(team.RESOURCE_LINK && joined) { %>
+                            <label for="comment">Resource URL</label>
+                            <h5><a href="<%= team.RESOURCE_LINK %>" target="_blank"><%= team.RESOURCE_LINK %></a></h5>
+                            <% } %>
+                            <label for="comment">Section</label>
+                            <h5><%= team.SECTION %></h5>
+                            <label for="comment">Start Date</label>
+                            <h5><%= team.START_DATE %></h5>
+                            <label for="comment">End Date</label>
+                            <h5><%= team.END_DATE %></h5>
+                            <label for="comment">Platforms</label>
+                            <h5><%= team.PLATFORMS %></h5>
+                        </div>
+                    </div>
                 </div>
-              </div>
-              <div class="col-6">
-                <div class="jumbotron" style="margin-top: 10px; height: 90%;">
-                  <h4><b>Number of current members: <%= team.NR_MEMBERS %></b></h4>
-                  <hr class="my-4">
-                  <label for="comment">Founder</label>
-                  <h5><%= team.LEADER %></h5>
-                  <label for="comment">Other Members:</label>
-                  <% if(team.POSTS){ %>
-                  <h5><%= team.POSTS %></h5>
-                  <% }else{ %>
-                  <h5>none</h5>
-                  <% } %>
-                  <% if(email!=team.LEADER && team.ACTIVE==1){ %>
-                  <label for="comment">Press the button to join the team</label><br>  
-                  <button class="btn" id="join" style="width: 150px; height: 20%; font-size: 200%;"><b>Join</b></button>
-                  <% }else if(team.ACTIVE==1 && team.LEADER==email){ %>
-                  <h5>Press the button below to stop searching for The Perfect Team</h5>
-                  <button class="btn" id="editBtn" style="width: 300px; height: 15%; font-size: 200%; margin-left: 5%; margin-top: 5%;"><b>Edit Team</b>
-                  </button>
-                  <% }else if(team.ACTIVE==0){ %>
-                  <h5><b>This project was marked as inactive<br> (no longer searching for participants)</b></h5>
-                  <% } %>
+                <div class="col-12 col-lg-6">
+                    <div class="card" style="height: 100%;">
+                        <div class="card-body">
+                            <h4 class="font-weight-bold">Number of current members: <%= team.NR_MEMBERS %></h4>
+                            <hr class="my-4">
+                            <label for="comment">Founder</label>
+                            <h5><%= team.LEADER %></h5>
+                            <label for="comment">Other Members:</label>
+                            <% if(team.POSTS){ %>
+                            <h5><%= team.POSTS.trim().substr(0, team.POSTS.length - 2) %></h5>
+                            <% }else{ %>
+                            <h5>none</h5>
+                            <% } %>
+                        </div>
+                        <div class="card-footer">
+                            <% if (email != team.LEADER && team.ACTIVE) { %>
+                            <button class="my-3 btn btn-lg btn-block font-weight-bold" id="join">Join</button>
+                            <% } else if (team.ACTIVE) { %>
+                            <button class="my-3 btn btn-lg btn-block font-weight-bold" id="editBtn">Edit Team</button>
+                            <% } else { %>
+                            <h5 class="font-weight-bold">This project was marked as inactive<br> (no longer searching for participants)</h5>
+                            <% } %>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-            
-          </div>
+
         </div>
-      </div>
-      <h1 style="display: none" id="teamNAME"><%= team.NAME %></h1>
-      <% include ../partials/socket-notification.ejs %>
-    <script type="text/javascript">
-      $("#join").on('click', function () {
-        var socket = io.connect();
-        var teamname = <%- JSON.stringify(team.NAME) %>;
-        var leadern = <%- JSON.stringify(team.LEADER) %>;
-        socket.emit('request join team', {username:$.cookie('username'), teamName:teamname, leader:leadern, token:'alabalaportocala'});
-        socket.on('request join team', function(res){
-          if(res.status==="succesfull"){
-            alert('A request was sent to the leader. Please wait for confirmation');
-            window.location.replace("/dashboard");
-          }else{
-            alert('An error has occurred:'+ res.status);
-          }      
+    </div>
+</div>
+<h1 style="display: none" id="teamNAME"><%= team.NAME %></h1>
+<% include ../partials/socket-notification.ejs %>
+<script type="text/javascript">
+    $("#join").on('click', function () {
+        let socket = io.connect();
+        let teamname = <%- JSON.stringify(team.NAME) %>;
+        let leadern = <%- JSON.stringify(team.LEADER) %>;
+        socket.emit('request join team', {
+            username: $.cookie('username'),
+            teamName: teamname,
+            leader: leadern,
+            token: 'alabalaportocala'
+        });
+        socket.on('request join team', function (res) {
+            if (res.status === "succesfull") {
+                alert('A request was sent to the leader. Please wait for confirmation');
+                window.location.replace("/dashboard");
+            } else {
+                alert('An error has occurred:' + res.status);
+            }
         });
 
-      });
-      $("#editBtn").on('click', function(){
+    });
+    $("#editBtn").on('click', function () {
         let name = document.getElementById("titleTeam").innerHTML
-        window.location.href = "/teams/edit/"+name;
-      })
-      $("#finish").on('click', function () {
-        team={name:document.getElementById("titleTeam").innerHTML};
+        window.location.href = "/teams/edit/" + name;
+    })
+    $("#finish").on('click', function () {
+        team = {name: document.getElementById("titleTeam").innerHTML};
         $.ajax({
-                        data:team,
-                        type: 'GET',
-                        url: 'http://localhost:3000/teams/finish',
-                        success: function(res) {
-                            console.log(res.status);
-                            if(res.status==='succesfull')
-                              window.location.href = '/teams/'+team.name;
-                            else alert(res.status); 
-                        }
+            data: team,
+            type: 'GET',
+            url: 'http://localhost:3000/teams/finish',
+            success: function (res) {
+                console.log(res.status);
+                if (res.status === 'succesfull')
+                    window.location.href = '/teams/' + team.name;
+                else alert(res.status);
+            }
         });
-      });
-    </script>
-  </body>
+    });
+</script>
+</body>
 
 </html>

@@ -68,7 +68,7 @@ router.get('/register', function (req, res) {
         }
         else {
             console.log("register team: " + result[0]);
-            con.query("INSERT INTO teams (ID, NAME, SUMMARY, HACKATON, SECTION, START_DATE, END_DATE, PLATFORMS, NR_MEMBERS, POSTS, LEADER, ACTIVE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, team.name, team.summary, team.hackaton, team.section, team.startDate, team.endDate, JSON.stringify(team.platforms), team.nrMembers, '', team.leader, 1], function (err, result) {
+            con.query("INSERT INTO teams (ID, NAME, SUMMARY, HACKATON, SECTION, START_DATE, END_DATE, PLATFORMS, RESOURCE_LINK, NR_MEMBERS, POSTS, LEADER, ACTIVE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, team.name, team.summary, team.hackaton, team.section, team.startDate, team.endDate, JSON.stringify(team.platforms), team.resource_link, team.nrMembers, '', team.leader, 1], function (err, result) {
                 if (err) {
                     socket.emit('register team', {status: JSON.stringify(err)});
                 }
@@ -90,7 +90,7 @@ router.get('/finish', function(req, res){
 router.get('/update', function(req, res){
     team = req.query;
     console.log("this is the update: "+JSON.stringify(team));
-    con.query("UPDATE teams SET SUMMARY=?, HACKATON=?, SECTION=?, START_DATE=?, END_DATE=? WHERE NAME=?", [team.summary, team.hackaton, team.section, team.startDate, team.endDate, team.name], function(err, result){
+    con.query("UPDATE teams SET SUMMARY=?, RESOURCE_LINK=?, HACKATON=?, SECTION=?, START_DATE=?, END_DATE=? WHERE NAME=?", [team.summary, team.resource_link, team.hackaton, team.section, team.startDate, team.endDate, team.name], function(err, result){
         if(err) throw err;
         res.send({status:"succesfull"});
     });

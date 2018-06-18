@@ -1,122 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
 
-  <head>
+<head>
     <% include ../partials/head %>
     <style type="text/css">
-      .jumbotron{
-        box-shadow: 2px 8px 16px -8px black;
-        padding: 2%;
-      }
-      .btn{
-        background-color: #343a40;
-        border-color: #343a40;
-        color: #00e500;
-      }
-      .btn:hover{
-        background-color: #343a40;
-        border-color: #00e500;
-        color: #00e500;
-      }
+        .jumbotron {
+            box-shadow: 2px 8px 16px -8px black;
+            padding: 2%;
+        }
+
+        .btn {
+            background-color: #343a40;
+            border-color: #343a40;
+            color: #00e500;
+        }
+
+        .btn:hover {
+            background-color: #343a40;
+            border-color: #00e500;
+            color: #00e500;
+        }
     </style>
-  </head>
-  <body>
-    <% if(!email){ %>
-    <% include ../partials/dashboard-header.ejs %>
-    <% } else { %>
-    <% include ../partials/header.ejs %>
-    <% } %>
-    <% include ../partials/footer %>
-    <div class="container"> 
-        <div class="row">
-          <div class="col-lg-12">
-            <div class="jumbotron" style="margin-top: 10px;">
-              <b><h4 id="project_name"><%= project.NAME %></h4></b>
-              <hr class="my-4">
-              <label for="comment" project's Purpose</label>
-              <h5><%= project.SUMMARY %></h5>
+</head>
+<body>
+<% if(!email){ %>
+<% include ../partials/dashboard-header.ejs %>
+<% } else { %>
+<% include ../partials/header.ejs %>
+<% } %>
+<% include ../partials/footer %>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card my-4">
+                <div class="card-body">
+                    <h4 id="project_name" class="font-weight-bold"><%= project.NAME %></h4>
+                    <hr class="my-4">
+                    <label for="comment"> Project's Purpose</label>
+                    <h5><%= project.SUMMARY %></h5>
+                </div>
             </div>
             <div class="row">
-              <div class="col-6">
-                <div class="jumbotron" style="margin-top: 10px; height: 90%;">
-                  <h4><b>More details</b></h4>
-                  <hr class="my-4">
-                  <label for="comment">Commitment</label>
-                  <h5><%= project.COMMITMENT %></h5>
-                  <label for="comment">Platforms</label>
-                  <h5><%= project.PLATFORMS %></h5>
-                  <label for="comment">Platform details</label>
-                  <h5><%= project.PLATFORM_DETAILS %></h5>
-                  <label for="comment">Stage</label>
-                  <h5><%= project.STAGE %></h5>
-                  <label for="comment">Budget</label>
-                  <h5><%= project.BUDGET %></h5>
+                <div class="col-12 col-lg-6">
+                    <div class="card" style="height: 100%;">
+                        <div class="card-body">
+                            <h4 class="font-weight-bold">More details</h4>
+                            <hr class="my-4">
+                            <%
+                            let joined = false;
+                            let participants = project.COLLABORATORS.trim().substr(0, project.COLLABORATORS.length - 1).split(',');
+                            if (participants.includes(email) || email == project.FOUNDER) joined = true
+                            %>
+                            <% if(project.RESOURCE_LINK && joined) { %>
+                            <label for="comment">Resource URL</label>
+                            <h5><a href="<%= project.RESOURCE_LINK %>" target="_blank"><%= project.RESOURCE_LINK %></a>
+                            </h5>
+                            <% } %>
+                            <label for="comment">Commitment</label>
+                            <h5><%= project.COMMITMENT %></h5>
+                            <label for="comment">Platforms</label>
+                            <h5><%= project.PLATFORMS %></h5>
+                            <label for="comment">Platform details</label>
+                            <h5><%= project.PLATFORM_DETAILS %></h5>
+                            <label for="comment">Stage</label>
+                            <h5><%= project.STAGE %></h5>
+                            <label for="comment">Budget</label>
+                            <h5><%= project.BUDGET %></h5>
+                        </div>
+                    </div>
                 </div>
-              </div>
-              <div class="col-6">
-                <div class="jumbotron" style="margin-top: 10px; height: 90%;">
-                  <h4><b>Development details</b></h4>
-                  <hr class="my-4">
-                  <label for="comment">Has funding?</label>
-                  <% if(project.FUNDING==='false' || project.FUNDING==='0'){ %>
-                  <h5><b>NO</b></h5>
-                  <% }else{ %>
-                  <h5><b>YES</b></h5>
-                  <% } %>
-                  <label for="comment">Founder</label>
-                  <h5><%= project.FOUNDER %></h5>
-                  <label for="comment">Country for development</label>
-                  <% if(project.NATIONAL){ %>
-                  <h5><%= project.NATIONAL %></h5>
-                  <% }else{ %>
-                  <h5>Everywhere</h5>
-                  <% } %>
-                  <label for="comment">Collaborators</label>
-                  <% if(project.COLLABORATORS){ %>
-                  <h5><%= project.COLLABORATORS %></h5>
-                  <% }else{ %>
-                  <h5>none yet</h5>
-                  <% } %>
-                  <% if(email!=project.FOUNDER){ %>
-                  <center>
-                  <button class="btn" id="join" style="width: 150px; height: 15%; font-size: 200%; margin-left: 5%; margin-top: 5%;"><b>Join</b></button></center>
-                  <% }else if(project.ACTIVE==1){ %>
-                  <h5>Press the button below to stop searching for The Perfect Team</h5>
-                    <button class="btn" id="edit" style="width: 300px; height: 15%; font-size: 200%; margin-left: 5%; margin-top: 5%;"><b>Edit Project</b></button>
-                  </button>
-                  <% }else{ %>
-                  <h5><b>This project was marked as inactive<br> (no longer searching for participants)</b></h5>
-                  <% } %>
+                <div class="col-12 col-lg-6">
+                    <div class="card" style="height: 100%;">
+                        <div class="card-body">
+                            <h4 class="font-weight-bold">Development details</h4>
+                            <hr class="my-4">
+                            <label for="comment">Has funding?</label>
+                            <% if(project.FUNDING === 'false' || project.FUNDING === '0'){ %>
+                            <h5 class="font-weight-bold">NO</h5>
+                            <% }else{ %>
+                            <h5 class="font-weight-bold">YES</h5>
+                            <% } %>
+                            <label for="comment">Founder</label>
+                            <h5><%= project.FOUNDER %></h5>
+                            <label for="comment">Country for development</label>
+                            <% if(project.NATIONAL){ %>
+                            <h5><%= project.NATIONAL %></h5>
+                            <% }else{ %>
+                            <h5>Everywhere</h5>
+                            <% } %>
+                            <label for="comment">Collaborators</label>
+                            <% if(project.COLLABORATORS){ %>
+                            <h5><%= project.COLLABORATORS.trim().substr(0, project.COLLABORATORS.length - 2) %></h5>
+                            <% }else{ %>
+                            <h5>none yet</h5>
+                            <% } %>
+                        </div>
+                        <div class="card-footer">
+                            <% if(email != project.FOUNDER && project.ACTIVE) { %>
+                            <button class="my-3 btn btn-lg btn-block font-weight-bold" id="join">Join</button>
+                            <% } else if(project.ACTIVE) { %>
+                            <button class="my-3 btn btn-lg btn-block font-weight-bold" id="edit" >Edit Project</button>
+                            <% } else { %>
+                            <h5 class="font-weight-bold">This project was marked as inactive<br> (no longer searching for participants)
+                            </h5>
+                            <% } %>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-            
-          </div>
+
         </div>
-      </div>
-      <% include ../partials/socket-notification.ejs %>
-    <script type="text/javascript">
-      $("#join").on('click', function () {
-        var socket = io.connect();
-        var teamname = <%- JSON.stringify(project.NAME) %>;
-        var leadern = <%- JSON.stringify(project.FOUNDER) %>;
-        socket.emit('request join project', {username:$.cookie('username'), projectName:teamname, leader:leadern, token:'alabalaportocala'});
-        socket.on('request join project', function(res){
-          if(res.status==="succesfull"){
-            alert('A request was sent to the leader. Please wait for confirmation');
-            window.location.replace("/dashboard");
-          }else{
-            alert('An error has occurred:'+ res.status);
-          }      
+    </div>
+</div>
+<% include ../partials/socket-notification.ejs %>
+<script type="text/javascript">
+    $("#join").on('click', function () {
+        let socket = io.connect();
+        let projectName = <%- JSON.stringify(project.NAME) %>;
+        let leader = <%- JSON.stringify(project.FOUNDER) %>;
+        socket.emit('request join project', {
+            username: $.cookie('username'),
+            projectName: projectName,
+            leader: leader,
+            token: 'alabalaportocala'
+        });
+        socket.on('request join project', function (res) {
+            if (res.status === "succesfull") {
+                alert('A request was sent to the leader. Please wait for confirmation');
+                window.location.replace("/dashboard");
+            } else {
+                alert('An error has occurred:' + res.status);
+            }
         });
 
-      });
-      
-      $("#edit").on('click', function(){
+    });
+
+    $("#edit").on('click', function () {
         name = document.getElementById("project_name").innerHTML;
-        window.location.href='/projects/edit/'+name;
-      })
-    </script>
-  </body>
+        window.location.href = '/projects/edit/' + name;
+    })
+</script>
+</body>
 
 </html>

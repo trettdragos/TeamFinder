@@ -58,6 +58,13 @@
                                             <textarea class="form-control" rows="5" id="summary"><%=team.SUMMARY%></textarea>
                                         </div>
                                         <div class="form-group">
+                                            <label for="resource_link">Resource URL</label>
+                                            <input title="Resource URL"
+                                                   value="<%=team.RESOURCE_LINK%>"
+                                                   placeholder="Example: https://www.github.com/your_account/your_repository/"
+                                                   class="form-control" id="resource_link"/>
+                                        </div>
+                                        <div class="form-group">
                                             <label for="exampleFormControlSelect1">Hackaton</label>
                                             <input required type="text" name="about" id="hackaton"
                                                    class="form-control form-control-lg" value="<%=team.HACKATON%>">
@@ -116,6 +123,7 @@
         team={
             name:document.getElementById("team_name").innerHTML,
             summary:document.getElementById('summary').value,
+            resource_link: $('#resource_link').val(),
             hackaton:document.getElementById('hackaton').value,
             section:document.getElementById('section').value,
             startDate:document.getElementById('datepickerStart').value,

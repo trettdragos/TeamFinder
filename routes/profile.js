@@ -28,7 +28,6 @@ router.get('/edit', (req, res) => {
 router.get('/:account_id', (req, res) => {
     // if (req.cookies.username) {
     let searchFor = '%' + req.params.account_id + '%';
-    console.log(searchFor);
     con.query("SELECT * FROM projects WHERE COLLABORATORS LIKE ? OR FOUNDER = ?", [searchFor, req.params.account_id], function (err, projects, fields) {
         if (err) throw err;
         con.query("SELECT * FROM teams WHERE POSTS LIKE ? OR LEADER = ?", [searchFor, req.params.account_id], function (errTeams, teams, fields2) {
@@ -132,12 +131,8 @@ router.post('/change-profile-picture', (req, res) => {
 
     con.query('SELECT * FROM accounts WHERE EMAIL = ?', [req.cookies.username], (db_err, db_res) => {
         if(db_err) throw db_err;
-        console.log(data);
-        console.log(db_res[0].PROFILE);
         let db_data = JSON.parse(db_res[0].PROFILE);
-        console.log(db_data);
         db_data.PROFILE_PICTURE = data.url;
-        console.log(db_data);
         con.query('UPDATE accounts SET PROFILE = ? WHERE EMAIL = ?', [JSON.stringify(db_data), req.cookies.username], (db_err_2, db_res_2) => {
             if(db_err_2) throw db_err_2;
             res.end(JSON.stringify({code: 200, message: "Profile picture successfully changed!"}));
