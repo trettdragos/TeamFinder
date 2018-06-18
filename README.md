@@ -2,6 +2,14 @@
 
 ## Tasks List
 
+<style>
+    .red {
+        color: red;
+    }
+</style>
+    
+<p class="red">Test</p>
+
 ### Structura
 
 - [x] <strike>inlocuirea metodelor socket.io cu metode get de la express app</strike>
