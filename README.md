@@ -25,6 +25,8 @@
 - [x] <strike>adaugare link pentru resurse la un proiect/echipa, vizibele doar pt cei ce fac parte din echipa/proiect</strike>
 - [ ] functionalitate de kick din echipa/proiect
 - [ ] imbunatatire interfata si mobile friendly(meniul nu merge mobile :)))))) shhhh)
+    - [ ] Imbunatatire interfata
+    - [x] <strike>Meniu</strike>
 - [ ] creeare tutorial de folosinta si prezentare website pt pagina de '/'
 - [x] <strike>adaugare optiune de modificare detalii cont si afisare detalii cont</strike>
 - [x] <strike>separare proiecte/echipe active de cele inactive/folosite</strike>
