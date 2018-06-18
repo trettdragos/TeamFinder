@@ -148,7 +148,7 @@
                 <div class="card-body">
                     <h4 class="card-title"><b><% if(username == email){ %>Your <% } else { %><%= name %>'s<% } %>Teams:</b></h4>
                     <hr class="mb-4 mt-1">
-                    <% for(i in projects){ %>
+                    <% for(i in teams){ %>
                     <div class="row">
                         <div class="col-lg-12 text-left">
                             <div class="card">
@@ -172,26 +172,50 @@
 
 <% include ../partials/footer.ejs %>
 <script>
+    let socket = io.connect();
     <% for(i in notifications){ %>
     <% if(notifications[i].vis === "false"){ %>
     $('#accept<%= notifications[i].id %>').on('click', function () {
-        socket.emit('answer request', {
+        let notif = {
             status: 'accept',
             id: '<%= notifications[i].id %>',
             type: '<%= notifications[i].type %>',
             name: '<%= notifications[i].name %>',
             requester: '<%= notifications[i].user %>',
             leader: $.cookie('username')
+        };
+        $.ajax({
+            data: notif,
+            type: 'GET',
+            url: 'http://localhost:3000/profile/answer',
+            success: function (res) {
+                console.log(res.status);
+                if (res.status == "succesfull") {
+                    window.location.href = '/profile';
+                }
+            }
         });
+        
     });
     $('#refuse<%= notifications[i].id %>').on('click', function () {
-        socket.emit('answer request', {
+        let notif = {
             status: 'refuse',
             id: '<%= notifications[i].id %>',
             type: '<%= notifications[i].type %>',
             name: '<%= notifications[i].name %>',
             requester: '<%= notifications[i].user %>',
             leader: $.cookie('username')
+        }
+        $.ajax({
+            data: notif,
+            type: 'GET',
+            url: 'http://localhost:3000/profile/answer',
+            success: function (res) {
+                console.log(res.status);
+                if (res.status == "succesfull") {
+                    window.location.href = '/profile';
+                }
+            }
         });
     });
     <% }} %>

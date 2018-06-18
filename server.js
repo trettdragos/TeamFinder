@@ -104,11 +104,19 @@ io.on('connection', function (socket) {
                         "name": req.projectName,
                         "id": id
                     };
+                    let newAltReq = {
+                        "user": req.username,
+                        "vis": "true",
+                        "type": "project",
+                        "name": req.projectName,
+                        "id": id
+                    }
                     io.sockets.connected[connectedUsers[req.leader]].emit('notification', newReq);
                     let reqtest = JSON.stringify(newReq);
+                    let reqAltTest = JSON.stringify(newAltReq);
                     let isValid = true;
                     for (let i in notifications) {
-                        if (reqtest === JSON.stringify(notifications[i])) {
+                        if (reqtest === JSON.stringify(notifications[i]) || reqAltTest === JSON.stringify(notifications[i])) {
                             socket.emit('request join project', {status: "already requested"});
                             console.log("failed to send request, already exists");
                             isValid = false;
@@ -133,7 +141,7 @@ io.on('connection', function (socket) {
             });
         });
         socket.on('answer request', function(req){
-    console.log("leader "+req.leader);
+            console.log("leader "+req.leader);
         con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ?", [req.leader], function(err, result){
           if(err) throw err;
           console.log(req.leader);

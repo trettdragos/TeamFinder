@@ -37,6 +37,50 @@ router.get('/edit', (req, res) => {
     });
 });
 
+router.get('/answer', (req, res) =>{
+    notification = req.query;
+    console.log(notification);
+    con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ?", [notification.leader], function(err, result){
+          if(err) throw err;
+          var stringNotif = result[0].NOTIFICATION;
+          var notif = JSON.parse(stringNotif);
+          for(i in notif){
+            if(notif[i].id===notification.id){
+              notif[i].vis = "true";
+            }
+          }
+          stringNotif = JSON.stringify(notif);
+          con.query("UPDATE accounts SET NOTIFICATION = ? WHERE EMAIL = ?", [stringNotif, notification.leader], function(err2, result2){
+            if(err2) throw err2;
+            if(result2.affectedRows!=0){
+              console.log('updated notifications for leader');
+              if(req.status==="accept"){
+                var table = notification.type+'s';
+                var col;
+                if(table === 'projects')
+                  col = 'COLLABORATORS';
+                else col = 'POSTS';
+                con.query("SELECT "+col+" FROM "+table+" WHERE NAME = ?", [notification.name], function(err3, result3){
+                    if(err3) throw err3;
+                    var coll;
+                    if(col=='POSTS')
+                    coll = result3[0].POSTS;
+                    else coll = result3[0].COLLABORATORS;
+                    coll = coll+notification.requester+',';
+                    con.query("UPDATE "+table+" SET "+col+" = ? WHERE NAME = ?", [coll, notification.name], function(err4, result4){
+                      if(err4) throw err4;
+                      if(result4.affectedRows!=0){
+                        console.log('added requester as colaborator');
+                        res.send({status: "succesfull"});
+                      }
+                    });
+                });
+              }
+            }
+          });
+        });
+})
+
 router.get('/:account_id', (req, res) => {
     // if (req.cookies.username) {
     let searchFor = '%' + req.params.account_id + '%';
