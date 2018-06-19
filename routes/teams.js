@@ -9,17 +9,7 @@ let con = mysql.createConnection({
     database: "TeamFinder"
 });
 
-router.get('/*', (req, res, next) => {
-    if (!req.cookies.username || !req.cookies.token) {
-        res.redirect('/login');
-    } else if (req.cookies.username) {
-        require('../other/security').verifyCookieToken(req.cookies.username, req.cookies.token, (result) => {
-            if (!result)
-                res.redirect('/logout?skip=true');
-            else next();
-        })
-    }
-});
+router.get('/*', (req, res, next) => require('../other/security').routeTokenVerification(req, res, next));
 
 router.get('/', function (req, res) {
     if (req.cookies.username) {

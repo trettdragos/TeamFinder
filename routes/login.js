@@ -33,7 +33,7 @@ router.get('/auth', function (req, res) {
                                 newNotif = true;
                         }
                         console.log("auth succesfull with user: " + user.email);
-                        require('../other/security').generateCookieToken(user.email, (token) => {
+                        require('../other/security').generateJWT(user.email, (token) => {
                             res.send({
                                 status: "succesfull",
                                 token: token,
