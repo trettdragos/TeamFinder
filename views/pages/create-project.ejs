@@ -194,7 +194,6 @@
             funding: hasFunding,
             national: country,
             founder: $.cookie('username')
-
         };
 
         let isFormOk = true;
@@ -202,7 +201,7 @@
             isFormOk = false;
             document.getElementById("projectName").style.borderColor = "red";
         } else {
-            document.getElementById("projectName").style, borderColor = "green";
+            document.getElementById("projectName").style.borderColor = "green";
         }
         if (project.summary === '') {
             isFormOk = false;
