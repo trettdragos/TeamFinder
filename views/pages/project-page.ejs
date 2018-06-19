@@ -90,9 +90,19 @@
                             <% } %>
                             <label for="comment">Collaborators</label>
                             <% if(project.COLLABORATORS){ %>
-                            <h5><%= project.COLLABORATORS.trim().substr(0, project.COLLABORATORS.length - 2) %></h5>
-                            <% }else{ %>
-                            <h5>none yet</h5>
+                            <%let collaborators = project.COLLABORATORS.trim().substr(0, project.COLLABORATORS.length - 1).split(',')%>
+                            <% for(index in collaborators) {%>
+                            <div class="form-row align-items-center">
+                                <div class="col-8 d-flex flex-column">
+                                    <span class="h4"><%=collaborators[index]%></span>
+                                </div>
+                                <div class="col-4 d-flex flex-column-reverse">
+                                    <button class="btn mb-2 removeCollaborator" data-collaborator="<%=collaborators[index]%>">Remove<i class="fas fa-times ml-3"></i></button>
+                                </div>
+                            </div>
+                            <% } %>
+                            <% } else{ %>
+                            <h5>none</h5>
                             <% } %>
                         </div>
                         <div class="card-footer">
@@ -114,6 +124,20 @@
 </div>
 <% include ../partials/socket-notification.ejs %>
 <script type="text/javascript">
+    $('.removeCollaborator').on('click', function() {
+        $.ajax({
+            data: {
+                collaborator: $(this).data('collaborator'),
+                project: <%-JSON.stringify(project)%>
+            },
+            type: 'GET',
+            url: '/projects/remove-member',
+            success: function (res) {
+                if (res.status === 'successful')
+                    window.location.reload();
+            }
+        });
+    })
     $("#join").on('click', function () {
         let socket = io.connect();
         let projectName = <%- JSON.stringify(project.NAME) %>;
@@ -125,7 +149,7 @@
             token: 'alabalaportocala'
         });
         socket.on('request join project', function (res) {
-            if (res.status === "succesfull") {
+            if (res.status === "successful") {
                 alert('A request was sent to the leader. Please wait for confirmation');
                 window.location.replace("/dashboard");
             } else {

@@ -61,7 +61,7 @@ router.get('/auth', function (req, res) {
                     };
                     sgMail.send(msg);
                     console.log('sent verification email to ' + user.email);
-                    res.send({status: "succesfull"});
+                    res.send({status: "successful"});
                 });
             });
         }

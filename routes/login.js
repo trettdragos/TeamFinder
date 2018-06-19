@@ -32,10 +32,10 @@ router.get('/auth', function (req, res) {
                             if (not[i].vis == "false")
                                 newNotif = true;
                         }
-                        console.log("auth succesfull with user: " + user.email);
+                        console.log("auth successful with user: " + user.email);
                         require('../other/security').generateJWT(user.email, (token) => {
                             res.send({
-                                status: "succesfull",
+                                status: "successful",
                                 token: token,
                                 email: user.email,
                                 notifications: JSON.stringify(result[0].NOTIFICATION),

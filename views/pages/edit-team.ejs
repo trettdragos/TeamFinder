@@ -135,7 +135,7 @@
             url:"http://localhost:3000/teams/update",
             success: function(res){
                 console.log(res.status);
-                if(res.status==='succesfull')
+                if(res.status==='successful')
                     window.location.href = '/teams/'+team.name;
                 else alert(res.status); 
             }
@@ -149,7 +149,7 @@
                         url: 'http://localhost:3000/teams/finish',
                         success: function(res) {
                             console.log(res.status);
-                            if(res.status==='succesfull')
+                            if(res.status==='successful')
                               window.location.href = '/teams/'+team.name;
                             else alert(res.status); 
                         }

@@ -105,8 +105,10 @@
         <% for(i in notifications){ %>
         <% if(notifications[i].vis === "false"){ %>
         <div>
-            <h4><a href="" class="btn" id="accept<%= notifications[i].id %>">Accept</a>
-                <a href="" class="btn" id="refuse<%= notifications[i].id %>">Refuse</a>
+            <h4><button class="btn accept-notification" data-notification-id="<%= notifications[i].id %>" data-notification-type="<%= notifications[i].type %>"
+                                                            data-notification-name="<%= notifications[i].name %>" data-notification-user="<%= notifications[i].user %>">Accept</button>
+                <button class="btn refuse-notification" data-notification-id="<%= notifications[i].id %>" data-notification-type="<%= notifications[i].type %>"
+                   data-notification-name="<%= notifications[i].name %>" data-notification-user="<%= notifications[i].user %>">Refuse</button>
                 User <b><%= notifications[i].user %></b> wants to join <%= notifications[i].type %>
                 : <%= notifications[i].name %></h4>
         </div>
@@ -156,7 +158,7 @@
                                     <h4 class="card-title display-6"><b><%= teams[i].NAME %></b></h4>
                                     <hr class="my-4">
                                     <h5><%= teams[i].SUMMARY %></h5>
-                                    <a href="/projects/<%= teams[i].NAME %>" style="color: #00e500" class="d-flex flex-row-reverse p-2">
+                                    <a href="/teams/<%= teams[i].NAME %>" style="color: #00e500" class="d-flex flex-row-reverse p-2">
                                         <p class="waves-effect waves-light px-4 py-3 z-depth-1-half" style="background-color: #343a40;">Learn more<i class="fas fa-angle-double-right ml-2"></i></p>
                                     </a>
                                 </div>
@@ -173,15 +175,17 @@
 <% include ../partials/footer.ejs %>
 <script>
     let socket = io.connect();
-    <% for(i in notifications){ %>
-    <% if(notifications[i].vis === "false"){ %>
-    $('#accept<%= notifications[i].id %>').on('click', function () {
+    $('.accept-notification').on('click', function () {
+        console.log()
+        console.log()
+        console.log()
+        console.log()
         let notif = {
             status: 'accept',
-            id: '<%= notifications[i].id %>',
-            type: '<%= notifications[i].type %>',
-            name: '<%= notifications[i].name %>',
-            requester: '<%= notifications[i].user %>',
+            id: $(this).data('notification-id'),
+            type: $(this).data('notification-type'),
+            name: $(this).data('notification-name'),
+            requester: $(this).data('notification-user'),
             leader: $.cookie('username')
         };
         $.ajax({
@@ -190,35 +194,38 @@
             url: 'http://localhost:3000/profile/answer',
             success: function (res) {
                 console.log(res.status);
-                if (res.status == "succesfull") {
-                    window.location.href = '/profile';
+                if (res.status == "successful") {
+                    window.location.reload();
                 }
             }
         });
-        
     });
-    $('#refuse<%= notifications[i].id %>').on('click', function () {
+    $('.refuse-notification').on('click', function () {
+        console.log()
+        console.log()
+        console.log()
+        console.log()
         let notif = {
             status: 'refuse',
-            id: '<%= notifications[i].id %>',
-            type: '<%= notifications[i].type %>',
-            name: '<%= notifications[i].name %>',
-            requester: '<%= notifications[i].user %>',
+            id: $(this).data('notification-id'),
+            type: $(this).data('notification-type'),
+            name: $(this).data('notification-name'),
+            requester: $(this).data('notification-user'),
             leader: $.cookie('username')
-        }
+        };
         $.ajax({
             data: notif,
             type: 'GET',
             url: 'http://localhost:3000/profile/answer',
             success: function (res) {
                 console.log(res.status);
-                if (res.status == "succesfull") {
-                    window.location.href = '/profile';
+                if (res.status == "successful") {
+                    window.location.reload();
                 }
             }
         });
+
     });
-    <% }} %>
 </script>
 
 </body>

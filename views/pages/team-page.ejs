@@ -50,7 +50,8 @@
                             <hr class="my-4">
                             <%
                             let joined = false;
-                            let participants = team.POSTS.trim().substr(0, team.POSTS.length - 2).split(',');
+                            // console.log(team.POSTS.trim().substr(0, team.POSTS.length - 1).split(',').length);
+                            let participants = team.POSTS.trim().substr(0, team.POSTS.length - 1).split(',');
                             if (participants.includes(email) || email == team.LEADER) joined = true
                             %>
                             <% if(team.RESOURCE_LINK && joined) { %>
@@ -71,15 +72,30 @@
                 <div class="col-12 col-lg-6">
                     <div class="card" style="height: 100%;">
                         <div class="card-body">
-                            <h4 class="font-weight-bold">Number of current members: <%= team.NR_MEMBERS %></h4>
+                            <%
+                               let len = 1;
+                               if(team.POSTS)
+                                   len += participants.length
+                             %>
+                            <h4 class="font-weight-bold">Number of current members: <%= len %></h4>
                             <hr class="my-4">
                             <label for="comment">Founder</label>
                             <h5><%= team.LEADER %></h5>
                             <label for="comment">Other Members:</label>
                             <% if(team.POSTS){ %>
-                            <h5><%= team.POSTS.trim().substr(0, team.POSTS.length - 2) %></h5>
-                            <% }else{ %>
-                            <h5>none</h5>
+                                <%let collaborators = team.POSTS.trim().substr(0, team.POSTS.length - 1).split(',')%>
+                                <% for(index in collaborators) {%>
+                                    <div class="form-row align-items-center">
+                                        <div class="col-8 d-flex flex-column">
+                                            <span class="h4"><%=collaborators[index]%></span>
+                                        </div>
+                                        <div class="col-4 d-flex flex-column-reverse">
+                                            <button class="btn mb-2 removeCollaborator" data-collaborator="<%=collaborators[index]%>">Remove<i class="fas fa-times ml-3"></i></button>
+                                        </div>
+                                    </div>
+                                <% } %>
+                            <% } else{ %>
+                                <h5>none</h5>
                             <% } %>
                         </div>
                         <div class="card-footer">
@@ -101,6 +117,21 @@
 <h1 style="display: none" id="teamNAME"><%= team.NAME %></h1>
 <% include ../partials/socket-notification.ejs %>
 <script type="text/javascript">
+    $('.removeCollaborator').on('click', function () {
+        $.ajax({
+            data: {
+                collaborator: $(this).data('collaborator'),
+                team: <%- JSON.stringify(team) %>
+            },
+            type: 'GET',
+            url: '/teams/remove-member',
+            success: function (res) {
+                if (res.status === 'successful')
+                    window.location.reload();
+            }
+        });
+    })
+
     $("#join").on('click', function () {
         let socket = io.connect();
         let teamname = <%- JSON.stringify(team.NAME) %>;
@@ -112,7 +143,7 @@
             token: 'alabalaportocala'
         });
         socket.on('request join team', function (res) {
-            if (res.status === "succesfull") {
+            if (res.status === "successful") {
                 alert('A request was sent to the leader. Please wait for confirmation');
                 window.location.replace("/dashboard");
             } else {
@@ -133,7 +164,7 @@
             url: 'http://localhost:3000/teams/finish',
             success: function (res) {
                 console.log(res.status);
-                if (res.status === 'succesfull')
+                if (res.status === 'successful')
                     window.location.href = '/teams/' + team.name;
                 else alert(res.status);
             }

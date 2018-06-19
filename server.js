@@ -26,17 +26,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
-app.use(logger('dev'));
 
 io.on('connection', function (socket) {
-    console.log('Client connected...' + socket.id);
     //add user to connected list
     socket.emit('request email');
     socket.on('receive email', function (res) {
         if (res.email) {
             connectedUsers[res.email] = socket.id;
             connectedSockets[socket.id] = res.email;
-            console.log(JSON.stringify(connectedUsers));
         }
     });
     socket.on('request join team', function (req) {
@@ -79,6 +76,8 @@ io.on('connection', function (socket) {
                         } else {
                             console.log('succesfully registered request to team leader ' + req.leader + " from user " + req.username + " in team " + req.teamName);
                             socket.emit('request join team', {status: "succesfull"});
+                            console.log('successfuly registered request to team leader ' + req.leader + " from user " + req.username + " in team " + req.teamName);
+                            socket.emit('request join team', {status: "successful"});
                         }
                     });
                 }

@@ -75,7 +75,7 @@ router.get('/register', function (req, res) {
                     res.send({status: JSON.stringify(err)});
                 }
                 console.log('registered project ' + project.name + ' successful');
-                res.send({status: "succesfull"});
+                res.send({status: "successful"});
             });
         }
     });
@@ -85,7 +85,7 @@ router.get('/finish', function(req, res){
     project = req.query.name;
     con.query("UPDATE projects SET ACTIVE=0 WHERE NAME=?", [project], function(err, result){
         if(err) throw err;
-        res.send({status:"succesfull"});
+        res.send({status:"successful"});
     });
 });
 
@@ -93,7 +93,20 @@ router.get('/update', function(req, res){
     project = req.query;
     con.query("UPDATE projects SET SUMMARY=?, RESOURCE_LINK=?, COMMITMENT=?, STAGE=?, BUDGET=?, FUNDING=? WHERE NAME=?", [project.summary, project.resource_link, project.commitment, project.stage, project.budget, project.funding, project.name], function(err, result){
         if(err) throw err;
-        res.send({status:"succesfull"});
+        res.send({status:"successful"});
+    });
+});
+
+router.get('/remove-member', (req, res) => {
+    let project = req.query.project;
+    let members = project.COLLABORATORS.trim().substr(0, project.COLLABORATORS.length - 1).split(',');
+    let index = members.indexOf(req.query.collaborator);
+    members.splice(index, 1);
+    let newMembers = '';
+    members.forEach((member) => newMembers += member+',')
+    con.query('UPDATE projects SET COLLABORATORS = ? WHERE ID = ?', [newMembers, project.ID], (err, result) => {
+        if(err) throw err;
+        res.send({status: 'successful'})
     });
 });
 

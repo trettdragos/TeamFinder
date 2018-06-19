@@ -75,7 +75,7 @@ router.get('/register', function (req, res) {
                     socket.emit('register team', {status: JSON.stringify(err)});
                 }
                 console.log('registered team ' + team.name + ' successful');
-                res.send({status: "succesfull"});
+                res.send({status: "successful"});
             });
         }
     });
@@ -85,7 +85,7 @@ router.get('/finish', function(req, res){
     team = req.query.name;
     con.query("UPDATE teams SET ACTIVE=0 WHERE NAME=?", [team], function(err, result){
         if(err) throw err;
-        res.send({status:"succesfull"});
+        res.send({status:"successful"});
     });
 });
 
@@ -94,15 +94,26 @@ router.get('/update', function(req, res){
     console.log("this is the update: "+JSON.stringify(team));
     con.query("UPDATE teams SET SUMMARY=?, RESOURCE_LINK=?, HACKATON=?, SECTION=?, START_DATE=?, END_DATE=? WHERE NAME=?", [team.summary, team.resource_link, team.hackaton, team.section, team.startDate, team.endDate, team.name], function(err, result){
         if(err) throw err;
-        res.send({status:"succesfull"});
+        res.send({status:"successful"});
+    });
+});
+
+router.get('/remove-member', (req, res) => {
+    let team = req.query.team;
+    let members = team.POSTS.trim().substr(0, team.POSTS.length - 1).split(',');
+    let index = members.indexOf(req.query.collaborator);
+    members.splice(index, 1);
+    let newMembers = '';
+    members.forEach((member) => newMembers += member+',')
+    con.query('UPDATE teams SET POSTS = ? WHERE ID = ?', [newMembers, team.ID], (err, result) => {
+        if(err) throw err;
+        res.send({status: 'successful'})
     });
 });
 
 router.get('/:team', function (req, res) {
     if (!req.cookies.username)
         res.redirect('/login');
-
-    console.log('Access teams from page: ' + req.params.team);
 
     if (req.params.team == 'create')
         return;
@@ -122,6 +133,8 @@ router.get('/:team', function (req, res) {
         }
     });
 });
+
+
 
 router.get('/edit/:team', function (req, res) {
     if (!req.cookies.username)

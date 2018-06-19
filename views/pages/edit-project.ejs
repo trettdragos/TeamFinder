@@ -153,7 +153,7 @@
             url:"http://localhost:3000/projects/update",
             success: function(res){
                 console.log(res.status);
-                if(res.status==='succesfull')
+                if(res.status==='successful')
                     window.location.href = '/projects/'+project.name;
                 else alert(res.status); 
             }
@@ -167,7 +167,7 @@
                         url: 'http://localhost:3000/projects/finish',
                         success: function(res) {
                             console.log(res.status);
-                            if(res.status==='succesfull')
+                            if(res.status==='successful')
                               window.location.href = '/projects/'+project.name;
                             else alert(res.status); 
                         }
