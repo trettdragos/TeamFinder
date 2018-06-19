@@ -10,6 +10,7 @@
     - [x] <strike>Login</strike>
     - [x] <strike>Register</strike>
     - [x] <strike>Token pentru orice comunicare cu serverul</strike>
+    - [ ] Foloseste JWT pentru autentificare
 
 ### Functionalitati de importanta primara
 
