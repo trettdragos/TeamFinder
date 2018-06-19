@@ -2,7 +2,8 @@
 <html lang="en">
 
 <head>
-    <% include ../partials/head %>
+    <% include ../partials/head.ejs %>
+    <link href="/vendor/bootstrap-tagsinput/tagsinput.css" rel="stylesheet"/>
     <style>
         .toggled {
             background-color: #00A86B !important;
@@ -16,7 +17,7 @@
 </head>
 
 <body>
-<% include ../partials/header %>
+<% include ../partials/header.ejs %>
 <form>
     <div class="container">
         <div class="row">
@@ -62,25 +63,8 @@
                     <hr class="my-4">
                     <div class="form-group">
                         <h4 id="platform">What Platform Will Your Project Be Built On?</h4>
-                        <div class="form-check form-check-inline">
-                            <input class="btn btn-lg platform-toggle-button" style="width: 175px; height:75px; margin-bottom: 5px;"
-                                   type="button" id="android" value="Android">
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="btn btn-lg platform-toggle-button" style="width: 175px; height:75px; margin-bottom: 5px;"
-                                   type="button" id="ios" value="iOS">
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="btn btn-lg platform-toggle-button" style="width: 175px; height:75px; margin-bottom: 5px;"
-                                   type="button" id="desktop" value="Desktop">
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="btn btn-lg platform-toggle-button" style="width: 175px; height:75px; margin-bottom: 5px;"
-                                   type="button" id="webFrontEnd" value="Web Front End">
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="btn btn-lg platform-toggle-button" style=" width: 175px; height:75px; margin-bottom: 5px;"
-                                   type="button" id="webBackEnd" value="Web Back End">
+                        <div class="md-form">
+                            <input title="skills" type="text" id="platformsInput" class="form-control" data-role="tagsinput">
                         </div>
                     </div>
                     <label for="comment"><i class="fas fa-info-circle"></i>More details on the specific skills</label>
@@ -123,7 +107,8 @@
         </div>
     </div>
 </form>
-<% include ../partials/footer %>
+<% include ../partials/footer.ejs %>
+<script src="/vendor/bootstrap-tagsinput/tagsinput.js"></script>
 <% include ../partials/socket-notification.ejs %>
 <script type="text/javascript">
     let userip;
@@ -181,13 +166,7 @@
             summary: document.getElementById("summary").value,
             resource_link: $('#resource_link').val(),
             commitment: commitmentLevel,
-            platforms: {
-                Android: android,
-                iOS: ios,
-                Desktop: desktop,
-                WebFront: webFront,
-                webBack: webBack
-            },
+            platforms: $("#platformsInput").tagsinput('items'),
             platformDetails: document.getElementById("platformDetails").value,
             stage: Stage,
             budget: Budget,

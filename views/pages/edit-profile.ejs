@@ -2,25 +2,9 @@
 <html lang="en">
 
 <head>
-    <% include ../partials/head %>
+    <% include ../partials/head.ejs %>
+    <link href="/vendor/bootstrap-tagsinput/tagsinput.css" rel="stylesheet"/>
     <style type="text/css">
-        .jumbotron {
-            box-shadow: 2px 8px 16px -8px black;
-            padding: 1%;
-        }
-
-        .btn {
-            background-color: #343a40;
-            border-color: #343a40;
-            color: #00e500;
-        }
-
-        .btn:hover {
-            background-color: #343a40;
-            border-color: #00e500;
-            color: #00e500;
-        }
-
         #changePasswordResponse, #changeLinksResponse {
             opacity: 0;
             display: none;
@@ -36,7 +20,7 @@
 </head>
 
 <body>
-<% include ../partials/header %>
+<% include ../partials/header.ejs %>
 <div class="container">
     <br class="my-3">
     <section class="forms">
@@ -57,21 +41,28 @@
                                 <div class="col-md-12 mx-auto">
                                     <form id="changeLinksForm">
                                         <div class="md-form">
-                                            <input required type="text" name="about" id="about"
-                                                   class="form-control form-control-lg" value="<%=profile.ABOUT%>">
+                                            <input required type="text" name="about" id="about" class="form-control form-control-lg" value="<%= profile.ABOUT %>">
                                             <label for="about">About</label>
                                         </div>
                                         <div class="md-form">
                                             <i class="fab fa-github prefix"></i>
-                                            <input required type="text" name="githubLink" id="githubLink"
-                                                   class="form-control form-control-lg" value="<%=profile.GITHUB%>">
+                                            <input required type="text" name="githubLink" id="githubLink" class="form-control form-control-lg" value="<%= profile.GITHUB %>">
                                             <label for="githubLink">GitHub Link</label>
                                         </div>
                                         <div class="md-form">
                                             <i class="fab fa-linkedin prefix"></i>
-                                            <input required type="text" name="linkedinLink" id="linkedinLink"
-                                                   class="form-control form-control-lg" value="<%=profile.LINKEDIN%>">
+                                            <input required type="text" name="linkedinLink" id="linkedinLink" class="form-control form-control-lg" value="<%= profile.LINKEDIN %>">
                                             <label for="linkedinLink">Linkedin Link</label>
+                                        </div>
+                                        <div class="md-form">
+                                            <%
+                                            console.log(profile.SKILLS+ "CACA")
+                                            %>
+                                            <select title="skills" multiple id="skillsInput" name="skills" class="form-control" data-role="tagsinput">
+                                                <% profile.SKILLS.forEach((platform) => { %>
+                                                <option value="<%= platform %>"><%= platform %></option>
+                                                <% }) %>
+                                            </select>
                                         </div>
                                     </form>
                                 </div>
@@ -97,18 +88,13 @@
                                         <div class="col-4">
                                             <div class="PROFILE-profile-image d-block mx-auto">
                                                 <p>Current</p>
-                                                <img id="currentImage"
-                                                     src="<% if(profile.PROFILE_PICTURE){ %> <%= profile.PROFILE_PICTURE %> <% } else { %>https://identicon-api.herokuapp.com/<%= username %>/512?format=png<% } %>"
-                                                     alt="Current profile picture"
-                                                     class="img-fluid d-block mx-auto">
+                                                <img id="currentImage" src="<% if(profile.PROFILE_PICTURE){ %> <%= profile.PROFILE_PICTURE %> <% } else { %>https://identicon-api.herokuapp.com/<%= username %>/512?format=png<% } %>" alt="Current profile picture" class="img-fluid d-block mx-auto">
                                             </div>
                                         </div>
                                         <div class="col-4">
                                             <div class="PROFILE-profile-image d-block mx-auto">
                                                 <p>Preview</p>
-                                                <img src="<% if(profile.PROFILE_PICTURE){ %> <%= profile.PROFILE_PICTURE %> <% } else { %>https://identicon-api.herokuapp.com/<%= username %>/512?format=png<% } %>"
-                                                     alt="Preview profile picture" id="previewImage"
-                                                     class="img-fluid d-block mx-auto">
+                                                <img src="<% if(profile.PROFILE_PICTURE){ %> <%= profile.PROFILE_PICTURE %> <% } else { %>https://identicon-api.herokuapp.com/<%= username %>/512?format=png<% } %>" alt="Preview profile picture" id="previewImage" class="img-fluid d-block mx-auto">
                                             </div>
                                         </div>
                                         <div class="col-4">
@@ -136,9 +122,7 @@
                             </div>
                             <div class="row pt-3">
                                 <div class="col-md-6 mx-auto">
-                                    <button class="btn btn-primary btn-lg btn-block"
-                                            id="resetProfilePicture"
-                                            title="Resets the profile picture to the default picture you had when first creating the account">
+                                    <button class="btn btn-primary btn-lg btn-block" id="resetProfilePicture" title="Resets the profile picture to the default picture you had when first creating the account">
                                         Reset profile picture to default <abbr title=".">?</abbr></button>
                                 </div>
                             </div>
@@ -156,18 +140,15 @@
                                 <div class="col-md-12 mx-auto">
                                     <form id="changePasswordForm">
                                         <div class="md-form">
-                                            <input required type="password" name="currentPassword" id="currentPassword"
-                                                   class="form-control form-control-lg">
+                                            <input required type="password" name="currentPassword" id="currentPassword" class="form-control form-control-lg">
                                             <label for="currentPassword">Current Password</label>
                                         </div>
                                         <div class="md-form">
-                                            <input required type="password" name="newPassword" id="newPassword"
-                                                   class="form-control form-control-lg">
+                                            <input required type="password" name="newPassword" id="newPassword" class="form-control form-control-lg">
                                             <label for="newPassword">New Password</label>
                                         </div>
                                         <div class="md-form">
-                                            <input required type="password" name="confirmNewPassword"
-                                                   id="confirmNewPassword" class="form-control form-control-lg">
+                                            <input required type="password" name="confirmNewPassword" id="confirmNewPassword" class="form-control form-control-lg">
                                             <label for="confirmNewPassword">Confirm New Password</label>
                                         </div>
                                     </form>
@@ -189,6 +170,7 @@
 </div>
 
 <% include ../partials/footer.ejs %>
+<script src="/vendor/bootstrap-tagsinput/tagsinput.js"></script>
 
 <script>
     let selected = false;
@@ -316,12 +298,14 @@
         $('#changeLinksButton').on('click', function () {
             if (!changeLinksValidator.form())
                 return;
+            let data = objectifyForm($("#changeLinksForm").serializeArray());
+            data.SKILLS = $("#skillsInput").tagsinput('items');
             $.ajax({
                 type: 'POST',
                 url: '/profile/update-profile',
                 data: {
                     action: "UPDATE_LINKS_AND_STATUS",
-                    body: JSON.stringify(objectifyForm($("#changeLinksForm").serializeArray()))
+                    body: JSON.stringify(data)
                 }
             }).done((response) => {
                 console.log(response);

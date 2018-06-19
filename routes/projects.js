@@ -15,9 +15,6 @@ router.get('/', function (req, res) {
     if (req.cookies.username) {
         con.query("SELECT * FROM projects WHERE ACTIVE=1 LIMIT 25", function (err, projects, fields) {
             if (err) throw err;
-            for (i in projects) {
-                projects[i].PLATFORMS = getPlatformString(JSON.parse(projects[i].PLATFORMS));
-            }
             let list = projects;
             list.reverse();
             res.render('pages/projects.ejs', {email: req.cookies.username, tab: '2', posts: list, term: ''});
@@ -38,9 +35,6 @@ router.get('/search/:searchTerm', function (req, res) {
     let searchFor = '%' + req.params.searchTerm + '%';
     con.query("SELECT * FROM projects WHERE NAME LIKE ?", [searchFor], function (err, result, fields) {
         if (err) throw err;
-        for (i in result) {
-            result[i].PLATFORMS = getPlatformString(JSON.parse(result[i].PLATFORMS));
-        }
         res.render('pages/projects', {
             email: req.cookies.username,
             tab: '2',
@@ -70,7 +64,11 @@ router.get('/register', function (req, res) {
         }
         else {
             console.log("register project: " + result[0]);
-            con.query("INSERT INTO projects (ID, NAME, SUMMARY, COMMITMENT, PLATFORMS, PLATFORM_DETAILS, RESOURCE_LINK, STAGE, BUDGET, FUNDING, NATIONAL, FOUNDER, ACTIVE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, project.name, project.summary, project.commitment, JSON.stringify(project.platforms), project.platformDetails, project.resource_link, project.stage, project.budget, project.funding, project.national, project.founder, 1], function (err, result) {
+            let platforms = [];
+            if (project.platforms) {
+                platforms = project.platforms;
+            }
+            con.query("INSERT INTO projects (ID, NAME, SUMMARY, COMMITMENT, PLATFORMS, PLATFORM_DETAILS, RESOURCE_LINK, STAGE, BUDGET, FUNDING, NATIONAL, FOUNDER, ACTIVE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, project.name, project.summary, project.commitment, JSON.stringify(platforms), project.platformDetails, project.resource_link, project.stage, project.budget, project.funding, project.national, project.founder, 1], function (err, result) {
                 if (err) {
                     res.send({status: JSON.stringify(err)});
                 }
@@ -91,7 +89,11 @@ router.get('/finish', function(req, res){
 
 router.get('/update', function(req, res){
     project = req.query;
-    con.query("UPDATE projects SET SUMMARY=?, RESOURCE_LINK=?, COMMITMENT=?, STAGE=?, BUDGET=?, FUNDING=? WHERE NAME=?", [project.summary, project.resource_link, project.commitment, project.stage, project.budget, project.funding, project.name], function(err, result){
+    let platforms = [];
+    if (project.platforms) {
+        platforms = project.platforms;
+    }
+    con.query("UPDATE projects SET SUMMARY=?, RESOURCE_LINK=?, PLATFORMS=?, COMMITMENT=?, STAGE=?, BUDGET=?, FUNDING=? WHERE NAME=?", [project.summary, project.resource_link, JSON.stringify(platforms), project.commitment, project.stage, project.budget, project.funding, project.name], function(err, result){
         if(err) throw err;
         res.send({status:"successful"});
     });
@@ -117,7 +119,6 @@ router.get('/:project', function (req, res) {
     con.query("SELECT * FROM projects WHERE NAME = ? LIMIT 1", [req.params.project], function (err, result, fields) {
         if (err) throw err;
         if (result[0]) {
-            result[0].PLATFORMS = getPlatformString(JSON.parse(result[0].PLATFORMS))
             res.render('pages/project-page', {email: req.cookies.username, tab: '2', project: result[0]});
         }
         else {
@@ -144,7 +145,6 @@ router.get('/edit/:project', function (req, res) {
                     message_page: "Requested project: " + req.params.team
                 });
             }else {
-                result[0].PLATFORMS = getPlatformString(JSON.parse(result[0].PLATFORMS))
                 res.render('pages/edit-project', {email: req.cookies.username, tab: '2', project: result[0]});
             }
         }
@@ -157,25 +157,5 @@ router.get('/edit/:project', function (req, res) {
         }
     });
 });
-
-function getPlatformString(platforms) {
-    let pl = '';
-    if (platforms.Android) {
-        pl = pl + 'Android ';
-    }
-    if (platforms.iOS) {
-        pl = pl + 'iOS ';
-    }
-    if (platforms.Desktop) {
-        pl = pl + 'Desktop ';
-    }
-    if (platforms.WebFront) {
-        pl = pl + 'Web FrontEnd ';
-    }
-    if (platforms.webBack) {
-        pl = pl + 'Web BackEnd';
-    }
-    return pl;
-}
 
 module.exports = {url: '/projects', router: router};

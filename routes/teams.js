@@ -15,9 +15,6 @@ router.get('/', function (req, res) {
     if (req.cookies.username) {
         con.query("SELECT * FROM teams WHERE ACTIVE=1 LIMIT 25", function (err, teams, fields) {
             if (err) throw err;
-            for (i in teams) {
-                teams[i].PLATFORMS = getPlatformString(JSON.parse(teams[i].PLATFORMS));
-            }
             let list = teams;
             list.reverse();
             res.render('pages/teams', {email: req.cookies.username, tab: '3', posts: list, term: ''});
@@ -47,9 +44,6 @@ router.get('/search/:searchTerm', function (req, res) {
     let searchFor = '%' + req.params.searchTerm + '%';
     con.query("SELECT * FROM teams WHERE NAME LIKE ?", [searchFor], function (err, result, fields) {
         if (err) throw err;
-        for (i in result) {
-            result[i].PLATFORMS = getPlatformString(JSON.parse(result[i].PLATFORMS));
-        }
         res.render('pages/teams', {
             email: req.cookies.username,
             tab: '3',
@@ -61,20 +55,20 @@ router.get('/search/:searchTerm', function (req, res) {
 
 router.get('/register', function (req, res) {
     team = req.query;
-    console.log('checking if team...' + team.name + ' is in db');
     con.query("SELECT * FROM teams WHERE NAME = ? LIMIT 1", [team.name], function (err, result, fields) {
         if (err) throw err;
         if (result[0]) {
-            console.log("team failed to register: " + team.name);
             res.send({status: "failed, team already exists"});
         }
         else {
-            console.log("register team: " + result[0]);
-            con.query("INSERT INTO teams (ID, NAME, SUMMARY, HACKATON, SECTION, START_DATE, END_DATE, PLATFORMS, RESOURCE_LINK, NR_MEMBERS, POSTS, LEADER, ACTIVE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, team.name, team.summary, team.hackaton, team.section, team.startDate, team.endDate, JSON.stringify(team.platforms), team.resource_link, team.nrMembers, '', team.leader, 1], function (err, result) {
+            let platforms = [];
+            if (team.platforms) {
+                platforms = team.platforms;
+            }
+            con.query("INSERT INTO teams (ID, NAME, SUMMARY, HACKATON, SECTION, START_DATE, END_DATE, PLATFORMS, RESOURCE_LINK, NR_MEMBERS, POSTS, LEADER, ACTIVE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, team.name, team.summary, team.hackaton, team.section, team.startDate, team.endDate, JSON.stringify(platforms), team.resource_link, team.nrMembers, '', team.leader, 1], function (err, result) {
                 if (err) {
                     socket.emit('register team', {status: JSON.stringify(err)});
                 }
-                console.log('registered team ' + team.name + ' successful');
                 res.send({status: "successful"});
             });
         }
@@ -91,8 +85,11 @@ router.get('/finish', function(req, res){
 
 router.get('/update', function(req, res){
     team = req.query;
-    console.log("this is the update: "+JSON.stringify(team));
-    con.query("UPDATE teams SET SUMMARY=?, RESOURCE_LINK=?, HACKATON=?, SECTION=?, START_DATE=?, END_DATE=? WHERE NAME=?", [team.summary, team.resource_link, team.hackaton, team.section, team.startDate, team.endDate, team.name], function(err, result){
+    let platforms = [];
+    if (team.platforms) {
+        platforms = team.platforms;
+    }
+    con.query("UPDATE teams SET SUMMARY=?, RESOURCE_LINK=?, PLATFORMS=?, HACKATON=?, SECTION=?, START_DATE=?, END_DATE=? WHERE NAME=?", [team.summary, team.resource_link, JSON.stringify(platforms), team.hackaton, team.section, team.startDate, team.endDate, team.name], function(err, result){
         if(err) throw err;
         res.send({status:"successful"});
     });
@@ -123,7 +120,6 @@ router.get('/:team', function (req, res) {
     con.query("SELECT * FROM teams WHERE NAME = ? LIMIT 1", [req.params.team], function (err, result, fields) {
         if (err) throw err;
         if (result[0]) {
-            result[0].PLATFORMS = getPlatformString(JSON.parse(result[0].PLATFORMS))
             res.render('pages/team-page', {email: req.cookies.username, tab: '3', team: result[0]});
         }
         else {
@@ -157,7 +153,6 @@ router.get('/edit/:team', function (req, res) {
                     message_page: "Requested team: " + req.params.team
                 });
             }else {
-            result[0].PLATFORMS = getPlatformString(JSON.parse(result[0].PLATFORMS))
             res.render('pages/edit-team', {email: req.cookies.username, tab: '3', team: result[0]});
             }
         }
@@ -171,25 +166,5 @@ router.get('/edit/:team', function (req, res) {
     });
 });
 
-function getPlatformString(platforms) {
-    let pl = '';
-    if (platforms.Android) {
-        pl = pl + 'Android ';
-    }
-    if (platforms.iOS) {
-        pl = pl + 'iOS ';
-    }
-    if (platforms.Desktop) {
-        pl = pl + 'Desktop ';
-    }
-    if (platforms.WebFront) {
-        pl = pl + 'Web FrontEnd ';
-    }
-    if (platforms.webBack) {
-        pl = pl + 'Web BackEnd';
-    }
-    return pl;
-    console.log(pl);
-}
 
 module.exports = {url: '/teams', router: router};

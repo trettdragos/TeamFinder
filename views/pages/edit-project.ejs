@@ -2,25 +2,10 @@
 <html lang="en">
 
 <head>
-    <% include ../partials/head %>
+    <% include ../partials/head.ejs %>
+    <link href="/vendor/bootstrap-tagsinput/tagsinput.css" rel="stylesheet"/>
+
     <style type="text/css">
-        .jumbotron {
-            box-shadow: 2px 8px 16px -8px black;
-            padding: 1%;
-        }
-
-        .btn {
-            background-color: #343a40;
-            border-color: #343a40;
-            color: #00e500;
-        }
-
-        .btn:hover {
-            background-color: #343a40;
-            border-color: #00e500;
-            color: #00e500;
-        }
-
         #changePasswordResponse, #changeLinksResponse {
             opacity: 0;
             display: none;
@@ -36,7 +21,7 @@
 </head>
 
 <body>
-<% include ../partials/header %>
+<% include ../partials/header.ejs %>
 <div class="container">
     <br class="my-3">
     <section class="forms">
@@ -100,6 +85,16 @@
                                             <h4>Do you have funding? <input type="checkbox" id="funding" data-toggle="toggle"></h4>
                                             <% } %>
                                         </div>
+                                        <div class="form-group">
+                                            <h4 id="platform">What Platform Will Your Project Be Built On?</h4>
+                                            <div class="md-form">
+                                            <select title="platforms" multiple id="platformsInput" class="form-control" data-role="tagsinput">
+                                                <% JSON.parse(project.PLATFORMS).forEach((platform) => { %>
+                                                    <option value="<%=platform%>"><%=platform%></option>
+                                                <% }) %>
+                                            </select>
+                                            </div>
+                                        </div>
                                     </form>
                                 </div>
                             </div>
@@ -139,6 +134,7 @@
 </div>
 
 <% include ../partials/footer.ejs %>
+<script src="/vendor/bootstrap-tagsinput/tagsinput.js"></script>
 
 <script>
     $('.removeCollaborator').on('click', function () {
@@ -167,6 +163,7 @@
             name:document.getElementById("project_name").innerHTML,
             summary:document.getElementById("summary").value,
             commitment:commitmentLevel,
+            platforms: $("#platformsInput").tagsinput('items'),
             resource_link: $('#resource_link').val(),
             stage:Stage,
             budget:Budget,

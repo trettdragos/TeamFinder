@@ -35,4 +35,5 @@
 - [x] <strike>problema cu fisierele din /public cand esti pe linkuri care nu sunt imediat langa root (de ex /projects/create)</strike>
 - [ ] accesarea proiectelor si echipelor printr-un id (ex `/projects/bWEgZnV0`)
 - [x] <strike>schimbare cheie pentru sendGrid(repair email confirmation)</strike>
-- [ ] Schimbare platforme pe pagina de creare proiect/echipa cu ceva asemanator cu skill-urile (Frontend)
+- [x] <strike>Schimbare platforme pe pagina de creare proiect/echipa cu ceva asemanator cu skill-urile (Frontend)</strike>
+- [x] <strike>Adaugare abilitate de a edita skill-urile pe pagina de editat profilul</strike>

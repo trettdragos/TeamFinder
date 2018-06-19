@@ -2,19 +2,26 @@
 <html lang="en">
 
 <head>
-    <% include ../partials/head %>
-    <!--<link href="../search-bar.css" rel="stylesheet">-->
+    <% include ../partials/head.ejs %>
 
     <style type="text/css">
-        .jumbotron {
-            box-shadow: 2px 8px 16px -8px black;
-            padding: 2%;
+        span.tags {
+            background: #ffffff;
+            border-radius: 2px;
+            color: #000;
+            font-weight: bold;
+            padding: 2px 4px;
+        }
+
+        span.tags.teal {
+            background: #1abc9c;
+            color: #f5f5f5
         }
     </style>
 </head>
 
 <body>
-<% include ../partials/header %>
+<% include ../partials/header.ejs %>
 
 <div class="container">
     <div class="row">
@@ -43,11 +50,16 @@
         <div class="col-lg-12 text-left">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title display-6 font-weight-bold"> <%= posts[i].NAME %>
-                        <% if(posts[i].PLATFORMS !== '') { %>
-                        - <%= posts[i].PLATFORMS %>
-                        <% } %>
-                    </h4>
+                    <div class="row">
+                        <div class="col-6">
+                            <h4 class="card-title display-6 font-weight-bold"> <%= posts[i].NAME %></h4>
+                        </div>
+                        <div class="col-6">
+                            <% for (j in JSON.parse(posts[i].PLATFORMS)) {%>
+                                <span style="float: right" class="tags teal ml-2 h5"><%= JSON.parse(posts[i].PLATFORMS).reverse()[j] %></span>
+                            <%}%>
+                        </div>
+                    </div>
                     <hr class="my-4">
                     <h5><%= posts[i].SUMMARY %></h5>
                     <a href="/projects/<%= posts[i].NAME %>" style="color: #00e500" class="d-flex flex-row-reverse p-2">

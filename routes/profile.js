@@ -18,6 +18,7 @@ router.get('/', (req, res) => {
 router.get('/edit', (req, res) => {
     con.query('SELECT * FROM accounts WHERE EMAIL = ?', [req.cookies.username], (db_err, db_res) => {
         if (db_err) throw db_err;
+        console.log(db_res[0].PROFILE);
         res.render('pages/edit-profile.ejs', {
             username: req.cookies.username,
             tab: '4',
@@ -69,7 +70,7 @@ router.get('/answer', (req, res) => {
             }
         });
     });
-})
+});
 
 router.get('/:account_id', (req, res) => {
     // if (req.cookies.username) {
@@ -111,6 +112,7 @@ router.post('/update-profile', (req, res) => {
     switch (req_data.action) {
         case 'CHANGE_PASSWORD': {
             let data = JSON.parse(req_data.body);
+            console.log(data);
             con.query('SELECT PASSWORD FROM accounts WHERE EMAIL = ?', [req.cookies.username], (err, db_res) => {
                 if (err) throw err;
                 security.checkPassword(data.currentPassword, db_res[0].PASSWORD, (ok) => {
@@ -161,6 +163,7 @@ router.post('/update-profile', (req, res) => {
                 db_data.GITHUB = data.githubLink;
                 db_data.LINKEDIN = data.linkedinLink;
                 db_data.ABOUT = data.about;
+                db_data.SKILLS = data.SKILLS;
                 con.query('UPDATE accounts SET PROFILE = ? WHERE EMAIL = ?', [JSON.stringify(db_data), req.cookies.username], (db_err_2, db_res_2) => {
                     if (db_err_2) throw db_err_2;
                     res.end(JSON.stringify({code: 200, message: "Profile picture successfully reset!"}));

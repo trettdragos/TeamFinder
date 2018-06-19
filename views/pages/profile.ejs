@@ -97,32 +97,43 @@
             </div>
         </div>
     </div>
-
-    <% if(username == email && notifications.length) { %>
-    <div class="jumbotron">
-        <h4>Notifications:</h4>
-        <hr class="my-4">
-        <% for(i in notifications){ %>
-        <% if(notifications[i].vis === "false"){ %>
-        <div>
-            <h4><button class="btn accept-notification" data-notification-id="<%= notifications[i].id %>" data-notification-type="<%= notifications[i].type %>"
-                                                            data-notification-name="<%= notifications[i].name %>" data-notification-user="<%= notifications[i].user %>">Accept</button>
-                <button class="btn refuse-notification" data-notification-id="<%= notifications[i].id %>" data-notification-type="<%= notifications[i].type %>"
-                   data-notification-name="<%= notifications[i].name %>" data-notification-user="<%= notifications[i].user %>">Refuse</button>
-                User <b><%= notifications[i].user %></b> wants to join <%= notifications[i].type %>
-                : <%= notifications[i].name %></h4>
+    <%
+    let count = 0;
+    notifications.forEach((notification) => {
+       if(notification.vis === "false")
+           count+=1;
+    });
+    %>
+    <% if(username == email && count) { %>
+    <div class="row my-3">
+        <div class="col-lg-12 text-left">
+            <div class="card">
+                <div class="card-body">
+                    <h4>Notifications:</h4>
+                    <hr class="my-4">
+                    <% for(i in notifications){ %>
+                    <% if(notifications[i].vis === "false"){ %>
+                    <div>
+                        <h4><button class="btn accept-notification" data-notification-id="<%= notifications[i].id %>" data-notification-type="<%= notifications[i].type %>"
+                                    data-notification-name="<%= notifications[i].name %>" data-notification-user="<%= notifications[i].user %>">Accept</button>
+                            <button class="btn refuse-notification" data-notification-id="<%= notifications[i].id %>" data-notification-type="<%= notifications[i].type %>"
+                                    data-notification-name="<%= notifications[i].name %>" data-notification-user="<%= notifications[i].user %>">Refuse</button>
+                            User <b><%= notifications[i].user %></b> wants to join <%= notifications[i].type %>
+                            : <%= notifications[i].name %></h4>
+                    </div>
+                    <% }} %>
+                </div>
+            </div>
         </div>
-        <% }} %>
     </div>
     <% } %>
 
-    <div class="row my-5">
+    <div class="row my-3">
         <div class="col-lg-12 text-left">
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title"><b><% if(username == email){ %>Your <% } else { %><%= name %>'s<% } %>Projects:</b></h4>
                     <hr class="mb-4 mt-1">
-
                     <% for(i in projects){ %>
                     <div class="row">
                         <div class="col-lg-12 text-left">
@@ -144,7 +155,7 @@
         </div>
     </div>
 
-    <div class="row my-5">
+    <div class="row my-3">
         <div class="col-lg-12 text-left">
             <div class="card">
                 <div class="card-body">

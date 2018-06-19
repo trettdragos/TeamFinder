@@ -2,7 +2,8 @@
 <html lang="en">
 
 <head>
-    <% include ../partials/head %>
+    <% include ../partials/head.ejs %>
+    <link href="/vendor/bootstrap-tagsinput/tagsinput.css" rel="stylesheet"/>
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.standalone.min.css"
           rel="stylesheet" type="text/css"/>
@@ -19,7 +20,7 @@
 </head>
 
 <body>
-<% include ../partials/header %>
+<% include ../partials/header.ejs %>
 <form>
     <div class="container">
         <div class="row">
@@ -63,26 +64,9 @@
                     </div>
                     <hr class="my-4">
                     <div class="form-group">
-                        <h4 id="Platform">What Platform Will Your Project Be Built On?</h4>
-                        <div class="form-check form-check-inline">
-                            <input class="btn btn-lg platform-toggle-button" style="width: 175px; height:75px; margin-bottom: 5px;"
-                                   type="button" id="android" value="Android">
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="btn btn-lg platform-toggle-button" style="width: 175px; height:75px; margin-bottom: 5px;"
-                                   type="button" id="ios" value="iOS">
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="btn btn-lg platform-toggle-button" style="width: 175px; height:75px; margin-bottom: 5px;"
-                                   type="button" id="desktop" value="Desktop">
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="btn btn-lg platform-toggle-button" style="width: 175px; height:75px; margin-bottom: 5px;"
-                                   type="button" id="webFrontEnd" value="Web Front End">
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="btn btn-lg platform-toggle-button" style="width: 175px; height:75px; margin-bottom: 5px;"
-                                   type="button" id="webBackEnd" value="Web Back End">
+                        <h4 id="platform">What Platform Will Your Project Be Built On?</h4>
+                        <div class="md-form">
+                            <input title="skills" type="text" id="platformsInput" class="form-control" data-role="tagsinput">
                         </div>
                     </div>
                 </div>
@@ -96,7 +80,8 @@
         </div>
     </div>
 </form>
-<% include ../partials/footer %>
+<% include ../partials/footer.ejs %>
+<script src="/vendor/bootstrap-tagsinput/tagsinput.js"></script>
 <% include ../partials/socket-notification.ejs %>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js"
         type="text/javascript"></script>
@@ -119,11 +104,6 @@
         });
     })
     let socket = io.connect();
-    let android = false;
-    let ios = false;
-    let desktop = false;
-    let webFront = false;
-    let webBack = false;
     $("#submit").on('click', function () {
         submitTeam();
     });
@@ -138,13 +118,7 @@
             section: document.getElementById('hackatonSection').value,
             startDate: document.getElementById('datepickerStart').value,
             endDate: document.getElementById('datepickerEnd').value,
-            platforms: {
-                Android: android,
-                iOS: ios,
-                Desktop: desktop,
-                WebFront: webFront,
-                webBack: webBack
-            },
+            platforms: $("#platformsInput").tagsinput('items'),
             nrMembers: 1,
             posts: '',
             leader: $.cookie('username')
@@ -185,12 +159,6 @@
             document.getElementById('datepickerEnd').style.borderColor = "red";
         } else {
             document.getElementById('datepickerEnd').style.borderColor = "green";
-        }
-        if (!(ios || android || desktop || webBack || webFront)) {
-            isFormOk = false;
-            document.getElementById('Platform').style.color = "red";
-        } else {
-            document.getElementById('Platform').style.color = "green";
         }
         if (isFormOk)
             $.ajax({

@@ -3,6 +3,7 @@
 
 <head>
     <% include ../partials/head.ejs %>
+    <link href="/vendor/bootstrap-tagsinput/tagsinput.css" rel="stylesheet"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.standalone.min.css" rel="stylesheet" type="text/css" />
     <style type="text/css">
         .btn {
@@ -77,6 +78,16 @@
                                             <label for="linkedinLink">Ending on</label>
                                             <input type="text" class="form-control" id="datepickerEnd" value="<%=team.END_DATE%>">      
                                         </div>
+                                        <div class="form-group">
+                                            <h4 id="platform">What Platform Will Your Project Be Built On?</h4>
+                                            <div class="md-form">
+                                                <select title="platforms" multiple id="platformsInput" class="form-control" data-role="tagsinput">
+                                                    <% JSON.parse(team.PLATFORMS).forEach((platform) => { %>
+                                                    <option value="<%=platform%>"><%=platform%></option>
+                                                    <% }) %>
+                                                </select>
+                                            </div>
+                                        </div>
                                     </form>
                                 </div>
                             </div>
@@ -116,6 +127,7 @@
 </div>
 
 <% include ../partials/footer.ejs %>
+<script src="/vendor/bootstrap-tagsinput/tagsinput.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js" type="text/javascript"></script>
 <script>
        $('#datepickerStart').datepicker({
@@ -149,6 +161,7 @@
             name:document.getElementById("team_name").innerHTML,
             summary:document.getElementById('summary').value,
             resource_link: $('#resource_link').val(),
+            platforms: $("#platformsInput").tagsinput('items'),
             hackaton:document.getElementById('hackaton').value,
             section:document.getElementById('section').value,
             startDate:document.getElementById('datepickerStart').value,

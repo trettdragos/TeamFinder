@@ -2,25 +2,19 @@
 <html lang="en">
 
 <head>
-    <% include ../partials/head %>
-    <link href="search-bar.css" rel="stylesheet">
-    <link href="button-style.css" rel="stylesheet" type="text/css">
+    <% include ../partials/head.ejs %>
     <style type="text/css">
-        .jumbotron {
-            box-shadow: 2px 8px 16px -8px black;
-            padding: 2%;
+        span.tags {
+            background: #ffffff;
+            border-radius: 2px;
+            color: #000;
+            font-weight: bold;
+            padding: 2px 4px;
         }
 
-        .btn {
-            background-color: #343a40;
-            border-color: #343a40;
-            color: #00e500;
-        }
-
-        .btn:hover {
-            background-color: #343a40;
-            border-color: #00e500;
-            color: #00e500;
+        span.tags.teal {
+            background: #1abc9c;
+            color: #f5f5f5
         }
     </style>
 </head>
@@ -64,8 +58,10 @@
                             <h5><%= team.START_DATE %></h5>
                             <label for="comment">End Date</label>
                             <h5><%= team.END_DATE %></h5>
-                            <label for="comment">Platforms</label>
-                            <h5><%= team.PLATFORMS %></h5>
+                            <label for="comment">Platforms</label><br>
+                            <% JSON.parse(team.PLATFORMS).forEach((platform) => { %>
+                            <span class="tags teal"><%= platform %></span>
+                            <% }) %>
                         </div>
                     </div>
                 </div>
