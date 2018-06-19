@@ -102,7 +102,9 @@ router.get('/remove-member', (req, res) => {
     let team = req.query.team;
     let members = team.POSTS.trim().substr(0, team.POSTS.length - 1).split(',');
     let index = members.indexOf(req.query.collaborator);
+    console.log(members);
     members.splice(index, 1);
+    console.log(members);
     let newMembers = '';
     members.forEach((member) => newMembers += member+',')
     con.query('UPDATE teams SET POSTS = ? WHERE ID = ?', [newMembers, team.ID], (err, result) => {
@@ -148,10 +150,24 @@ router.get('/edit/:team', function (req, res) {
     con.query("SELECT * FROM teams WHERE NAME = ? LIMIT 1", [req.params.team], function (err, result, fields) {
         if (err) throw err;
         if (result[0]) {
+            if(result[0].LEADER != req.cookies.username) {
+                res.render('pages/404.ejs', {
+                    message_main: "You are not allowed to edit the team (403)",
+                    message_redirect: `Click <a href=\"/teams/${req.params.team}\">here</a> to go back`,
+                    message_page: "Requested team: " + req.params.team
+                });
+            }else {
             result[0].PLATFORMS = getPlatformString(JSON.parse(result[0].PLATFORMS))
             res.render('pages/edit-team', {email: req.cookies.username, tab: '3', team: result[0]});
+            }
         }
-        else res.send('Error 404 team not found with the name ' + req.params.team);
+        else{
+            res.render('pages/404.ejs', {
+                message_main: "The team you're looking for does not exist (404)",
+                message_redirect: `Click <a href=\"/teams\">here</a> to go back`,
+                message_page: "Requested team: " + req.params.team
+            });
+        }
     });
 });
 

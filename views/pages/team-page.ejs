@@ -87,10 +87,7 @@
                                 <% for(index in collaborators) {%>
                                     <div class="form-row align-items-center">
                                         <div class="col-8 d-flex flex-column">
-                                            <span class="h4"><%=collaborators[index]%></span>
-                                        </div>
-                                        <div class="col-4 d-flex flex-column-reverse">
-                                            <button class="btn mb-2 removeCollaborator" data-collaborator="<%=collaborators[index]%>">Remove<i class="fas fa-times ml-3"></i></button>
+                                            <h5><%=collaborators[index]%></h5>
                                         </div>
                                     </div>
                                 <% } %>
@@ -117,21 +114,6 @@
 <h1 style="display: none" id="teamNAME"><%= team.NAME %></h1>
 <% include ../partials/socket-notification.ejs %>
 <script type="text/javascript">
-    $('.removeCollaborator').on('click', function () {
-        $.ajax({
-            data: {
-                collaborator: $(this).data('collaborator'),
-                team: <%- JSON.stringify(team) %>
-            },
-            type: 'GET',
-            url: '/teams/remove-member',
-            success: function (res) {
-                if (res.status === 'successful')
-                    window.location.reload();
-            }
-        });
-    })
-
     $("#join").on('click', function () {
         let socket = io.connect();
         let teamname = <%- JSON.stringify(team.NAME) %>;

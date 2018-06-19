@@ -103,6 +103,22 @@
                                     </form>
                                 </div>
                             </div>
+                            <h1>Members:</h1>
+                            <% if(project.COLLABORATORS){ %>
+                            <%let collaborators = project.COLLABORATORS.trim().substr(0, project.COLLABORATORS.length - 1).split(',')%>
+                            <% for(index in collaborators) {%>
+                            <div class="form-row align-items-center">
+                                <div class="col-8 d-flex flex-column">
+                                    <span class="h4"><%=collaborators[index]%></span>
+                                </div>
+                                <div class="col-4 d-flex flex-column-reverse">
+                                    <button class="btn mb-2 removeCollaborator" data-collaborator="<%=collaborators[index]%>">Remove<i class="fas fa-times ml-3"></i></button>
+                                </div>
+                            </div>
+                            <% } %>
+                            <% } else{ %>
+                            <h5>none</h5>
+                            <% } %>
                             <div class="row pt-3">
                                 <div class="col-md-6 mx-auto">
                                     <button class="btn btn-primary btn-lg btn-block" id="applyBtn">Apply
@@ -125,19 +141,28 @@
 <% include ../partials/footer.ejs %>
 
 <script>
+    $('.removeCollaborator').on('click', function () {
+        $.ajax({
+            data: {
+                collaborator: $(this).data('collaborator'),
+                project: <%- JSON.stringify(project) %>
+            },
+            type: 'GET',
+            url: '/projects/remove-member',
+            success: function (res) {
+                if (res.status === 'successful')
+                    window.location.reload();
+            }
+        });
+    })
     $('#applyBtn').on('click', function(){
-        var e1 = document.getElementById("commitmentLevel");
-        var commitmentLevel = e1.options[e1.selectedIndex].text;
-        var e2 = document.getElementById("stage");
-        var Stage = e2.options[e2.selectedIndex].text;
-        var e3 = document.getElementById("budget");
-        var Budget = e3.options[e3.selectedIndex].text;
-        var hasFunding;
-        if(document.getElementById("funding").checked){
-          hasFunding = true;
-        }else{
-            hasFunding = false;
-        }
+        let e1 = document.getElementById("commitmentLevel");
+        let commitmentLevel = e1.options[e1.selectedIndex].text;
+        let e2 = document.getElementById("stage");
+        let Stage = e2.options[e2.selectedIndex].text;
+        let e3 = document.getElementById("budget");
+        let Budget = e3.options[e3.selectedIndex].text;
+        let hasFunding = document.getElementById("funding").checked;
         project={
             name:document.getElementById("project_name").innerHTML,
             summary:document.getElementById("summary").value,

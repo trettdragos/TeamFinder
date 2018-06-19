@@ -137,10 +137,24 @@ router.get('/edit/:project', function (req, res) {
     con.query("SELECT * FROM projects WHERE NAME = ? LIMIT 1", [req.params.project], function (err, result, fields) {
         if (err) throw err;
         if (result[0]) {
-            result[0].PLATFORMS = getPlatformString(JSON.parse(result[0].PLATFORMS))
-            res.render('pages/edit-project', {email: req.cookies.username, tab: '2', project: result[0]});
+            if(result[0].FOUNDER != req.cookies.username) {
+                res.render('pages/404.ejs', {
+                    message_main: "You are not allowed to edit the project (403)",
+                    message_redirect: `Click <a href=\"/projects/${req.params.project}\">here</a> to go back`,
+                    message_page: "Requested project: " + req.params.team
+                });
+            }else {
+                result[0].PLATFORMS = getPlatformString(JSON.parse(result[0].PLATFORMS))
+                res.render('pages/edit-project', {email: req.cookies.username, tab: '2', project: result[0]});
+            }
         }
-        else res.send('Error 404 project not found with the name ' + req.params.project);
+        else {
+            res.render('pages/404.ejs', {
+                message_main: "The project you're looking for does not exist (404)",
+                message_redirect: `Click <a href=\"/projects\">here</a> to go back`,
+                message_page: "Requested project: " + req.params.project
+            });
+        }
     });
 });
 

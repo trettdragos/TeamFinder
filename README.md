@@ -23,7 +23,7 @@
 
 - [x] <strike>posibiliatea de a modifica proiectele/echipele create de un utilizator</strike>
 - [x] <strike>adaugare link pentru resurse la un proiect/echipa, vizibele doar pt cei ce fac parte din echipa/proiect</strike>
-- [ ] functionalitate de kick din echipa/proiect
+- [x] <strike>functionalitate de kick din echipa/proiect</strike>
 - [ ] imbunatatire interfata si mobile friendly(meniul nu merge mobile :)))))) shhhh)
     - [ ] Imbunatatire interfata
     - [x] <strike>Meniu</strike>

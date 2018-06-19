@@ -2,14 +2,9 @@
 <html lang="en">
 
 <head>
-    <% include ../partials/head %>
+    <% include ../partials/head.ejs %>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.standalone.min.css" rel="stylesheet" type="text/css" />
     <style type="text/css">
-        .jumbotron {
-            box-shadow: 2px 8px 16px -8px black;
-            padding: 1%;
-        }
-
         .btn {
             background-color: #343a40;
             border-color: #343a40;
@@ -37,7 +32,7 @@
 </head>
 
 <body>
-<% include ../partials/header %>
+<% include ../partials/header.ejs %>
 <div class="container">
     <br class="my-3">
     <section class="forms">
@@ -85,6 +80,22 @@
                                     </form>
                                 </div>
                             </div>
+                                <h1>Members:</h1>
+                                <% if(team.POSTS){ %>
+                                <%let collaborators = team.POSTS.trim().substr(0, team.POSTS.length - 1).split(',')%>
+                                <% for(index in collaborators) {%>
+                                <div class="row align-items-center">
+                                    <div class="col-8 d-flex flex-column">
+                                        <span class="h4"><%=collaborators[index]%></span>
+                                    </div>
+                                    <div class="col-4 d-flex flex-column-reverse">
+                                        <button class="btn mb-2 removeCollaborator" data-collaborator="<%=collaborators[index]%>">Remove<i class="fas fa-times ml-3"></i></button>
+                                    </div>
+                                </div>
+                                <% } %>
+                                <% } else{ %>
+                                <h5>none</h5>
+                                <% } %>
                             <div class="row pt-3">
                                 <div class="col-md-6 mx-auto">
                                     <button class="btn btn-primary btn-lg btn-block" id="applyBtn">Apply
@@ -119,6 +130,20 @@
 
 
 <script>
+    $('.removeCollaborator').on('click', function () {
+        $.ajax({
+            data: {
+                collaborator: $(this).data('collaborator'),
+                team: <%- JSON.stringify(team) %>
+            },
+            type: 'GET',
+            url: '/teams/remove-member',
+            success: function (res) {
+                if (res.status === 'successful')
+                    window.location.reload();
+            }
+        });
+    })
     $('#applyBtn').on('click', function(){
         team={
             name:document.getElementById("team_name").innerHTML,
