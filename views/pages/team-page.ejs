@@ -44,7 +44,7 @@
                             <hr class="my-4">
                             <%
                             let joined = false;
-                            // console.log(team.POSTS.trim().substr(0, team.POSTS.length - 1).split(',').length);
+                            console.log(team.POSTS.trim().substr(0, team.POSTS.length - 1).split(',').length);
                             let participants = team.POSTS.trim().substr(0, team.POSTS.length - 1).split(',');
                             if (participants.includes(email) || email == team.LEADER) joined = true
                             %>

@@ -32,7 +32,7 @@ router.get('/auth', function (req, res) {
                             if (not[i].vis == "false")
                                 newNotif = true;
                         }
-                        console.log("auth successful with user: " + user.email);
+                        // console.log("auth successful with user: " + user.email);
                         require('../other/security').generateJWT(user.email, (token) => {
                             res.send({
                                 status: "successful",
@@ -46,13 +46,13 @@ router.get('/auth', function (req, res) {
                         res.send({status: "account not verified", email: user.email})
                     }
                 } else {
-                    console.log("auth failed for user: " + user.email);
+                    // console.log("auth failed for user: " + user.email);
                     res.send({status: "faileded", email: user.email});
                 }
             });
         }
         else {
-            console.log("auth failed for user: " + user.email);
+            // console.log("auth failed for user: " + user.email);
             res.send({status: "faileded", email: user.email});
         }
     });

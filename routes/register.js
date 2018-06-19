@@ -21,24 +21,24 @@ router.get('/confirmed', function (req, res) {
 
 router.get('/auth', function (req, res) {
     user = req.query;
-    console.log(user);
-    console.log("checking if user: " + user.email + " is already in the db...")
+    // console.log(user);
+    // console.log("checking if user: " + user.email + " is already in the db...")
     con.query("SELECT * FROM accounts WHERE EMAIL = ? LIMIT 1", [user.email], function (err, result, fields) {
         if (err) throw err;
         if (result[0]) {
-            console.log("user with email " + user.email + " already exists");
+            // console.log("user with email " + user.email + " already exists");
             res.send({status: "Email already used.", email: user.email});
         }
         else {
-            console.log("registering user: " + user.name + " with the email: " + user.email);
+            // console.log("registering user: " + user.name + " with the email: " + user.email);
             /* Encrypt password */
             security.encryptPassword(user.password, (hash) => {
-                console.log(user.skills);
-                console.log(JSON.stringify(user.skills));
+                // console.log(user.skills);
+                // console.log(JSON.stringify(user.skills));
                 let skills = [];
                 if (user.skills) {
                     skills = user.skills;
-                    console.log('ADDED SKILLS')
+                    // console.log('ADDED SKILLS')
                 }
                 let profile = {
                     "GITHUB": user.github,
@@ -60,7 +60,7 @@ router.get('/auth', function (req, res) {
                       html: email_template,
                     };
                     sgMail.send(msg);
-                    console.log('sent verification email to ' + user.email);
+                    // console.log('sent verification email to ' + user.email);
                     res.send({status: "successful"});
                 });
             });

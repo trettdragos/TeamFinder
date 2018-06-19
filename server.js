@@ -26,6 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
+app.use(logger('dev'));
 
 io.on('connection', function (socket) {
     //add user to connected list
@@ -37,7 +38,7 @@ io.on('connection', function (socket) {
         }
     });
     socket.on('request join team', function (req) {
-        console.log("client " + req.username + " requested to join team " + req.teamName + " of user " + req.leader + " with token " + req.token);
+        // console.log("client " + req.username + " requested to join team " + req.teamName + " of user " + req.leader + " with token " + req.token);
         con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ? LIMIT 1", [req.leader], function (err, result, fields) {
             if (err) throw err;
             if (result) {
@@ -60,7 +61,7 @@ io.on('connection', function (socket) {
                 for (let i in notifications) {
                     if (reqtest === JSON.stringify(notifications[i])) {
                         socket.emit('request join team', {status: "already requested"});
-                        console.log("failed to send request, already exists");
+                        // console.log("failed to send request, already exists");
                         isValid = false;
                         break;
                     }
@@ -72,11 +73,11 @@ io.on('connection', function (socket) {
                         if (err) throw err;
                         if (result.affectedRows == 0) {
                             socket.emit('request join team', {status: "failed"});
-                            console.log('failed to register request to team leader ' + req.leader + " from user " + req.username + " in team " + req.teamName);
+                            // console.log('failed to register request to team leader ' + req.leader + " from user " + req.username + " in team " + req.teamName);
                         } else {
-                            console.log('succesfully registered request to team leader ' + req.leader + " from user " + req.username + " in team " + req.teamName);
+                            // console.log('succesfully registered request to team leader ' + req.leader + " from user " + req.username + " in team " + req.teamName);
                             socket.emit('request join team', {status: "succesfull"});
-                            console.log('successfuly registered request to team leader ' + req.leader + " from user " + req.username + " in team " + req.teamName);
+                            // console.log('successfuly registered request to team leader ' + req.leader + " from user " + req.username + " in team " + req.teamName);
                             socket.emit('request join team', {status: "successful"});
                         }
                     });
@@ -86,7 +87,7 @@ io.on('connection', function (socket) {
     });
 
         socket.on('request join project', function (req) {
-            console.log("client " + req.username + " requested to join project " + req.projectName + " of user " + req.leader + " with token " + req.token);
+            // console.log("client " + req.username + " requested to join project " + req.projectName + " of user " + req.leader + " with token " + req.token);
             con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ? LIMIT 1", [req.leader], function (err, result, fields) {
                 if (err) throw err;
                 if (result) {
@@ -117,7 +118,7 @@ io.on('connection', function (socket) {
                     for (let i in notifications) {
                         if (reqtest === JSON.stringify(notifications[i]) || reqAltTest === JSON.stringify(notifications[i])) {
                             socket.emit('request join project', {status: "already requested"});
-                            console.log("failed to send request, already exists");
+                            // console.log("failed to send request, already exists");
                             isValid = false;
                             break;
                     }
@@ -129,9 +130,9 @@ io.on('connection', function (socket) {
                         if (err) throw err;
                         if (result.affectedRows == 0) {
                             socket.emit('request join project', {status: "failed"});
-                            console.log('failed to register request to team leader ' + req.leader + " from user " + req.username + " in team " + req.teamName);
+                            // console.log('failed to register request to team leader ' + req.leader + " from user " + req.username + " in team " + req.teamName);
                         } else {
-                            console.log('succesfully registered request to team leader ' + req.leader + " from user " + req.username + " in team " + req.teamName);
+                            // console.log('succesfully registered request to team leader ' + req.leader + " from user " + req.username + " in team " + req.teamName);
                             socket.emit('request join project', {status: "succesfull"});
                         }
                     });
@@ -140,10 +141,10 @@ io.on('connection', function (socket) {
         });
     });
     socket.on('answer request', function (req) {
-        console.log("leader " + req.leader);
+        // console.log("leader " + req.leader);
         con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ?", [req.leader], function (err, result) {
             if (err) throw err;
-            console.log(req.leader);
+            // console.log(req.leader);
             let stringNotif = result[0].NOTIFICATION;
             let notif = JSON.parse(stringNotif);
             for (i in notif) {
@@ -155,7 +156,7 @@ io.on('connection', function (socket) {
             con.query("UPDATE accounts SET NOTIFICATION = ? WHERE EMAIL = ?", [stringNotif, req.leader], function (err2, result2) {
                 if (err2) throw err2;
                 if (result2.affectedRows != 0) {
-                    console.log('updated notifications for leader');
+                    // console.log('updated notifications for leader');
                     if (req.status === "accept") {
                         let table = req.type + 's';
                         let col;
@@ -172,7 +173,7 @@ io.on('connection', function (socket) {
                             con.query("UPDATE " + table + " SET " + col + " = ? WHERE NAME = ?", [coll, req.name], function (err4, result4) {
                                 if (err4) throw err4;
                                 if (result4.affectedRows != 0) {
-                                    console.log('added requester as colaborator');
+                                    // console.log('added requester as colaborator');
                                     socket.emit('answer request', {status: 'succesfull'});
                                 }
                             });
@@ -183,9 +184,9 @@ io.on('connection', function (socket) {
         });
     });
     socket.on('disconnect', function () {
-        console.log("Client disconected..." + socket.id + " with email " + connectedSockets[socket.id]);
+        // console.log("Client disconected..." + socket.id + " with email " + connectedSockets[socket.id]);
         delete connectedUsers[connectedSockets[socket.id]];
-        console.log(JSON.stringify(connectedUsers));
+        // console.log(JSON.stringify(connectedUsers));
         //remove user from conected list
     });
 });
@@ -196,7 +197,7 @@ app.set('view engine', 'ejs');
 let routes = require('./routes');
 routes.forEach(item => app.use(item.url, item.router));
 app.get('/logout', function (req, res) {
-    console.log(req.query.skip);
+    // console.log(req.query.skip);
     if (req.query.skip)
         res.render('pages/logout', {time: 1});
     else
