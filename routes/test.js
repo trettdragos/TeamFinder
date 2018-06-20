@@ -68,6 +68,13 @@ router.get('/uuid', (req, res) => {
     })
 });
 
+router.get('/chat/a', (req, res) => {
+    res.render('pages/chat.ejs', {from: {uuid: '8CCB2690-68A2-491C-A726-A83312E49B55', name: 'Teodor Vecerdi'}, to: {uuid: '96FA97C7-FADD-4EB1-997F-68FB02C64AA2', name: 'Trett Dragos'}, profile: 'https://thumbs.dreamstime.com/b/profile-icon-senior-female-head-chat-bubble-isolated-elderly-woman-avatar-cartoon-character-portrait-profile-icon-senior-female-108359162.jpg'});
+});
+router.get('/chat/b', (req, res) => {
+    res.render('pages/chat.ejs', {from:{uuid: '96FA97C7-FADD-4EB1-997F-68FB02C64AA2', name: 'Trett Dragos'}, to:{uuid: '8CCB2690-68A2-491C-A726-A83312E49B55', name: 'Teodor Vecerdi'}, profile: 'https://thumbs.dreamstime.com/b/profile-icon-senior-female-head-chat-bubble-isolated-elderly-woman-avatar-cartoon-character-portrait-flat-vector-illustration-108360340.jpg' });
+});
+
 router.get('/uuid-base64', (req, res) => {
     require('../other/security').getUUID((uuid) => require('../other/security').convertUUIDToBase64(uuid, (base64) => res.send(`${uuid}<br>${base64}`)));
 });

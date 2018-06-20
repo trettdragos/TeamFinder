@@ -22,6 +22,10 @@ let con = mysql.createConnection({
     database: "TeamFinder"
 });
 
+//// CHAT TEST REMOVE LATER
+let messagesUsers = {};
+let messagesSockets = {};
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
@@ -36,6 +40,20 @@ io.on('connection', function (socket) {
             connectedUsers[res.email] = socket.id;
             connectedSockets[socket.id] = res.email;
         }
+    });
+    socket.emit('chat?');
+    socket.on('chat!', function (res) {
+       if (res.chat) {
+           connectedUsers[res.uuid] = {
+               uuid: res.uuid,
+               name: res.name,
+               socket: socket,
+           }
+       }
+    });
+    socket.on('send chat', (res) => {
+       let to = connectedUsers[res.to_uuid].socket;
+       to.emit('receive chat', {from: [res.uuid, res.name], message: res.message});
     });
     socket.on('request join team', function (req) {
         // console.log("client " + req.username + " requested to join team " + req.teamName + " of user " + req.leader + " with token " + req.token);
