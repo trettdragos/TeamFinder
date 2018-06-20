@@ -105,16 +105,14 @@ router.get('/remove-member', (req, res) => {
     let team = req.query.team;
     let members = team.POSTS.trim().substr(0, team.POSTS.length - 1).split(',');
     let index = members.indexOf(req.query.collaborator);
-    // console.log(members);
+    console.log(members);
     members.splice(index, 1);
-    // console.log(members);
+    console.log(members);
     let newMembers = '';
     members.forEach((member) => newMembers += member + ',');
-    require('../other/security').convertBase64ToUUID(team.ID, (uuid) => {
-        con.query('UPDATE teams SET POSTS = ? WHERE ID = ?', [newMembers, uuid], (err, result) => {
-            if (err) throw err;
-            res.send({status: 'successful'})
-        })
+    con.query('UPDATE teams SET POSTS = ? WHERE ID = ?', [newMembers, team.ID], (err, result) => {
+        if (err) throw err;
+        res.send({status: 'successful'})
     });
 });
 

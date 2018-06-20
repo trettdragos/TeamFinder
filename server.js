@@ -56,7 +56,9 @@ io.on('connection', function (socket) {
                     "name": req.teamName,
                     "id": id
                 };
-                io.sockets.connected[connectedUsers[req.leader]].emit('notification', newReq);
+                if(connectedUsers[req.leader]){
+                    io.sockets.connected[connectedUsers[req.leader]].emit('notification', newReq);
+                }
                 let reqtest = JSON.stringify(newReq);
                 let isValid = true;
                 for (let i in notifications) {
@@ -77,8 +79,6 @@ io.on('connection', function (socket) {
                             // console.log('failed to register request to team leader ' + req.leader + " from user " + req.username + " in team " + req.teamName);
                         } else {
                             // console.log('succesfully registered request to team leader ' + req.leader + " from user " + req.username + " in team " + req.teamName);
-                            socket.emit('request join team', {status: "succesfull"});
-                            // console.log('successfuly registered request to team leader ' + req.leader + " from user " + req.username + " in team " + req.teamName);
                             socket.emit('request join team', {status: "successful"});
                         }
                     });
@@ -113,7 +113,9 @@ io.on('connection', function (socket) {
                         "name": req.projectName,
                         "id": id
                     };
-                    io.sockets.connected[connectedUsers[req.leader]].emit('notification', newReq);
+                    if(connectedUsers[req.leader]){
+                        io.sockets.connected[connectedUsers[req.leader]].emit('notification', newReq);                        
+                    }
                     let reqtest = JSON.stringify(newReq);
                     let reqAltTest = JSON.stringify(newAltReq);
                     let isValid = true;
@@ -135,7 +137,7 @@ io.on('connection', function (socket) {
                             // console.log('failed to register request to team leader ' + req.leader + " from user " + req.username + " in team " + req.teamName);
                         } else {
                             // console.log('succesfully registered request to team leader ' + req.leader + " from user " + req.username + " in team " + req.teamName);
-                            socket.emit('request join project', {status: "succesfull"});
+                            socket.emit('request join project', {status: "successful"});
                         }
                     });
                 }
@@ -176,7 +178,7 @@ io.on('connection', function (socket) {
                                 if (err4) throw err4;
                                 if (result4.affectedRows != 0) {
                                     // console.log('added requester as colaborator');
-                                    socket.emit('answer request', {status: 'succesfull'});
+                                    socket.emit('answer request', {status: 'successful'});
                                 }
                             });
                         });
