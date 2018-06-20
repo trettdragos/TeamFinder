@@ -42,8 +42,7 @@ router.get('/search', function (req, res) {
 router.get('/search/:searchTerm', function (req, res) {
     if (!req.cookies.username)
         res.redirect('/login');
-    let searchFor = '%' + req.params.searchTerm + '%';
-    con.query("SELECT * FROM teams WHERE NAME LIKE ?", [searchFor], function (err, result, fields) {
+    con.query("SELECT * FROM teams WHERE NAME LIKE ?", [`%${req.params.searchTerm}%`], function (err, result, fields) {
         if (err) throw err;
         res.render('pages/teams', {
             email: req.cookies.username,
