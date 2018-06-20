@@ -13,11 +13,12 @@ router.get('/*', (req, res, next) => require('../other/security').routeTokenVeri
 
 router.get('/', function (req, res) {
     if (req.cookies.username) {
-        con.query("SELECT * FROM teams WHERE ACTIVE=1 LIMIT 25", function (err, teams, fields) {
+        con.query("SELECT * FROM teams WHERE ACTIVE=1  ORDER BY TIMESTAMP DESC", function (err, teams, fields) {
             if (err) throw err;
-            let list = teams;
-            list.reverse();
-            res.render('pages/teams', {email: req.cookies.username, tab: '3', posts: list, term: ''});
+            teams.forEach((team) => {
+                require('../other/security').convertUUIDToBase64(team.ID, (b64) => team.BASE64 = b64);
+            });
+            res.render('pages/teams', {email: req.cookies.username, tab: '3', posts: teams, term: ''});
         });
     }
     else {
@@ -65,33 +66,38 @@ router.get('/register', function (req, res) {
             if (team.platforms) {
                 platforms = team.platforms;
             }
-            con.query("INSERT INTO teams (ID, NAME, SUMMARY, HACKATON, SECTION, START_DATE, END_DATE, PLATFORMS, RESOURCE_LINK, NR_MEMBERS, POSTS, LEADER, ACTIVE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [0, team.name, team.summary, team.hackaton, team.section, team.startDate, team.endDate, JSON.stringify(platforms), team.resource_link, team.nrMembers, '', team.leader, 1], function (err, result) {
-                if (err) {
-                    socket.emit('register team', {status: JSON.stringify(err)});
-                }
-                res.send({status: "successful"});
+            require('../other/security').getUUID((uuid) => {
+                con.query("INSERT INTO teams (ID, TIMESTAMP, NAME, SUMMARY, HACKATON, SECTION, START_DATE, END_DATE, PLATFORMS, RESOURCE_LINK, NR_MEMBERS, POSTS, LEADER, ACTIVE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [uuid, Date.now().toString(), team.name, team.summary, team.hackaton, team.section, team.startDate, team.endDate, JSON.stringify(platforms), team.resource_link, team.nrMembers, '', team.leader, 1], function (err, result) {
+                    if (err) {
+                        socket.emit('register team', {status: JSON.stringify(err)});
+                    }
+                    res.send({status: "successful"});
+                })
             });
         }
     });
 });
 
-router.get('/finish', function(req, res){
-    team = req.query.name;
-    con.query("UPDATE teams SET ACTIVE=0 WHERE NAME=?", [team], function(err, result){
-        if(err) throw err;
-        res.send({status:"successful"});
+router.get('/finish', function (req, res) {
+    require('../other/security').convertBase64ToUUID(req.query.BASE64, (uuid) => {
+        con.query("UPDATE teams SET ACTIVE=0 WHERE ID=?", [uuid], function (err, result) {
+            if (err) throw err;
+            res.send({status: "successful"});
+        })
     });
 });
 
-router.get('/update', function(req, res){
+router.get('/update', function (req, res) {
     team = req.query;
     let platforms = [];
     if (team.platforms) {
         platforms = team.platforms;
     }
-    con.query("UPDATE teams SET SUMMARY=?, RESOURCE_LINK=?, PLATFORMS=?, HACKATON=?, SECTION=?, START_DATE=?, END_DATE=? WHERE NAME=?", [team.summary, team.resource_link, JSON.stringify(platforms), team.hackaton, team.section, team.startDate, team.endDate, team.name], function(err, result){
-        if(err) throw err;
-        res.send({status:"successful"});
+    require('../other/security').convertBase64ToUUID(team.id, (uuid) => {
+        con.query("UPDATE teams SET SUMMARY=?, RESOURCE_LINK=?, PLATFORMS=?, HACKATON=?, SECTION=?, START_DATE=?, END_DATE=? WHERE ID=?", [team.summary, team.resource_link, JSON.stringify(platforms), team.hackaton, team.section, team.startDate, team.endDate, uuid], function (err, result) {
+            if (err) throw err;
+            res.send({status: "successful"});
+        })
     });
 });
 
@@ -103,10 +109,12 @@ router.get('/remove-member', (req, res) => {
     members.splice(index, 1);
     // console.log(members);
     let newMembers = '';
-    members.forEach((member) => newMembers += member+',')
-    con.query('UPDATE teams SET POSTS = ? WHERE ID = ?', [newMembers, team.ID], (err, result) => {
-        if(err) throw err;
-        res.send({status: 'successful'})
+    members.forEach((member) => newMembers += member + ',');
+    require('../other/security').convertBase64ToUUID(team.ID, (uuid) => {
+        con.query('UPDATE teams SET POSTS = ? WHERE ID = ?', [newMembers, uuid], (err, result) => {
+            if (err) throw err;
+            res.send({status: 'successful'})
+        })
     });
 });
 
@@ -116,22 +124,23 @@ router.get('/:team', function (req, res) {
 
     if (req.params.team == 'create')
         return;
-
-    con.query("SELECT * FROM teams WHERE NAME = ? LIMIT 1", [req.params.team], function (err, result, fields) {
-        if (err) throw err;
-        if (result[0]) {
-            res.render('pages/team-page', {email: req.cookies.username, tab: '3', team: result[0]});
-        }
-        else {
-            res.render('pages/404.ejs', {
-                message_main: "The team you're looking for does not exist (404)",
-                message_redirect: `Click <a href=\"/teams\">here</a> to go back`,
-                message_page: "Requested team: " + req.params.team
-            });
-        }
+    require('../other/security').convertBase64ToUUID(req.params.team, (uuid) => {
+        con.query("SELECT * FROM teams WHERE ID = ? LIMIT 1", [uuid], function (err, result, fields) {
+            if (err) throw err;
+            if (result[0]) {
+                result[0].BASE64 = req.params.team;
+                res.render('pages/team-page', {email: req.cookies.username, tab: '3', team: result[0]});
+            }
+            else {
+                res.render('pages/404.ejs', {
+                    message_main: "The team you're looking for does not exist (404)",
+                    message_redirect: `Click <a href=\"/teams\">here</a> to go back`,
+                    message_page: "Requested team: " + req.params.team
+                });
+            }
+        })
     });
 });
-
 
 
 router.get('/edit/:team', function (req, res) {
@@ -142,27 +151,29 @@ router.get('/edit/:team', function (req, res) {
 
     if (req.params.team == 'create')
         return;
-
-    con.query("SELECT * FROM teams WHERE NAME = ? LIMIT 1", [req.params.team], function (err, result, fields) {
-        if (err) throw err;
-        if (result[0]) {
-            if(result[0].LEADER != req.cookies.username) {
+    require('../other/security').convertBase64ToUUID(req.params.team, (uuid) => {
+        con.query("SELECT * FROM teams WHERE ID = ? LIMIT 1", [uuid], function (err, result, fields) {
+            if (err) throw err;
+            if (result[0]) {
+                if (result[0].LEADER != req.cookies.username) {
+                    res.render('pages/404.ejs', {
+                        message_main: "You are not allowed to edit the team (403)",
+                        message_redirect: `Click <a href=\"/teams/${req.params.team}\">here</a> to go back`,
+                        message_page: "Requested team: " + req.params.team
+                    });
+                } else {
+                    result[0].BASE64 = req.params.team;
+                    res.render('pages/edit-team', {email: req.cookies.username, tab: '3', team: result[0]});
+                }
+            }
+            else {
                 res.render('pages/404.ejs', {
-                    message_main: "You are not allowed to edit the team (403)",
-                    message_redirect: `Click <a href=\"/teams/${req.params.team}\">here</a> to go back`,
+                    message_main: "The team you're looking for does not exist (404)",
+                    message_redirect: `Click <a href=\"/teams\">here</a> to go back`,
                     message_page: "Requested team: " + req.params.team
                 });
-            }else {
-            res.render('pages/edit-team', {email: req.cookies.username, tab: '3', team: result[0]});
             }
-        }
-        else{
-            res.render('pages/404.ejs', {
-                message_main: "The team you're looking for does not exist (404)",
-                message_redirect: `Click <a href=\"/teams\">here</a> to go back`,
-                message_page: "Requested team: " + req.params.team
-            });
-        }
+        })
     });
 });
 

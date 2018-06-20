@@ -95,7 +95,7 @@
                             <% if (email != team.LEADER && team.ACTIVE && !joined) { %>
                             <button class="my-3 btn btn-lg btn-block font-weight-bold" id="join">Join</button>
                             <% } else if (team.ACTIVE && email == team.LEADER) { %>
-                            <button class="my-3 btn btn-lg btn-block font-weight-bold" id="editBtn">Edit Team</button>
+                            <a href="/teams/edit/<%=team.BASE64%>" class="my-3 btn btn-lg btn-block font-weight-bold" id="editBtn">Edit Team</a>
                             <% } else if(!team.ACTIVE){ %>
                             <h5 class="font-weight-bold">This project was marked as inactive<br> (no longer searching for participants)</h5>
                             <% } %>
@@ -107,7 +107,6 @@
         </div>
     </div>
 </div>
-<h1 style="display: none" id="teamNAME"><%= team.NAME %></h1>
 <% include ../partials/socket-notification.ejs %>
 <script type="text/javascript">
     $("#join").on('click', function () {
@@ -116,6 +115,7 @@
         let leadern = <%- JSON.stringify(team.LEADER) %>;
         socket.emit('request join team', {
             username: $.cookie('username'),
+            teamUUID: '<%-team.BASE64%>',
             teamName: teamname,
             leader: leadern,
             token: 'alabalaportocala'
@@ -130,24 +130,7 @@
         });
 
     });
-    $("#editBtn").on('click', function () {
-        let name = document.getElementById("titleTeam").innerHTML
-        window.location.href = "/teams/edit/" + name;
-    })
-    $("#finish").on('click', function () {
-        team = {name: document.getElementById("titleTeam").innerHTML};
-        $.ajax({
-            data: team,
-            type: 'GET',
-            url: 'http://localhost:3000/teams/finish',
-            success: function (res) {
-                console.log(res.status);
-                if (res.status === 'successful')
-                    window.location.href = '/teams/' + team.name;
-                else alert(res.status);
-            }
-        });
-    });
+
 </script>
 </body>
 

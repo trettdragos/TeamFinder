@@ -116,7 +116,7 @@
                             <% if(email != project.FOUNDER && project.ACTIVE && !joined) { %>
                             <button class="my-3 btn btn-lg btn-block font-weight-bold" id="join">Join</button>
                             <% } else if(project.ACTIVE && email == project.FOUNDER) { %>
-                            <button class="my-3 btn btn-lg btn-block font-weight-bold" id="edit" >Edit Project</button>
+                            <a href="/projects/edit/<%=project.BASE64%>" class="my-3 btn btn-lg btn-block font-weight-bold">Edit Project</a>
                             <% } else if(!project.ACTIVE){ %>
                             <h5 class="font-weight-bold">This project was marked as inactive<br> (no longer searching for participants)
                             </h5>
@@ -137,7 +137,8 @@
         let leader = <%- JSON.stringify(project.FOUNDER) %>;
         socket.emit('request join project', {
             username: $.cookie('username'),
-            projectName: projectName,
+            projectName: '<%-project.NAME%>',
+            projectUUID: '<%-project.BASE64%>',
             leader: leader,
             token: 'alabalaportocala'
         });
@@ -151,11 +152,6 @@
         });
 
     });
-
-    $("#edit").on('click', function () {
-        name = document.getElementById("project_name").innerHTML;
-        window.location.href = '/projects/edit/' + name;
-    })
 </script>
 </body>
 

@@ -43,7 +43,8 @@ io.on('connection', function (socket) {
             if (err) throw err;
             if (result) {
                 let notifications = JSON.parse(result[0].NOTIFICATION);
-                let id = req.username + req.teamName;
+                let id = req.username;
+                require('./other/security').convertBase64ToUUID(req.teamUUID, (uuid) => id += uuid);
                 id = id.replace('/', '');
                 id = id.replace('@', '');
                 id = id.replace('.', '');
@@ -92,7 +93,8 @@ io.on('connection', function (socket) {
                 if (err) throw err;
                 if (result) {
                     let notifications = JSON.parse(result[0].NOTIFICATION);
-                    let id = req.username + req.projectName;
+                    let id = req.username;
+                    require('./other/security').convertBase64ToUUID(req.projectUUID, (uuid) => id += uuid);
                     id = id.replace('/', '');
                     id = id.replace('@', '');
                     id = id.replace('.', '');

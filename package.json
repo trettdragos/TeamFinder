@@ -32,6 +32,7 @@
     "socket.io": "^2.0.4",
     "socket.io-bundle": "^0.1.2",
     "tiny-worker": "^2.1.2",
+    "uuid-base64": "^1.0.0",
     "webworker-threads": "^0.7.13",
     "xss": "^0.3.7"
   }

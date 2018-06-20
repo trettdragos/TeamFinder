@@ -4,7 +4,7 @@
 <head>
     <% include ../partials/head.ejs %>
     <link href="/vendor/bootstrap-tagsinput/tagsinput.css" rel="stylesheet"/>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.standalone.min.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.standalone.min.css" rel="stylesheet" type="text/css"/>
     <style type="text/css">
         .btn {
             background-color: #343a40;
@@ -42,7 +42,7 @@
                 <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
                     <div id="changeLinks" class="card rounded-0 align-self-center">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h1 class="text-orange display-5">Edit Team <b id="team_name"><%=team.NAME%></b></h1>
+                            <h1 class="text-orange display-5">Edit Team <b id="team_name"><%= team.NAME %></b></h1>
                         </div>
                         <div id="changeLinksContent" class="card-body" role="tabpanel">
                             <h1 id="changeLinksResponse">Internal Server Error</h1>
@@ -51,39 +51,34 @@
                                     <form id="changeLinksForm">
                                         <div class="form-group">
                                             <label for="about">About</label>
-                                            <textarea class="form-control" rows="5" id="summary"><%=team.SUMMARY%></textarea>
+                                            <textarea class="form-control" rows="5" id="summary"><%= team.SUMMARY %></textarea>
                                         </div>
                                         <div class="form-group">
                                             <label for="resource_link">Resource URL</label>
-                                            <input title="Resource URL"
-                                                   value="<%=team.RESOURCE_LINK%>"
-                                                   placeholder="Example: https://www.github.com/your_account/your_repository/"
-                                                   class="form-control" id="resource_link"/>
+                                            <input title="Resource URL" value="<%= team.RESOURCE_LINK %>" placeholder="Example: https://www.github.com/your_account/your_repository/" class="form-control" id="resource_link"/>
                                         </div>
                                         <div class="form-group">
                                             <label for="exampleFormControlSelect1">Hackaton</label>
-                                            <input required type="text" name="about" id="hackaton"
-                                                   class="form-control form-control-lg" value="<%=team.HACKATON%>">
+                                            <input required type="text" name="about" id="hackaton" class="form-control form-control-lg" value="<%= team.HACKATON %>">
                                         </div>
                                         <div class="form-group">
                                             <label for="linkedinLink">Section</label>
-                                            <input required type="text" name="about" id="section"
-                                                   class="form-control form-control-lg" value="<%=team.SECTION%>">
+                                            <input required type="text" name="about" id="section" class="form-control form-control-lg" value="<%= team.SECTION %>">
                                         </div>
                                         <div class="form-group">
                                             <label for="linkedinLink">Startting on</label>
-                                            <input type="text" class="form-control" id="datepickerStart" value="<%=team.START_DATE%>">
+                                            <input type="text" class="form-control" id="datepickerStart" value="<%= team.START_DATE %>">
                                         </div>
                                         <div class="form-group">
                                             <label for="linkedinLink">Ending on</label>
-                                            <input type="text" class="form-control" id="datepickerEnd" value="<%=team.END_DATE%>">      
+                                            <input type="text" class="form-control" id="datepickerEnd" value="<%= team.END_DATE %>">
                                         </div>
                                         <div class="form-group">
                                             <h4 id="platform">What Platform Will Your Project Be Built On?</h4>
                                             <div class="md-form">
                                                 <select title="platforms" multiple id="platformsInput" class="form-control" data-role="tagsinput">
                                                     <% JSON.parse(team.PLATFORMS).forEach((platform) => { %>
-                                                    <option value="<%=platform%>"><%=platform%></option>
+                                                    <option value="<%= platform %>"><%= platform %></option>
                                                     <% }) %>
                                                 </select>
                                             </div>
@@ -91,22 +86,23 @@
                                     </form>
                                 </div>
                             </div>
-                                <h1>Members:</h1>
-                                <% if(team.POSTS){ %>
-                                <%let collaborators = team.POSTS.trim().substr(0, team.POSTS.length - 1).split(',')%>
-                                <% for(index in collaborators) {%>
-                                <div class="row align-items-center">
-                                    <div class="col-8 d-flex flex-column">
-                                        <span class="h4"><%=collaborators[index]%></span>
-                                    </div>
-                                    <div class="col-4 d-flex flex-column-reverse">
-                                        <button class="btn mb-2 removeCollaborator" data-collaborator="<%=collaborators[index]%>">Remove<i class="fas fa-times ml-3"></i></button>
-                                    </div>
+                            <h1>Members:</h1>
+                            <% if(team.POSTS){ %>
+                            <% let collaborators = team.POSTS.trim().substr(0, team.POSTS.length - 1).split(',') %>
+                            <% for(index in collaborators) { %>
+                            <div class="row align-items-center">
+                                <div class="col-8 d-flex flex-column">
+                                    <span class="h4"><%= collaborators[index] %></span>
                                 </div>
-                                <% } %>
-                                <% } else{ %>
-                                <h5>none</h5>
-                                <% } %>
+                                <div class="col-4 d-flex flex-column-reverse">
+                                    <button class="btn mb-2 removeCollaborator" data-collaborator="<%= collaborators[index] %>">
+                                        Remove<i class="fas fa-times ml-3"></i></button>
+                                </div>
+                            </div>
+                            <% } %>
+                            <% } else{ %>
+                            <h5>none</h5>
+                            <% } %>
                             <div class="row pt-3">
                                 <div class="col-md-6 mx-auto">
                                     <button class="btn btn-primary btn-lg btn-block" id="applyBtn">Apply
@@ -119,7 +115,7 @@
                         </div>
                     </div>
                 </div>
-                
+
             </div>
         </div>
 
@@ -130,14 +126,14 @@
 <script src="/vendor/bootstrap-tagsinput/tagsinput.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js" type="text/javascript"></script>
 <script>
-       $('#datepickerStart').datepicker({
-            format: 'dd/mm/yyyy',
-            startDate: '+1d'
-        });
-       $('#datepickerEnd').datepicker({
-            format: 'dd/mm/yyyy',
-            startDate: '+1d'
-        });
+    $('#datepickerStart').datepicker({
+        format: 'dd/mm/yyyy',
+        startDate: '+1d'
+    });
+    $('#datepickerEnd').datepicker({
+        format: 'dd/mm/yyyy',
+        startDate: '+1d'
+    });
 </script>
 
 
@@ -156,43 +152,45 @@
             }
         });
     })
-    $('#applyBtn').on('click', function(){
-        team={
-            name:document.getElementById("team_name").innerHTML,
-            summary:document.getElementById('summary').value,
+    $('#applyBtn').on('click', function () {
+        team = {
+            name: document.getElementById("team_name").innerHTML,
+            BASE64: '<%- team.BASE64 %>',
+            summary: document.getElementById('summary').value,
             resource_link: $('#resource_link').val(),
             platforms: $("#platformsInput").tagsinput('items'),
-            hackaton:document.getElementById('hackaton').value,
-            section:document.getElementById('section').value,
-            startDate:document.getElementById('datepickerStart').value,
-            endDate:document.getElementById('datepickerEnd').value
+            hackaton: document.getElementById('hackaton').value,
+            section: document.getElementById('section').value,
+            startDate: document.getElementById('datepickerStart').value,
+            endDate: document.getElementById('datepickerEnd').value
         };
         $.ajax({
-            data:team,
-            type:"GET",
-            url:"http://localhost:3000/teams/update",
-            success: function(res){
+            data: team,
+            type: "GET",
+            url: "http://localhost:3000/teams/update",
+            success: function (res) {
                 console.log(res.status);
-                if(res.status==='successful')
-                    window.location.href = '/teams/'+team.name;
-                else alert(res.status); 
+                if (res.status === 'successful')
+                    window.location.href = '/teams/<%- team.BASE64 %>';
+                else alert(res.status);
             }
         });
     });
     $("#finish").on('click', function () {
-        team={name:document.getElementById("team_name").innerHTML};
         $.ajax({
-                        data:team,
-                        type: 'GET',
-                        url: 'http://localhost:3000/teams/finish',
-                        success: function(res) {
-                            console.log(res.status);
-                            if(res.status==='successful')
-                              window.location.href = '/teams/'+team.name;
-                            else alert(res.status); 
-                        }
+            data: {
+                BASE64:'<%- team.BASE64 %>'
+            },
+            type: 'GET',
+            url: 'http://localhost:3000/teams/finish',
+            success: function (res) {
+                console.log(res.status);
+                if (res.status === 'successful')
+                    window.location.href = '/teams/<%- team.BASE64 %>/';
+                else alert(res.status);
+            }
         });
-      });
+    });
 </script>
 </body>
 </html>

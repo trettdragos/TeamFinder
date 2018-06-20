@@ -1,6 +1,6 @@
 let express = require('express');
 let router = express.Router();
-tests = ['/email', '/cookie-token', '/verify-cookie-token', '/jwt', '/verify-jwt-true', '/verify-jwt-false'];
+tests = ['/email', '/cookie-token', '/verify-cookie-token', '/jwt', '/verify-jwt-true', '/verify-jwt-false', '/uuid', '/uuid-base64'];
 router.get('/', (req, res) => {
     let construct = '';
     tests.forEach((test) => {
@@ -53,6 +53,23 @@ router.get('/verify-jwt-false', (req, res) => {
     require('../other/security').verifyJWT('teo.vecerdi@gmail.com', 'EyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlby52ZWNlcmRpQGdtYWlsLmNvbSIsImlhdCI6MTUyOTQwNzY4NX0.GsSO9Jl3rUsqt8x06rIpPhra_wS7WuhNAooNEOjxpajsAAa3GueTK2LOmDMcvKwqXZlx5j1Tq1Ss5r9-r9KvGQ', (valid) => {
         res.send(`Input:<br>&nbsp;&nbsp;&nbsp;teo.vecerdi@gmail.com<br>&nbsp;&nbsp;&nbsp;EyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlby52ZWNlcmRpQGdtYWlsLmNvbSIsImlhdCI6MTUyOTQwNzY4NX0.GsSO9Jl3rUsqt8x06rIpPhra_wS7WuhNAooNEOjxpajsAAa3GueTK2LOmDMcvKwqXZlx5j1Tq1Ss5r9-r9KvGQ<br>Expected output:<br>&nbsp;&nbsp;&nbsp;false<br>Actual output:<br>&nbsp;&nbsp;&nbsp;${valid}`)
     })
+});
+
+router.get('/uuid', (req, res) => {
+    require('../other/security').getUUID((uuid) => res.send(`${uuid}`));
+    require('../other/security').getUUID((uuid) => {
+        require('../other/security').convertUUIDToBase64(uuid, (base64) => {
+            require('../other/security').convertBase64ToUUID(base64, (uuid2) => {
+                console.log(`Original UUID: ${uuid}`);
+                console.log(`Encoded Base64: ${base64}`);
+                console.log(`Decoded UUID: ${uuid2}`);
+            })
+        })
+    })
+});
+
+router.get('/uuid-base64', (req, res) => {
+    require('../other/security').getUUID((uuid) => require('../other/security').convertUUIDToBase64(uuid, (base64) => res.send(`${uuid}<br>${base64}`)));
 });
 
 module.exports = {url: '/test', router: router};

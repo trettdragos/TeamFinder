@@ -10,18 +10,13 @@ let con = mysql.createConnection({
 });
 
 router.get('/', function (req, res) {
-    con.query("SELECT * FROM projects WHERE ACTIVE=1 LIMIT 25", function (err, projects, fields) {
+    con.query("SELECT * FROM projects WHERE ACTIVE=1 ORDER BY TIMESTAMP DESC", function (err, projects, fields) {
         if (err) throw err;
-        for (i in projects) {
-            projects[i].PLATFORMS = getPlatformString(JSON.parse(projects[i].PLATFORMS));
-        }
-        con.query("SELECT * FROM teams WHERE ACTIVE=1 LIMIT 25", function (err, teams, fields) {
+        projects.forEach((project) => require('../other/security').convertUUIDToBase64(project.ID, (b64) => project.BASE64 = b64));
+        con.query("SELECT * FROM teams WHERE ACTIVE=1 ORDER BY TIMESTAMP DESC", function (err, teams, fields) {
             if (err) throw err;
-            for (i in teams) {
-                teams[i].PLATFORMS = getPlatformString(JSON.parse(teams[i].PLATFORMS));
-            }
+            teams.forEach((team) => require('../other/security').convertUUIDToBase64(team.ID, (b64) => team.BASE64 = b64));
             let list = teams.concat(projects);
-            list.reverse();
             res.render('pages/dashboard.ejs', {email: req.cookies.username, tab: '1', posts: list, term: ''});
         });
     });

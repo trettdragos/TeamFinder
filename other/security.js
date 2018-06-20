@@ -29,4 +29,8 @@ let routeTokenVerification = (req, res, next) => {
     }
 };
 
-module.exports = {encryptPassword, checkPassword, generateJWT, verifyJWT, routeTokenVerification};
+let getUUID = (cb) => {require('request').get({url: 'https://www.uuidgenerator.net/api/version4'}, (error, response, body) => cb(body.toUpperCase()))};
+let convertUUIDToBase64 = (UUID, cb) => {cb(require('uuid-base64').encode(UUID).replace(/\./g, '-'))};
+let convertBase64ToUUID = (Base64, cb) => {cb(require('uuid-base64').decode(Base64.replace(/-/g, '.')).toUpperCase())};
+
+module.exports = {encryptPassword, checkPassword, generateJWT, verifyJWT, routeTokenVerification, getUUID, convertBase64ToUUID, convertUUIDToBase64};
