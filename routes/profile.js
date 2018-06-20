@@ -75,9 +75,9 @@ router.get('/answer', (req, res) => {
 router.get('/:account_id', (req, res) => {
     // if (req.cookies.username) {
     let searchFor = '%' + req.params.account_id + '%';
-    con.query("SELECT * FROM projects WHERE COLLABORATORS LIKE ? OR FOUNDER = ?", [searchFor, req.params.account_id], function (err, projects, fields) {
+    con.query("SELECT * FROM projects WHERE COLLABORATORS LIKE ? OR FOUNDER = ? ORDER BY TIMESTAMP DESC", [searchFor, req.params.account_id], function (err, projects, fields) {
         if (err) throw err;
-        con.query("SELECT * FROM teams WHERE POSTS LIKE ? OR LEADER = ?", [searchFor, req.params.account_id], function (errTeams, teams, fields2) {
+        con.query("SELECT * FROM teams WHERE POSTS LIKE ? OR LEADER = ? ORDER BY TIMESTAMP DESC", [searchFor, req.params.account_id], function (errTeams, teams, fields2) {
             if (errTeams) throw errTeams;
             con.query("SELECT * FROM accounts WHERE EMAIL = ?", [req.params.account_id], function (err3, result, fields3) {
                 if (err3 || !result[0]) {
@@ -88,6 +88,8 @@ router.get('/:account_id', (req, res) => {
                         message_page: "Requested profile: " + req.params.account_id
                     });
                 } else {
+                    projects.forEach((project) => require('../other/security').convertUUIDToBase64(project.ID, (base64) => project.BASE64 = base64));
+                    teams.forEach((team) => require('../other/security').convertUUIDToBase64(team.ID, (base64) => team.BASE64 = base64));
                     res.render('pages/profile', {
                         username: req.cookies.username,
                         // profile: "https://identicon-api.herokuapp.com/"+req.params.account_id+"/512?format=png",
