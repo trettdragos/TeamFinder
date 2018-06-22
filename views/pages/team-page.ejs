@@ -251,7 +251,30 @@
                     <div class="chat w-100">
                         <div class="chat-history">
                             <ul class="list-unstyled" id="messages">
+                                <% for(index in messages){ %>
+                                    <% if(messages[index].from_uuid==uuid){ %>
+                                        <li class="clearfix">
+                                            <div class="message-data align-right">
+                                                <span class="message-data-time"><%=messages[index].timestamp%></span> &nbsp; &nbsp;
+                                                <span class="message-data-name"><%=messages[index].from_name%></span> <i class="fa fa-circle me"></i>
 
+                                            </div>
+                                            <div class="message other-message float-right">
+                                                <%=messages[index].message%>
+                                            </div>
+                                        </li>
+                                    <% }else{ %>
+                                        <li>
+                                            <div class="message-data">
+                                                <span class="message-data-name"><i class="fa fa-circle online"></i><%=messages[index].from_name%></span>
+                                                <span class="message-data-time"><%=messages[index].timestamp%></span>
+                                            </div>
+                                            <div class="message my-message">
+                                                <%=messages[index].message%>
+                                            </div>
+                                        </li>
+                                    <% } %>
+                                <% } %>
                             </ul>
                         </div>
                         <div class="chat-message clearfix">
@@ -293,7 +316,7 @@
                 $('#messages').append(`<li>
                         <div class="message-data">
                             <span class="message-data-name"><i class="fa fa-circle online"></i>${res.from.username}</span>
-                            <span class="message-data-time">${new Date().toLocaleTimeString("en-us", options)}</span>
+                            <span class="message-data-time">${new Date(res.time).toLocaleTimeString("en-us", options)}</span>
                         </div>
                         <div class="message my-message">
                             ${res.text}
@@ -314,9 +337,10 @@
 
         function sendMessage(){
             if ($('#message-to-send').val().trim() == '') return;
+            let date = 
             $('#messages').append(`<li class="clearfix">
                         <div class="message-data align-right">
-                            <span class="message-data-time">${new Date().toLocaleTimeString("en-us", options)}</span> &nbsp; &nbsp;
+                            <span class="message-data-time">${new Date(Date.now()).toLocaleTimeString("en-us", options)}</span> &nbsp; &nbsp;
                             <span class="message-data-name">${$.cookie('username')}</span> <i class="fa fa-circle me"></i>
 
                         </div>
@@ -325,7 +349,7 @@
                         </div>
                     </li>`);
             group_chat_socket.emit('send message', {from:{username:$.cookie('username'), uuid: $.cookie('uuid')}, to:'<%-team.ID%>', text:$('#message-to-send').val()});
-            $('#message-to-send').val('')
+            $('#message-to-send').val('');
         };
     }
     $("#join").on('click', function () {

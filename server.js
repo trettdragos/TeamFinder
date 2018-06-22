@@ -64,7 +64,15 @@ io.on('connection', function (socket) {
 
     socket.on('send message', (req) =>{
         console.log(`-------USER ${req.from.username}(${req.from.uuid}) SENT ${req.text} TO ROOM ${req.to} -------`);
-        io.to(req.to).emit('send message', {text:req.text, from:req.from});
+        let time =  Date.now();
+        console.log(req.from.uuid);
+        con.query("SELECT USERNAME FROM accounts WHERE ID = ?", [req.from.uuid], function(error, result){
+            if(error) throw error;
+                con.query("INSERT INTO group_messages (id, from_uuid, from_name, group_uuid, message, timestamp) VALUES (?, ?, ?, ?, ?, ?)", [0, req.from.uuid, result[0].USERNAME, req.to, req.text, time], function(err, resultI){
+                if(err) throw err;
+            });
+        });
+        io.to(req.to).emit('send message', {text:req.text, from:req.from, time:time});
     });
 
     socket.on('request join team', function (req) {

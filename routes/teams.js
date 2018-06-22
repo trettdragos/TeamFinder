@@ -126,7 +126,18 @@ router.get('/:team', function (req, res) {
             if (err) throw err;
             if (result[0]) {
                 result[0].BASE64 = req.params.team;
-                res.render('pages/team-page', {email: req.cookies.username, tab: '3', team: result[0]});
+                con.query("SELECT * FROM group_messages WHERE group_uuid = ?", [uuid], function(error, result2){
+                    if(error) throw error;
+                    let options = {
+                        weekday: "long", year: "numeric", month: "short",
+                        day: "numeric", hour: "2-digit", minute: "2-digit",
+                        second: '2-digit', hour12: false
+                    };
+                    for(index in result2){
+                        result2[index].timestamp = new Date(parseInt(result2[index].timestamp)).toLocaleTimeString("en-us", options);
+                    }
+                    res.render('pages/team-page', {email: req.cookies.username, uuid:req.cookies.uuid, tab: '3', team: result[0], messages:result2});
+                });
             }
             else {
                 res.render('pages/404.ejs', {
