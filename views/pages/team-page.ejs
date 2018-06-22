@@ -17,6 +17,148 @@
             color: #f5f5f5
         }
     </style>
+    <style>
+        @import url(https://fonts.googleapis.com/css?family=Lato:400,700);
+
+        *, *:before, *:after {
+            box-sizing: border-box;
+        }
+
+        .chat {
+            float: left;
+            background: #F2F5F8;
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+            color: #434651;
+        }
+
+        .chat .chat-history {
+            padding: 30px 30px 20px;
+            border-bottom: 2px solid white;
+            overflow-y: scroll;
+            height: 575px;
+        }
+
+        .chat .chat-history .message-data {
+            margin-bottom: 15px;
+        }
+
+        .chat .chat-history .message-data-time {
+            color: #a8aab1;
+            padding-left: 6px;
+        }
+
+        .chat .chat-history .message {
+            color: white;
+            padding: 18px 20px;
+            line-height: 26px;
+            font-size: 16px;
+            border-radius: 7px;
+            margin-bottom: 30px;
+            width: 90%;
+            position: relative;
+        }
+
+        .chat .chat-history .message:after {
+            bottom: 100%;
+            left: 7%;
+            border: solid transparent;
+            content: " ";
+            height: 0;
+            width: 0;
+            position: absolute;
+            pointer-events: none;
+            border-bottom-color: #86BB71;
+            border-width: 10px;
+            margin-left: -10px;
+        }
+
+        .chat .chat-history .my-message {
+            background: #86BB71;
+        }
+
+        .chat .chat-history .other-message {
+            background: #94C2ED;
+        }
+
+        .chat .chat-history .other-message:after {
+            border-bottom-color: #94C2ED;
+            left: 93%;
+        }
+
+        .chat .chat-message {
+            padding: 30px;
+        }
+
+        .chat .chat-message textarea {
+            width: 100%;
+            border: none;
+            padding: 10px 20px;
+            font: 14px/22px "Lato", Arial, sans-serif;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            resize: none;
+        }
+
+        .chat .chat-message .fa-file-o, .chat .chat-message .fa-file-image-o {
+            font-size: 16px;
+            color: gray;
+            cursor: pointer;
+        }
+
+        .chat .chat-message button {
+            float: right;
+            color: #94C2ED;
+            font-size: 16px;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            background: #F2F5F8;
+        }
+
+        .chat .chat-message button:hover {
+            color: #75b1e8;
+        }
+
+        .online, .offline, .me {
+            margin-right: 3px;
+            font-size: 10px;
+        }
+
+        .online {
+            color: #86BB71;
+        }
+
+        .offline {
+            color: #E38968;
+        }
+
+        .me {
+            color: #94C2ED;
+        }
+
+        .align-left {
+            text-align: left;
+        }
+
+        .align-right {
+            text-align: right;
+        }
+
+        .float-right {
+            float: right;
+        }
+
+        .clearfix:after {
+            visibility: hidden;
+            display: block;
+            font-size: 0;
+            content: " ";
+            clear: both;
+            height: 0;
+        }
+    </style>
 </head>
 <body>
 <% if(!email){ %>
@@ -92,7 +234,6 @@
                             <% } %>
                         </div>
                         <div class="card-footer">
-                            <button class="my-3 btn btn-lg btn-block font-weight-bold" id="send">Send message (debug)</button>
                             <% if (email != team.LEADER && team.ACTIVE && !joined) { %>
                             <button class="my-3 btn btn-lg btn-block font-weight-bold" id="join">Join</button>
                             <% } else if (team.ACTIVE && email == team.LEADER) { %>
@@ -104,13 +245,34 @@
                     </div>
                 </div>
             </div>
+            <% if(joined) { %>
+            <div class="card my-4">
+                <div class="card-body">
+                    <div class="chat w-100">
+                        <div class="chat-history">
+                            <ul class="list-unstyled" id="messages">
 
+                            </ul>
+                        </div>
+                        <div class="chat-message clearfix">
+                            <textarea name="message-to-send" id="message-to-send" placeholder="Type your message" rows="3"></textarea>
+                            <button id="send">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% } %>
         </div>
     </div>
 </div>
 <% include ../partials/socket-notification.ejs %>
 <script type="text/javascript">
     let posts = '<%-team.POSTS%>'
+    let options = {
+        weekday: "long", year: "numeric", month: "short",
+        day: "numeric", hour: "2-digit", minute: "2-digit",
+        second: '2-digit', hour12: false
+    };
     let participants = posts.trim().substr(0, posts.length - 1).split(',');
     if (participants.includes($.cookie('username')) || $.cookie('username') == '<%-team.LEADER%>'){
         let group_chat_socket = io.connect();
@@ -121,11 +283,38 @@
                 uuid: $.cookie('uuid')
             }
         });
+
+        group_chat_socket.on('new user to chat', function(res){
+            $('#messages').append('<center><p>User '+res.from+' has joined the chat</p></center>');
+        });
+
         group_chat_socket.on('send message', function(res){
-            alert(res.text);
+            if(res.from.username != $.cookie('username')){
+                $('#messages').append(`<li>
+                        <div class="message-data">
+                            <span class="message-data-name"><i class="fa fa-circle online"></i>${res.from.username}</span>
+                            <span class="message-data-time">${new Date().toLocaleTimeString("en-us", options)}</span>
+                        </div>
+                        <div class="message my-message">
+                            ${res.text}
+                        </div>
+                    </li>`);
+            } 
         });
         $("#send").on('click', function(){
-            group_chat_socket.emit('send message', {from:{username:$.cookie('username'), uuid: $.cookie('uuid')}, to:'<%-team.ID%>', text:"ana are mere"});
+            if ($('#message-to-send').val().trim() == '') return;
+            $('#messages').append(`<li class="clearfix">
+                        <div class="message-data align-right">
+                            <span class="message-data-time">${new Date().toLocaleTimeString("en-us", options)}</span> &nbsp; &nbsp;
+                            <span class="message-data-name">${$.cookie('username')}</span> <i class="fa fa-circle me"></i>
+
+                        </div>
+                        <div class="message other-message float-right">
+                            ${$('#message-to-send').val()}
+                        </div>
+                    </li>`);
+            group_chat_socket.emit('send message', {from:{username:$.cookie('username'), uuid: $.cookie('uuid')}, to:'<%-team.ID%>', text:$('#message-to-send').val()});
+            $('#message-to-send').val('')
         });
     }
     $("#join").on('click', function () {
