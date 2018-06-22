@@ -55,6 +55,17 @@ io.on('connection', function (socket) {
        let to = connectedUsers[res.to_uuid].socket;
        to.emit('receive chat', {from: [res.uuid, res.name], message: res.message});
     });
+
+    socket.on('join room', (req) =>{
+        console.log("-------USER"+req.user+" REQUESTING TO JOIN ROOM ------"+req.chat_name);
+        socket.join(req.chat_name);
+        io.to(req.chat_name).emit('send message', {text:req.user+" has joined the chat"});
+    });
+
+    socket.on('send message', (req) =>{
+        io.to(req.to).emit('send message', {text:req.text, from:req.from});
+    });
+
     socket.on('request join team', function (req) {
         // console.log("client " + req.username + " requested to join team " + req.teamName + " of user " + req.leader + " with token " + req.token);
         con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ? LIMIT 1", [req.leader], function (err, result, fields) {

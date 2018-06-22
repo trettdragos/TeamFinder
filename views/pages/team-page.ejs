@@ -109,6 +109,21 @@
 </div>
 <% include ../partials/socket-notification.ejs %>
 <script type="text/javascript">
+    let posts = '<%-team.POSTS%>'
+    let participants = posts.trim().substr(0, posts.length - 1).split(',');
+    if (participants.includes($.cookie('username')) || $.cookie('username') == '<%-team.LEADER%>'){
+        let group_chat_socket = io.connect();
+        group_chat_socket.emit('join room', {
+            chat_name:'<%-team.ID%>',
+            user:$.cookie('username')
+        });
+        group_chat_socket.on('send message', function(res){
+            alert(res.text);
+        });
+        $("#send").on('click', function(){
+            group_chat_socket.emit('send message', {from:$.cookie('username'), to:'<%-team.ID%>', text:"ana are mere"});
+        });
+    }
     $("#join").on('click', function () {
         let socket = io.connect();
         let teamname = <%- JSON.stringify(team.NAME) %>;
