@@ -38,6 +38,7 @@ router.get('/auth', function (req, res) {
                                 status: "successful",
                                 token: token,
                                 email: user.email,
+                                uuid: result[0].ID,
                                 notifications: JSON.stringify(result[0].NOTIFICATION),
                                 newNotif: newNotif
                             });

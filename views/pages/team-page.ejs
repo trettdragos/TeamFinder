@@ -44,7 +44,7 @@
                             <hr class="my-4">
                             <%
                             let joined = false;
-                            console.log(team.POSTS.trim().substr(0, team.POSTS.length - 1).split(',').length);
+                            // console.log(team.POSTS.trim().substr(0, team.POSTS.length - 1).split(',').length);
                             let participants = team.POSTS.trim().substr(0, team.POSTS.length - 1).split(',');
                             if (participants.includes(email) || email == team.LEADER) joined = true
                             %>
@@ -92,6 +92,7 @@
                             <% } %>
                         </div>
                         <div class="card-footer">
+                            <button class="my-3 btn btn-lg btn-block font-weight-bold" id="send">Send message (debug)</button>
                             <% if (email != team.LEADER && team.ACTIVE && !joined) { %>
                             <button class="my-3 btn btn-lg btn-block font-weight-bold" id="join">Join</button>
                             <% } else if (team.ACTIVE && email == team.LEADER) { %>
@@ -115,13 +116,16 @@
         let group_chat_socket = io.connect();
         group_chat_socket.emit('join room', {
             chat_name:'<%-team.ID%>',
-            user:$.cookie('username')
+            user: {
+                username: $.cookie('username'),
+                uuid: $.cookie('uuid')
+            }
         });
         group_chat_socket.on('send message', function(res){
             alert(res.text);
         });
         $("#send").on('click', function(){
-            group_chat_socket.emit('send message', {from:$.cookie('username'), to:'<%-team.ID%>', text:"ana are mere"});
+            group_chat_socket.emit('send message', {from:{username:$.cookie('username'), uuid: $.cookie('uuid')}, to:'<%-team.ID%>', text:"ana are mere"});
         });
     }
     $("#join").on('click', function () {

@@ -57,12 +57,15 @@ io.on('connection', function (socket) {
     });
 
     socket.on('join room', (req) =>{
-        console.log("-------USER"+req.user+" REQUESTING TO JOIN ROOM ------"+req.chat_name);
+        // console.log("-------USER "+req.user+" REQUESTING TO JOIN ROOM "+req.chat_name+ " -------");
+        console.log(`-------USER ${req.user.username}(${req.user.uuid}) REQUESTING TO JOIN ROOM ${req.chat_name} -------`);
         socket.join(req.chat_name);
-        io.to(req.chat_name).emit('send message', {text:req.user+" has joined the chat"});
+        io.to(req.chat_name).emit('send message', {text:req.user.username+" has joined the chat"});
     });
 
     socket.on('send message', (req) =>{
+        console.log(`-------USER ${req.from.username}(${req.from.uuid}) SENT ${req.text} TO ROOM ${req.to} -------`);
+        // console.log("-------USER "+req.user+" SENT " + req.text+ " TO ROOM "+req.chat_name+ " -------");
         io.to(req.to).emit('send message', {text:req.text, from:req.from});
     });
 

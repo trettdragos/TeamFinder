@@ -68,6 +68,7 @@
                 console.log(res.status);
                 if (res.status == "successful") {
                     $.cookie('username', res.email, {expires: 7, path: '/'});
+                    $.cookie('uuid', res.uuid, {expires: 7, path: '/'});
                     $.cookie('token', res.token, {expires: 7, path: '/'});
                     $.cookie('notifications', JSON.stringify(res.notifications), {expires: 7, path: '/'});
                     $.cookie('newNotif', res.newNotif, {expires: 7, path: '/'});
