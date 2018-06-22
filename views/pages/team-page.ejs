@@ -196,10 +196,13 @@
                             <% } %>
                             <label for="comment">Section</label>
                             <h5><%= team.SECTION %></h5>
+                            <!--`${('00' + d.getDate()).slice(-2)}/${('00' + (d.getMonth() + 1)).slice(-2)}/${d.getFullYear()}`-->
                             <label for="comment">Start Date</label>
-                            <h5><%= team.START_DATE %></h5>
+                            <% let ds = new Date(parseInt(team.START_DATE))%>
+                            <h5><%= `${('00' + ds.getDate()).slice(-2)}/${('00' + (ds.getMonth() + 1)).slice(-2)}/${ds.getFullYear()}` %></h5>
                             <label for="comment">End Date</label>
-                            <h5><%= team.END_DATE %></h5>
+                            <% let de = new Date(parseInt(team.END_DATE))%>
+                            <h5><%= `${('00' + de.getDate()).slice(-2)}/${('00' + (de.getMonth() + 1)).slice(-2)}/${de.getFullYear()}` %></h5>
                             <label for="comment">Platforms</label><br>
                             <% JSON.parse(team.PLATFORMS).forEach((platform) => { %>
                             <span class="tags teal"><%= platform %></span>

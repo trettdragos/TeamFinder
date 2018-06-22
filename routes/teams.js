@@ -104,9 +104,9 @@ router.get('/remove-member', (req, res) => {
     let team = req.query.team;
     let members = team.POSTS.trim().substr(0, team.POSTS.length - 1).split(',');
     let index = members.indexOf(req.query.collaborator);
-    console.log(members);
+    debug.log(members);
     members.splice(index, 1);
-    console.log(members);
+    debug.log(members);
     let newMembers = '';
     members.forEach((member) => newMembers += member + ',');
     con.query('UPDATE teams SET POSTS = ? WHERE ID = ?', [newMembers, team.ID], (err, result) => {
@@ -155,7 +155,7 @@ router.get('/edit/:team', function (req, res) {
     if (!req.cookies.username)
         res.redirect('/login');
 
-    // console.log('Access teams from page: ' + req.params.team);
+    // debug.log('Access teams from page: ' + req.params.team);
 
     if (req.params.team == 'create')
         return;

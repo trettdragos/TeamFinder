@@ -60,9 +60,9 @@ router.get('/uuid', (req, res) => {
     require('../other/security').getUUID((uuid) => {
         require('../other/security').convertUUIDToBase64(uuid, (base64) => {
             require('../other/security').convertBase64ToUUID(base64, (uuid2) => {
-                console.log(`Original UUID: ${uuid}`);
-                console.log(`Encoded Base64: ${base64}`);
-                console.log(`Decoded UUID: ${uuid2}`);
+                debug.log(`Original UUID: ${uuid}`);
+                debug.log(`Encoded Base64: ${base64}`);
+                debug.log(`Decoded UUID: ${uuid2}`);
             })
         })
     })

@@ -18,7 +18,7 @@ router.get('/', (req, res) => {
 router.get('/edit', (req, res) => {
     con.query('SELECT * FROM accounts WHERE EMAIL = ?', [req.cookies.username], (db_err, db_res) => {
         if (db_err) throw db_err;
-        // console.log(db_res[0].PROFILE);
+        // debug.log(db_res[0].PROFILE);
         res.render('pages/edit-profile.ejs', {
             username: req.cookies.username,
             tab: '4',
@@ -30,7 +30,7 @@ router.get('/edit', (req, res) => {
 
 router.get('/answer', (req, res) => {
     notification = req.query;
-    // console.log(notification);
+    // debug.log(notification);
     con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ?", [notification.leader], function (err, result) {
         if (err) throw err;
         let stringNotif = result[0].NOTIFICATION;
@@ -44,7 +44,7 @@ router.get('/answer', (req, res) => {
         con.query("UPDATE accounts SET NOTIFICATION = ? WHERE EMAIL = ?", [stringNotif, notification.leader], function (err2, result2) {
             if (err2) throw err2;
             if (result2.affectedRows != 0) {
-                // console.log('updated notifications for leader');
+                // debug.log('updated notifications for leader');
                 if (notification.status === "accept") {
                     let table = notification.type + 's';
                     let col;
@@ -61,7 +61,7 @@ router.get('/answer', (req, res) => {
                         con.query("UPDATE " + table + " SET " + col + " = ? WHERE NAME = ?", [coll, notification.name], function (err4, result4) {
                             if (err4) throw err4;
                             if (result4.affectedRows != 0) {
-                                // console.log('added requester as colaborator');
+                                // debug.log('added requester as colaborator');
                                 res.send({status: "successful"});
                             }
                         });
@@ -114,7 +114,7 @@ router.post('/update-profile', (req, res) => {
     switch (req_data.action) {
         case 'CHANGE_PASSWORD': {
             let data = JSON.parse(req_data.body);
-            // console.log(data);
+            // debug.log(data);
             con.query('SELECT PASSWORD FROM accounts WHERE EMAIL = ?', [req.cookies.username], (err, db_res) => {
                 if (err) throw err;
                 security.checkPassword(data.currentPassword, db_res[0].PASSWORD, (ok) => {

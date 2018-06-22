@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <% include ../partials/head.ejs %>
+    <link href="/vendor/bootstrap-tagsinput/tagsinput.css" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.standalone.min.css" rel="stylesheet" type="text/css"/>
+
+    <style type="text/css">
+        span.tags {
+            background: #ffffff;
+            border-radius: 2px;
+            color: #000;
+            font-weight: bold;
+            padding: 2px 4px;
+        }
+
+        span.tags.teal {
+            background: #1abc9c;
+            color: #f5f5f5
+        }
+
+        .search {
+            background-color: #1d2124;
+            border-radius: 20px 20px 0 0;
+            /*transition: all 100ms ease-in;*/
+            cursor: pointer;
+        }
+
+        .search.collapsed, .search-contents.collapsed {
+            border-radius: 20px;
+            /*transition: all 700ms ease-out;*/
+        }
+
+        .search-contents {
+            background-color: #2b3135;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .collapsing {
+            -webkit-transition: none;
+            transition: none;
+            display: none;
+        }
+
+        .noselect {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .tab-pane {
+            background-color: #1d2124;
+            border-radius: 10px;
+        }
+
+        .material-switch > input[type="checkbox"] {
+            display: none;
+        }
+
+        .material-switch > label {
+            cursor: pointer;
+            height: 0px;
+            position: relative;
+            width: 40px;
+        }
+
+        .material-switch > label::before {
+            background: rgb(0, 0, 0);
+            box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            content: '';
+            height: 16px;
+            margin-top: -8px;
+            position: absolute;
+            opacity: 0.3;
+            transition: all 0.4s ease-in-out;
+            width: 40px;
+        }
+
+        .material-switch > label::after {
+            background: rgb(255, 255, 255);
+            border-radius: 16px;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+            content: '';
+            height: 24px;
+            left: -4px;
+            margin-top: -8px;
+            position: absolute;
+            top: -4px;
+            transition: all 0.3s ease-in-out;
+            width: 24px;
+        }
+
+        .material-switch > input[type="checkbox"]:checked + label::before {
+            background: inherit;
+            opacity: 0.5;
+        }
+
+        .material-switch > input[type="checkbox"]:checked + label::after {
+            background: inherit;
+            left: 20px;
+        }
+    </style>
+</head>
+
+<body>
+<% include ../partials/header.ejs %>
+<!-- START OF BODY -->
+<div class="container">
+    <div class="row mt-3 py-2 px-1 search collapsed noselect">
+        <div class="col-1 text-white">
+            <i class="fas fa-angle-right search-icon"></i>
+        </div>
+        <div class="col-11 text-white font-weight-bold">Advanced search</div>
+    </div>
+    <div class="row collapse search-contents collapsed py-2 px-1 text-white">
+        <div class="col-12">
+            <ul class="nav nav-tabs nav-justified">
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="#panel1" role="tab">Projects</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#panel2" role="tab">Teams</a>
+                </li>
+            </ul>
+            <div class="tab-content mb-2 mt-2">
+                <div class="tab-pane p-3 active show" id="panel1" role="tabpanel">
+                    <div class="row">
+                        <form class="col-12" id="projectSearchForm">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label for="projectName">Name search</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="material-switch pull-right" style="float: right">
+                                            <input id="projectNameCheck" name="projectNameCheck" type="checkbox"/>
+                                            <label for="projectNameCheck" class="label-success success-color"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="text" class="form-control" name="projectName" placeholder="Enter project name">
+                            </div>
+                            <div class="form-group">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <label for="commitmentLevel">Commitment search</label>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="material-switch pull-right" style="float: right">
+                                                <input id="commitmentLevelCheck" name="commitmentLevelCheck" type="checkbox"/>
+                                                <label for="commitmentLevelCheck" class="label-success success-color"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <select class="form-control" name="commitmentLevel" id="commitmentLevel">
+                                        <option>Contractual</option>
+                                        <option>Part-time</option>
+                                        <option>Full-time</option>
+                                        <option>Co-founder</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <hr class="my-4">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label for="national">Country search</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="material-switch pull-right" style="float: right">
+                                            <input id="nationalCheck" name="nationalCheck" type="checkbox"/>
+                                            <label for="nationalCheck" class="label-success success-color"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="checkbox" id="national" name="national" data-toggle="toggle">
+                            </div>
+                            <hr class="my-4">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label for="national">Platform search</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="material-switch pull-right" style="float: right">
+                                            <input id="platformsInputCheck" name="platformsInputCheck" type="checkbox"/>
+                                            <label for="platformsInputCheck" class="label-success success-color"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="md-form">
+                                    <input title="skills" type="text" name="platformsInput" class="form-control" data-role="tagsinput">
+                                </div>
+                            </div>
+                            <hr class="my-4">
+                            <div class="form-group">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <label for="stage">Stage search</label>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="material-switch pull-right" style="float: right">
+                                                <input id="stageCheck" name="stageCheck" type="checkbox"/>
+                                                <label for="stageCheck" class="label-success success-color"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <select class="form-control" id="stage" name="stage">
+                                        <option>Ideea Stage</option>
+                                        <option>Prototype Already Build</option>
+                                        <option>Live-version available</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <hr class="my-4">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label for="budget">Budget search</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="material-switch pull-right" style="float: right">
+                                            <input id="budgetCheck" name="budgetCheck" type="checkbox"/>
+                                            <label for="budgetCheck" class="label-success success-color"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <select class="form-control" id="budget" name="budget">
+                                    <option>$0-$1,000</option>
+                                    <option>$1,000-$5,000</option>
+                                    <option>$5,000-$10,000</option>
+                                    <option>$10,000-$25,000</option>
+                                    <option>$25,000-$50,000</option>
+                                    <option>$50,000-$100,000</option>
+                                    <option>$100,000+</option>
+                                </select>
+                            </div>
+                            <hr class="my-4">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label for="funding">Funding search</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="material-switch pull-right" style="float: right">
+                                            <input id="fundingCheck" name="fundingCheck" type="checkbox"/>
+                                            <label for="fundingCheck" class="label-success success-color"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="checkbox" id="funding" name="funding" data-toggle="toggle">
+                            </div>
+                            <button class="btn btn-block search-button" data-search-type="projects">Search
+                                Projects
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <div class="tab-pane p-3" id="panel2" role="tabpanel">
+                    <div class="row">
+                        <form class="col-12" id="teamSearchForm">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label for="teamName">Name search</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="material-switch pull-right" style="float: right">
+                                            <input id="teamNameCheck" name="teamNameCheck" type="checkbox"/>
+                                            <label for="teamNameCheck" class="label-success success-color"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="text" class="form-control" name="teamName" placeholder="Enter team name">
+                            </div>
+                            <hr class="my-4">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label for="platformsTeamInput">Platform search</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="material-switch pull-right" style="float: right">
+                                            <input id="platformsTeamInputCheck" name="platformsTeamInputCheck" type="checkbox"/>
+                                            <label for="platformsTeamInputCheck" class="label-success success-color"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="md-form">
+                                    <input title="skills" type="text" name="platformsTeamInput" class="form-control" data-role="tagsinput">
+                                </div>
+                            </div>
+                            <hr class="my-4">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label for="teamHackaton">Hackaton search</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="material-switch pull-right" style="float: right">
+                                            <input id="teamHackatonCheck" name="teamHackatonCheck" type="checkbox"/>
+                                            <label for="teamHackatonCheck" class="label-success success-color"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="text" class="form-control" name="teamHackaton" placeholder="Enter team hackaton">
+                            </div>
+                            <hr class="my-4">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label for="teamDate">Date search</label>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="material-switch pull-right" style="float: right">
+                                            <input id="teamDateCheck" name="teamDateCheck" type="checkbox"/>
+                                            <label for="teamDateCheck" class="label-success success-color"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="date-range">
+                                    <div class="row text-center">
+                                        <div class="col-6">Starting on</div>
+                                        <div class="col-6">Ending on</div>
+                                    </div>
+                                    <div class="input-daterange input-group" id="datepicker">
+                                        <input type="text" class="input-sm form-control" id="date_start" name="date_start"/>
+                                        <input type="text" class="input-sm form-control" id="date_end" name="date_end"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-block search-button" data-search-type="teams">Search
+                                Teams
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="search-results">
+
+    </div>
+</div>
+<!-- END OF BODY -->
+<% include ../partials/footer.ejs %>
+<% include ../partials/socket-notification.ejs %>
+<script src="/vendor/bootstrap-tagsinput/tagsinput.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js" type="text/javascript"></script>
+
+<script>
+    $.fn.serializeArrayWithCheckboxes = function () {
+        let rCRLF = /\r?\n/g;
+        return this.map(function () {
+            return this.elements ? jQuery.makeArray(this.elements) : this;
+        })
+
+            .map(function (i, elem) {
+                var val = jQuery(this).val();
+
+
+                if (val == null) {
+                    return val == null
+                    //next 2 lines of code look if it is a checkbox and set the value to blank
+                    //if it is unchecked
+                } else if (this.type == "checkbox" && this.checked == false) {
+                    return {name: this.name, value: this.checked ? this.value : ""}
+                    //next lines are kept from default jQuery implementation and
+                    //default to all checkboxes = on
+                } else {
+                    return jQuery.isArray(val) ?
+                        jQuery.map(val, function (val, i) {
+                            return {name: elem.name, value: val.replace(rCRLF, "\r\n")};
+                        }) :
+                        {name: elem.name, value: val.replace(rCRLF, "\r\n")};
+                }
+            }).get();
+    };
+
+    toggleCollapseSearch()
+
+    $('.date-range .input-daterange').datepicker({
+        format: "dd/mm/yyyy",
+        clearBtn: true,
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    $('.search').on('click', () => {
+        toggleCollapseSearch()
+    });
+    $('#projectSearchForm, #teamSearchForm').on('submit', function () {
+        return false;
+    })
+    $('.search-button').on('click', function () {
+        console.log(`Search ${$(this).data('search-type')}`);
+        if ($(this).data('search-type') == 'projects') {
+            let data = objectifyForm($('#projectSearchForm').serializeArrayWithCheckboxes());
+            $.ajax({
+                    data: data,
+                    type: 'GET',
+                    url: 'http://localhost:3000/advanced-search/projects',
+                    success: function (res) {
+                        console.log(res);
+                        if (res.status == 'successful') {
+                            toggleCollapseSearch();
+                            window.scrollTo(0, 0);
+                            $('.search-results').html('');
+                            res.projects.forEach((project) => {
+                                let platforms = ``;
+                                JSON.parse(project.PLATFORMS).reverse().forEach((platform) => {
+                                    platforms += `<span style="float: right" class="tags teal ml-2 h5">${platform}</span>`
+                                })
+                                $('.search-results').append(`<div class="row">
+                                <div class="col-lg-12 text-left">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <h4 class="card-title display-6 font-weight-bold">${project.NAME}</h4>
+                                                </div>
+                                                <div class="col-6">
+                                                   ${platforms}
+                                                </div>
+                                            </div>
+                                            <hr class="my-4">
+                                            <h5>${project.SUMMARY}</h5>
+                                            <a href="/projects/${project.BASE64}" style="color: #00e500" class="d-flex flex-row-reverse p-2">
+                                                <p class="waves-effect waves-light px-4 py-3 z-depth-1-half" style="background-color: #343a40;">
+                                                    Learn more<i class="fas fa-angle-double-right ml-2"></i></p>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`)
+                            });
+                        }
+                    }
+                }
+            );
+        }
+        if ($(this).data('search-type') == 'teams') {
+            let data = objectifyForm($('#teamSearchForm').serializeArrayWithCheckboxes());
+            data.date_start = $('#date_start').datepicker('getDate').getTime();
+            data.date_end = $('#date_end').datepicker('getDate').getTime();
+            $.ajax({
+                    data: data,
+                    type: 'GET',
+                    url: 'http://localhost:3000/advanced-search/teams',
+                    success: function (res) {
+                        console.log(res);
+                        if (res.status == 'successful') {
+                            toggleCollapseSearch();
+                            window.scrollTo(0, 0);
+                            $('.search-results').html('');
+                            res.teams.forEach((team) => {
+                                let platforms = ``;
+                                JSON.parse(team.PLATFORMS).reverse().forEach((platform) => {
+                                    platforms += `<span style="float: right" class="tags teal ml-2 h5">${platform}</span>`
+                                })
+                                $('.search-results').append(`<div class="row">
+                                <div class="col-lg-12 text-left">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <h4 class="card-title display-6 font-weight-bold">${team.NAME}</h4>
+                                                </div>
+                                                <div class="col-6">
+                                                   ${platforms}
+                                                </div>
+                                            </div>
+                                            <hr class="my-4">
+                                            <h5>${team.SUMMARY}</h5>
+                                            <a href="/projects/${team.BASE64}" style="color: #00e500" class="d-flex flex-row-reverse p-2">
+                                                <p class="waves-effect waves-light px-4 py-3 z-depth-1-half" style="background-color: #343a40;">
+                                                    Learn more<i class="fas fa-angle-double-right ml-2"></i></p>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`)
+                            });
+                        }
+                    }
+                }
+            );
+        }
+    })
+
+    function toggleCollapseSearch() {
+        $('.search-icon').toggleClass('fa-angle-right').toggleClass('fa-angle-down');
+        $('.search').toggleClass('collapsed');
+        $('.search-contents').toggleClass('collapsed').collapse('toggle');
+    }
+
+    function objectifyForm(formArray) {
+        let returnArray = {};
+        for (let i = 0; i < formArray.length; i++) {
+            returnArray[formArray[i]['name']] = formArray[i]['value'];
+        }
+        return returnArray;
+    }
+</script>
+
+</body>
+
+</html>

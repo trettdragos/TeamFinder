@@ -26,14 +26,8 @@ router.get('/:searchTerm', function (req, res) {
     let searchFor = '%' + req.params.searchTerm + '%';
     con.query("SELECT * FROM projects WHERE NAME LIKE ?", [searchFor], function (err, projects, fields) {
         if (err) throw err;
-        for (i in projects) {
-            projects[i].PLATFORMS = getPlatformString(JSON.parse(projects[i].PLATFORMS));
-        }
         con.query("SELECT * FROM teams WHERE NAME LIKE ?", [searchFor], function (err, teams, fields) {
             if (err) throw err;
-            for (i in teams) {
-                teams[i].PLATFORMS = getPlatformString(JSON.parse(teams[i].PLATFORMS));
-            }
             let list = teams.concat(projects);
             list.reverse();
             res.render('pages/dashboard.ejs', {

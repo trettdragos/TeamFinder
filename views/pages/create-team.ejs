@@ -5,8 +5,7 @@
     <% include ../partials/head.ejs %>
     <link href="/vendor/bootstrap-tagsinput/tagsinput.css" rel="stylesheet"/>
 
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.standalone.min.css"
-          rel="stylesheet" type="text/css"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.standalone.min.css" rel="stylesheet" type="text/css"/>
     <style>
         .toggled {
             background-color: #00A86B !important;
@@ -56,10 +55,16 @@
                             <label for="exampleFormControlSelect1">And section?</label>
                             <input type="text" class="form-control" id="hackatonSection" placeholder="section">
                             <hr class="my-4">
-                            <label for="exampleFormControlSelect1">Starting on...</label>
-                            <input type="text" class="form-control" id="datepickerStart" placeholder="DD/MM/YYYY">
-                            <label for="exampleFormControlSelect1">Ending on...</label>
-                            <input type="text" class="form-control" id="datepickerEnd" placeholder="DD/MM/YYYY">
+                            <div class="date-range">
+                                <div class="row text-center">
+                                    <div class="col-6">Starting on</div>
+                                    <div class="col-6">Ending on</div>
+                                </div>
+                                <div class="input-daterange input-group" id="datepicker">
+                                    <input type="text" class="input-sm form-control" id="date_start" name="date_start" />
+                                    <input type="text" class="input-sm form-control" id="date_end" name="date_end" />
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <hr class="my-4">
@@ -70,6 +75,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="jumbotron" style="margin-top: 10px;">
                     <center>
                         <button class="btn btn-lg" id="submit" type="button"
@@ -83,16 +89,14 @@
 <% include ../partials/footer.ejs %>
 <script src="/vendor/bootstrap-tagsinput/tagsinput.js"></script>
 <% include ../partials/socket-notification.ejs %>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js"
-        type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js" type="text/javascript"></script>
 <script>
-    $('#datepickerStart').datepicker({
-        format: 'dd/mm/yyyy',
-        startDate: '-3d'
-    });
-    $('#datepickerEnd').datepicker({
-        format: 'dd/mm/yyyy',
-        startDate: '-3d'
+    $('.date-range .input-daterange').datepicker({
+        format: "dd/mm/yyyy",
+        startDate: '-3d',
+        clearBtn: true,
+        autoclose: true,
+        todayHighlight: true
     });
 </script>
 <script>
@@ -116,8 +120,8 @@
             resource_link: $('#resource_link').val(),
             hackaton: document.getElementById('hackaton').value,
             section: document.getElementById('hackatonSection').value,
-            startDate: document.getElementById('datepickerStart').value,
-            endDate: document.getElementById('datepickerEnd').value,
+            startDate: $('#date_start').datepicker('getDate').getTime(),
+            endDate: $('#date_end').datepicker('getDate').getTime(),
             platforms: $("#platformsInput").tagsinput('items'),
             nrMembers: 1,
             posts: '',
@@ -150,15 +154,15 @@
         }
         if (team.startDate === '') {
             isFormOk = false;
-            document.getElementById('datepickerStart').style.borderColor = "red";
+            document.getElementById('date_start').style.borderColor = "red";
         } else {
-            document.getElementById('datepickerStart').style.borderColor = "green";
+            document.getElementById('date_start').style.borderColor = "green";
         }
         if (team.endDate === '') {
             isFormOk = false;
-            document.getElementById('datepickerEnd').style.borderColor = "red";
+            document.getElementById('date_end').style.borderColor = "red";
         } else {
-            document.getElementById('datepickerEnd').style.borderColor = "green";
+            document.getElementById('date_end').style.borderColor = "green";
         }
         if (isFormOk)
             $.ajax({

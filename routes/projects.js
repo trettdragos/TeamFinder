@@ -56,15 +56,15 @@ router.get('/create', function (req, res) {
 
 router.get('/register', function (req, res) {
     project = req.query;
-    // console.log('checking if project...' + project.name + ' is in db');
+    // debug.log('checking if project...' + project.name + ' is in db');
     con.query("SELECT * FROM projects WHERE NAME = ? LIMIT 1", [project.name], function (err, result, fields) {
         if (err) throw err;
         if (result[0]) {
-            // console.log("project failed to register: " + project.name);
+            // debug.log("project failed to register: " + project.name);
             res.send({status: "failed, project already exists"});
         }
         else {
-            // console.log("register project: " + result[0]);
+            // debug.log("register project: " + result[0]);
             let platforms = [];
             if (project.platforms) {
                 platforms = project.platforms;
@@ -74,7 +74,7 @@ router.get('/register', function (req, res) {
                     if (err) {
                         res.send({status: JSON.stringify(err)});
                     }
-                    // console.log('registered project ' + project.name + ' successful');
+                    // debug.log('registered project ' + project.name + ' successful');
                     res.send({status: "successful"});
                 })
             });
