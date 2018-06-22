@@ -302,6 +302,17 @@
             } 
         });
         $("#send").on('click', function(){
+            sendMessage();
+        });
+        $('#message-to-send').on("keypress", function (e) {
+            if (e.keyCode == 13 && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+                return false;
+            }
+        });
+
+        function sendMessage(){
             if ($('#message-to-send').val().trim() == '') return;
             $('#messages').append(`<li class="clearfix">
                         <div class="message-data align-right">
@@ -315,7 +326,7 @@
                     </li>`);
             group_chat_socket.emit('send message', {from:{username:$.cookie('username'), uuid: $.cookie('uuid')}, to:'<%-team.ID%>', text:$('#message-to-send').val()});
             $('#message-to-send').val('')
-        });
+        };
     }
     $("#join").on('click', function () {
         let socket = io.connect();
