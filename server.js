@@ -6,7 +6,7 @@ let mysql = require('mysql');
 let cookieParser = require('cookie-parser');
 let bodyParser = require('body-parser');
 let server = require('http').createServer(app);
-global.debug = require('tracer').colorConsole({format : '\x1b[36m{{message}}\x1b[0m (in {{file}}:{{line}})'});
+global.debug = require('tracer').colorConsole({format : '\x1b[36m{{message}}\x1b[0m (in \x1b[31m{{file}}:{{line}}\x1b[0m)'});
 
 let connectedUsers = {};
 let connectedSockets = {};

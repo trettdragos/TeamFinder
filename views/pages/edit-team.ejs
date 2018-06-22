@@ -78,7 +78,7 @@
                                             <div class="md-form">
                                                 <select title="platforms" multiple id="platformsInput" class="form-control" data-role="tagsinput">
                                                     <% JSON.parse(team.PLATFORMS).forEach((platform) => { %>
-                                                    <option value="<%= platform %>"><%= platform %></option>
+                                                    <option value='<%= platform.replace(/"/g, '\'') %>'><%= platform.replace(/"/g, '\'') %></option>
                                                     <% }) %>
                                                 </select>
                                             </div>

@@ -169,6 +169,10 @@
             clear: both;
             height: 0;
         }
+
+        .profile-link {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -228,25 +232,45 @@
                             <hr class="my-4">
                             <label for="comment">Has funding?</label>
                             <% if(project.FUNDING === 'false' || project.FUNDING === '0'){ %>
-                            <h5 class="font-weight-bold">NO</h5>
+                            <h5>NO</h5>
                             <% }else{ %>
-                            <h5 class="font-weight-bold">YES</h5>
+                            <h5>YES</h5>
                             <% } %>
-                            <label for="comment">Founder</label>
-                            <h5><%= project.FOUNDER %></h5>
                             <label for="comment">Country for development</label>
                             <% if(project.NATIONAL){ %>
                             <h5><%= project.NATIONAL %></h5>
                             <% }else{ %>
                             <h5>Everywhere</h5>
                             <% } %>
+                            <label for="comment">Founder</label>
+                            <div class="card align-items-center my-2 profile-link" data-profile="<%=leader.EMAIL%>">
+                                <div class="card-body col-12 d-flex flex-column">
+                                    <div class="row">
+                                        <div class="col-12 col-md-6 my-auto">
+                                            <h5><%=leader.USERNAME%></h5>
+                                            <h5><%=leader.EMAIL%></h5>
+                                        </div>
+                                        <div class="col-12 col-md-6 my-0 py-0" style="">
+                                            <img src="<% if(leader.PROFILE_PICTURE){ %> <%= leader.PROFILE_PICTURE %> <% } else { %>https://identicon-api.herokuapp.com/<%= leader.EMAIL %>/70?format=png<% } %>" alt="" class="" style="max-width: 70px; float: right;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <label for="comment">Collaborators</label>
                             <% if(project.COLLABORATORS){ %>
                             <%let collaborators = project.COLLABORATORS.trim().substr(0, project.COLLABORATORS.length - 1).split(',')%>
-                            <% for(index in collaborators) {%>
-                            <div class="form-row align-items-center">
-                                <div class="col-12 d-flex flex-column">
-                                    <h5><%=collaborators[index]%></h5>
+                            <% for(index in accounts) {%>
+                            <div class="card align-items-center my-2 profile-link" data-profile="<%=accounts[index].EMAIL%>">
+                                <div class="card-body col-12 d-flex flex-column">
+                                    <div class="row">
+                                        <div class="col-12 col-md-6 my-auto">
+                                            <h5><%=accounts[index].USERNAME%></h5>
+                                            <h5><%=accounts[index].EMAIL%></h5>
+                                        </div>
+                                        <div class="col-12 col-md-6 my-0 py-0" style="">
+                                            <img src="<% if(accounts[index].PROFILE_PICTURE){ %> <%= accounts[index].PROFILE_PICTURE %> <% } else { %>https://identicon-api.herokuapp.com/<%= accounts[index].EMAIL %>/70?format=png<% } %>" alt="" class="" style="max-width: 70px; float: right;">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <% } %>
@@ -268,7 +292,7 @@
                 </div>
             </div>
             <% if(joined) { %>
-            <div class="card my-4">
+            <div class="card my-5">
                 <div class="card-body">
                     <div class="chat w-100">
                         <div class="chat-history">
@@ -356,6 +380,10 @@
                 return false;
             }
         });
+
+        $('.profile-link').on('click', function () {
+            window.location.href = '/profile/' + $(this).data('profile');
+        })
 
         function sendMessage(){
             if ($('#message-to-send').val().trim() == '') return;

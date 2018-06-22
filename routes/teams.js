@@ -16,6 +16,7 @@ router.get('/', function (req, res) {
         con.query("SELECT * FROM teams WHERE ACTIVE=1  ORDER BY TIMESTAMP DESC", function (err, teams, fields) {
             if (err) throw err;
             teams.forEach((team) => {
+                team.PLATFORMS = team.PLATFORMS.replace(/\\'/g, '\\"');
                 require('../other/security').convertUUIDToBase64(team.ID, (b64) => team.BASE64 = b64);
             });
             res.render('pages/teams', {email: req.cookies.username, tab: '3', posts: teams, term: ''});
@@ -44,6 +45,10 @@ router.get('/search/:searchTerm', function (req, res) {
         res.redirect('/login');
     con.query("SELECT * FROM teams WHERE NAME LIKE ?", [`%${req.params.searchTerm}%`], function (err, result, fields) {
         if (err) throw err;
+        result.forEach((project) => {
+            project.PLATFORMS = project.PLATFORMS.replace(/\\'/g, '\\"');
+            require('../other/security').convertUUIDToBase64(project.ID, (b64) => project.BASE64 = b64);
+        });
         res.render('pages/teams', {
             email: req.cookies.username,
             tab: '3',
@@ -136,7 +141,26 @@ router.get('/:team', function (req, res) {
                     for(index in result2){
                         result2[index].timestamp = new Date(parseInt(result2[index].timestamp)).toLocaleTimeString("en-us", options);
                     }
-                    res.render('pages/team-page', {email: req.cookies.username, uuid:req.cookies.uuid, tab: '3', team: result[0], messages:result2});
+                    let people = result[0].POSTS.trim().substr(0, result[0].POSTS.trim().length - 1).split(',');
+                    let list = '';
+                    people.forEach((person) => {
+                        list += `\'${person}\', `
+                    });
+                    list = list.substr(0, list.length-2);
+                    con.query(`SELECT * FROM accounts WHERE EMAIL in (${list})`, (err, result3) => {
+                        con.query('SELECT * FROM accounts WHERE EMAIL = ?', [result[0].LEADER], (err, result4) => {
+                            result[0].PLATFORMS = result[0].PLATFORMS.replace(/\\'/g, '\\"');
+                            res.render('pages/team-page', {
+                                email: req.cookies.username,
+                                uuid: req.cookies.uuid,
+                                tab: '3',
+                                team: result[0],
+                                messages: result2,
+                                accounts: result3,
+                                leader: result4[0]
+                            });
+                        });
+                    });
                 });
             }
             else {
@@ -171,6 +195,7 @@ router.get('/edit/:team', function (req, res) {
                     });
                 } else {
                     result[0].BASE64 = req.params.team;
+                    result[0].PLATFORMS = result[0].PLATFORMS.replace(/\\'/g, '\\"');
                     res.render('pages/edit-team', {email: req.cookies.username, tab: '3', team: result[0]});
                 }
             }
