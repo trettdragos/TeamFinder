@@ -104,10 +104,11 @@
                 email: true
             },
             password: {
-                required: true
+                required: true,
+                regex: /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/g
             },
             passwordCheck: {
-                required: true,
+                equalTo: '#password'
             },
             fullName: {
                 required: true,
@@ -127,10 +128,11 @@
                 email: "Email must be a valid email"
             },
             password: {
-                required: "Password is required"
+                required: "Password is required",
+                regex: "Password must contain <span title='A lowercase character, a uppercase character, a digit, a special symbol and at least 8 characters'><i class='far fa-question-circle'></i></span>"
             },
             passwordCheck: {
-                required: "Check Password is required",
+                equalTo: "Check Password must be the same as Password",
             },
             fullName: {
                 required: "Full Name is required",
