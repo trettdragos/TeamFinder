@@ -202,10 +202,10 @@
                             <h5><%= team.SECTION %></h5>
                             <!--`${('00' + d.getDate()).slice(-2)}/${('00' + (d.getMonth() + 1)).slice(-2)}/${d.getFullYear()}`-->
                             <label for="comment">Start Date</label>
-                            <% let ds = new Date(parseInt(team.START_DATE))%>
+                            <% let ds = new Date(parseInt(team.START_DATE)) %>
                             <h5><%= `${('00' + ds.getDate()).slice(-2)}/${('00' + (ds.getMonth() + 1)).slice(-2)}/${ds.getFullYear()}` %></h5>
                             <label for="comment">End Date</label>
-                            <% let de = new Date(parseInt(team.END_DATE))%>
+                            <% let de = new Date(parseInt(team.END_DATE)) %>
                             <h5><%= `${('00' + de.getDate()).slice(-2)}/${('00' + (de.getMonth() + 1)).slice(-2)}/${de.getFullYear()}` %></h5>
                             <label for="comment">Platforms</label><br>
                             <% JSON.parse(team.PLATFORMS).forEach((platform) => { %>
@@ -218,19 +218,19 @@
                     <div class="card" style="height: 100%;">
                         <div class="card-body">
                             <%
-                               let len = 1;
-                               if(team.POSTS)
-                                   len += participants.length
-                             %>
+                            let len = 1;
+                            if (team.POSTS)
+                                len += participants.length
+                            %>
                             <h4 class="font-weight-bold">Number of current members: <%= len %></h4>
                             <hr class="my-4">
                             <label for="comment">Founder</label>
-                            <div class="card align-items-center my-2 profile-link" data-profile="<%=leader.EMAIL%>">
+                            <div class="card align-items-center my-2 profile-link" data-profile="<%= leader.EMAIL %>">
                                 <div class="card-body col-12 d-flex flex-column">
                                     <div class="row">
                                         <div class="col-12 col-md-6 my-auto">
-                                            <h5><%=leader.USERNAME%></h5>
-                                            <h5><%=leader.EMAIL%></h5>
+                                            <h5><%= leader.USERNAME %></h5>
+                                            <h5><%= leader.EMAIL %></h5>
                                         </div>
                                         <div class="col-12 col-md-6 my-0 py-0" style="">
                                             <img src="<% if(leader.PROFILE_PICTURE){ %> <%= leader.PROFILE_PICTURE %> <% } else { %>https://identicon-api.herokuapp.com/<%= leader.EMAIL %>/70?format=png<% } %>" alt="" class="" style="max-width: 70px; float: right;">
@@ -240,14 +240,14 @@
                             </div>
                             <label for="comment">Other Members:</label>
                             <% if(team.POSTS){ %>
-                            <%let collaborators = team.POSTS.trim().substr(0, team.POSTS.length - 1).split(',')%>
-                            <% for(index in accounts) {%>
-                            <div class="card align-items-center my-2 profile-link" data-profile="<%=accounts[index].EMAIL%>">
+                            <% let collaborators = team.POSTS.trim().substr(0, team.POSTS.length - 1).split(',') %>
+                            <% for(index in accounts) { %>
+                            <div class="card align-items-center my-2 profile-link" data-profile="<%= accounts[index].EMAIL %>">
                                 <div class="card-body col-12 d-flex flex-column">
                                     <div class="row">
                                         <div class="col-12 col-md-6 my-auto">
-                                            <h5><%=accounts[index].USERNAME%></h5>
-                                            <h5><%=accounts[index].EMAIL%></h5>
+                                            <h5><%= accounts[index].USERNAME %></h5>
+                                            <h5><%= accounts[index].EMAIL %></h5>
                                         </div>
                                         <div class="col-12 col-md-6 my-0 py-0" style="">
                                             <img src="<% if(accounts[index].PROFILE_PICTURE){ %> <%= accounts[index].PROFILE_PICTURE %> <% } else { %>https://identicon-api.herokuapp.com/<%= accounts[index].EMAIL %>/70?format=png<% } %>" alt="" class="" style="max-width: 70px; float: right;">
@@ -264,9 +264,11 @@
                             <% if (email != team.LEADER && team.ACTIVE && !joined) { %>
                             <button class="my-3 btn btn-lg btn-block font-weight-bold" id="join">Join</button>
                             <% } else if (team.ACTIVE && email == team.LEADER) { %>
-                            <a href="/teams/edit/<%=team.BASE64%>" class="my-3 btn btn-lg btn-block font-weight-bold" id="editBtn">Edit Team</a>
+                            <a href="/teams/edit/<%= team.BASE64 %>" class="my-3 btn btn-lg btn-block font-weight-bold" id="editBtn">Edit
+                                Team</a>
                             <% } else if(!team.ACTIVE){ %>
-                            <h5 class="font-weight-bold">This project was marked as inactive<br> (no longer searching for participants)</h5>
+                            <h5 class="font-weight-bold">This project was marked as inactive<br> (no longer searching
+                                for participants)</h5>
                             <% } %>
                         </div>
                     </div>
@@ -279,28 +281,29 @@
                         <div class="chat-history">
                             <ul class="list-unstyled" id="messages">
                                 <% for(index in messages){ %>
-                                    <% if(messages[index].from_uuid==uuid){ %>
-                                        <li class="clearfix">
-                                            <div class="message-data align-right">
-                                                <span class="message-data-time"><%=messages[index].timestamp%></span> &nbsp; &nbsp;
-                                                <span class="message-data-name"><%=messages[index].from_name%></span> <i class="fa fa-circle me"></i>
+                                <% if(messages[index].from_uuid == uuid){ %>
+                                <li class="clearfix">
+                                    <div class="message-data align-right">
+                                        <span class="message-data-time"><%= messages[index].timestamp %></span> &nbsp;
+                                        &nbsp; <span class="message-data-name"><%= messages[index].from_name %></span>
+                                        <i class="fa fa-circle me"></i>
 
-                                            </div>
-                                            <div class="message other-message float-right">
-                                                <%=messages[index].message%>
-                                            </div>
-                                        </li>
-                                    <% }else{ %>
-                                        <li>
-                                            <div class="message-data">
-                                                <span class="message-data-name"><i class="fa fa-circle online"></i><%=messages[index].from_name%></span>
-                                                <span class="message-data-time"><%=messages[index].timestamp%></span>
-                                            </div>
-                                            <div class="message my-message">
-                                                <%=messages[index].message%>
-                                            </div>
-                                        </li>
-                                    <% } %>
+                                    </div>
+                                    <div class="message other-message float-right">
+                                        <%= messages[index].message %>
+                                    </div>
+                                </li>
+                                <% }else{ %>
+                                <li>
+                                    <div class="message-data">
+                                        <span class="message-data-name"><i class="fa fa-circle online"></i><%= messages[index].from_name %></span>
+                                        <span class="message-data-time"><%= messages[index].timestamp %></span>
+                                    </div>
+                                    <div class="message my-message">
+                                        <%= messages[index].message %>
+                                    </div>
+                                </li>
+                                <% } %>
                                 <% } %>
                             </ul>
                         </div>
@@ -317,29 +320,29 @@
 </div>
 <% include ../partials/socket-notification.ejs %>
 <script type="text/javascript">
-    let posts = '<%-team.POSTS%>'
+    let posts = '<%- team.POSTS %>'
     let options = {
         weekday: "long", year: "numeric", month: "short",
         day: "numeric", hour: "2-digit", minute: "2-digit",
         second: '2-digit', hour12: false
     };
     let participants = posts.trim().substr(0, posts.length - 1).split(',');
-    if (participants.includes($.cookie('username')) || $.cookie('username') == '<%-team.LEADER%>'){
+    if (participants.includes($.cookie('username')) || $.cookie('username') == '<%- team.LEADER %>') {
         let group_chat_socket = io.connect();
         group_chat_socket.emit('join room', {
-            chat_name:'<%-team.ID%>',
+            chat_name: '<%- team.ID %>',
             user: {
                 username: $.cookie('username'),
                 uuid: $.cookie('uuid')
             }
         });
 
-        group_chat_socket.on('new user to chat', function(res){
-            $('#messages').append('<center><p>User '+res.from+' has joined the chat</p></center>');
+        group_chat_socket.on('new user to chat', function (res) {
+            $('#messages').append('<center><p>User ' + res.from + ' has joined the chat</p></center>');
         });
 
-        group_chat_socket.on('send message', function(res){
-            if(res.from.username != $.cookie('username')){
+        group_chat_socket.on('send message', function (res) {
+            if (res.from.username != $.cookie('username')) {
                 $('#messages').append(`<li>
                         <div class="message-data">
                             <span class="message-data-name"><i class="fa fa-circle online"></i>${res.from.username}</span>
@@ -349,9 +352,9 @@
                             ${res.text}
                         </div>
                     </li>`);
-            } 
+            }
         });
-        $("#send").on('click', function(){
+        $("#send").on('click', function () {
             sendMessage();
         });
         $('#message-to-send').on("keypress", function (e) {
@@ -366,9 +369,8 @@
             window.location.href = '/profile/' + $(this).data('profile');
         })
 
-        function sendMessage(){
+        function sendMessage() {
             if ($('#message-to-send').val().trim() == '') return;
-            let date = 
             $('#messages').append(`<li class="clearfix">
                         <div class="message-data align-right">
                             <span class="message-data-time">${new Date(Date.now()).toLocaleTimeString("en-us", options)}</span> &nbsp; &nbsp;
@@ -379,17 +381,23 @@
                             ${$('#message-to-send').val()}
                         </div>
                     </li>`);
-            group_chat_socket.emit('send message', {from:{username:$.cookie('username'), uuid: $.cookie('uuid')}, to:'<%-team.ID%>', text:$('#message-to-send').val()});
+            document.getElementsByClassName('chat-history')[0].scrollTop = document.getElementsByClassName('chat-history')[0].scrollHeight;
+            group_chat_socket.emit('send message', {
+                from: {username: $.cookie('username'), uuid: $.cookie('uuid')},
+                to: '<%- team.ID %>',
+                text: $('#message-to-send').val()
+            });
             $('#message-to-send').val('');
-        };
+        }
     }
+    document.getElementsByClassName('chat-history')[0].scrollTop = document.getElementsByClassName('chat-history')[0].scrollHeight;
     $("#join").on('click', function () {
         let socket = io.connect();
         let teamname = <%- JSON.stringify(team.NAME) %>;
         let leadern = <%- JSON.stringify(team.LEADER) %>;
         socket.emit('request join team', {
             username: $.cookie('username'),
-            teamUUID: '<%-team.BASE64%>',
+            teamUUID: '<%- team.BASE64 %>',
             teamName: teamname,
             leader: leadern,
             token: 'alabalaportocala'
