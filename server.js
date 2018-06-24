@@ -27,6 +27,8 @@ let con = mysql.createConnection({
 let messagesUsers = {};
 let messagesSockets = {};
 
+let lastMessage = {};
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
@@ -58,22 +60,44 @@ io.on('connection', function (socket) {
     });
 
     socket.on('join room', (req) =>{
-        debug.log(`-------USER ${req.user.username}(${req.user.uuid}) REQUESTING TO JOIN ROOM ${req.chat_name} -------`);
+        //debug.log(`-------USER ${req.user.username}(${req.user.uuid}) REQUESTING TO JOIN ROOM ${req.chat_name} -------`);
         socket.join(req.chat_name);
         io.to(req.chat_name).emit('new user to chat', {text:"has joined the chat", from:req.user.username});
     });
 
     socket.on('send message', (req) =>{
-        console.log(`-------USER ${req.from.username}(${req.from.uuid}) SENT ${req.text} TO ROOM ${req.to} -------`);
+        //debug.log(`-------USER ${req.from.username}(${req.from.uuid}) SENT ${req.text} TO ROOM ${req.to} -------`);
         let time =  Date.now();
-        console.log(req.from.uuid);
         con.query("SELECT USERNAME FROM accounts WHERE ID = ?", [req.from.uuid], function(error, result){
             if(error) throw error;
                 con.query("INSERT INTO group_messages (id, from_uuid, from_name, group_uuid, message, timestamp) VALUES (?, ?, ?, ?, ?, ?)", [0, req.from.uuid, result[0].USERNAME, req.to, req.text, time], function(err, resultI){
                 if(err) throw err;
+                let people = req.participants.trim().substr(0, req.participants.trim().length - 1).split(',');
+                if(lastMessage[req.to]){
+                    debug.log(time);
+                    debug.log(lastMessage[req.to]);
+                    if(time-lastMessage[req.to]>60000){
+                        people.forEach((person) => {
+                            if(connectedUsers[person]){
+                                let textToSend = "New message in group "+req.group+" from "+result[0].USERNAME;
+                                io.sockets.connected[connectedUsers[person]].emit('notification', textToSend);
+                                lastMessage[req.to]=time;
+                            }
+                        });
+                    }
+                }else{
+                    lastMessage[req.to]=time;
+                    people.forEach((person) => {
+                            if(connectedUsers[person]){
+                                let textToSend = "New message in group "+req.group+" from "+result[0].USERNAME;
+                                io.sockets.connected[connectedUsers[person]].emit('notification', textToSend);
+                                lastMessage[req.to]=time;
+                            }
+                    });
+                }
+                io.to(req.to).emit('send message', {text:req.text, from:req.from, time:time});
             });
         });
-        io.to(req.to).emit('send message', {text:req.text, from:req.from, time:time});
     });
 
     socket.on('request join team', function (req) {
@@ -96,7 +120,8 @@ io.on('connection', function (socket) {
                     "id": id
                 };
                 if(connectedUsers[req.leader]){
-                    io.sockets.connected[connectedUsers[req.leader]].emit('notification', newReq);
+                    let textToSend = "User "+newReq.user+" has requested to join "+newReq.type+" "+newReq.name;
+                    io.sockets.connected[connectedUsers[req.leader]].emit('notification', textToSend);
                 }
                 let reqtest = JSON.stringify(newReq);
                 let isValid = true;
@@ -153,7 +178,8 @@ io.on('connection', function (socket) {
                         "id": id
                     };
                     if(connectedUsers[req.leader]){
-                        io.sockets.connected[connectedUsers[req.leader]].emit('notification', newReq);                        
+                        let textToSend = "User "+newReq.user+" has requested to join "+newReq.type+" "+newReq.name;
+                        io.sockets.connected[connectedUsers[req.leader]].emit('notification', textToSend);                        
                     }
                     let reqtest = JSON.stringify(newReq);
                     let reqAltTest = JSON.stringify(newAltReq);

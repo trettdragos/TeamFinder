@@ -385,12 +385,15 @@
             group_chat_socket.emit('send message', {
                 from: {username: $.cookie('username'), uuid: $.cookie('uuid')},
                 to: '<%- team.ID %>',
+                participants: '<%- team.POSTS %>'+'<%- team.LEADER %>'+',',
+                group: '<%- team.NAME %>',
                 text: $('#message-to-send').val()
             });
             $('#message-to-send').val('');
         }
+        document.getElementsByClassName('chat-history')[0].scrollTop = document.getElementsByClassName('chat-history')[0].scrollHeight;
     }
-    document.getElementsByClassName('chat-history')[0].scrollTop = document.getElementsByClassName('chat-history')[0].scrollHeight;
+
     $("#join").on('click', function () {
         let socket = io.connect();
         let teamname = <%- JSON.stringify(team.NAME) %>;

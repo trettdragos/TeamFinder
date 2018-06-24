@@ -6,7 +6,7 @@
 			socket.emit('receive email', {email:$.cookie('username')});
 		});
 		socket.on('notification', function(notification){
-			$.notify("User "+notification.user+" has requested to join "+notification.type+" "+notification.name, "info");
+			$.notify(notification, "info");
 		});
 	}
 </script>

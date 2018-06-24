@@ -339,7 +339,7 @@
 </div>
 <% include ../partials/socket-notification.ejs %>
 <script type="text/javascript">
-    let posts = '<%- project.COLLABORATORS %>'
+    let posts = '<%- project.COLLABORATORS %>';
     let options = {
         weekday: "long", year: "numeric", month: "short",
         day: "numeric", hour: "2-digit", minute: "2-digit",
@@ -400,6 +400,8 @@
             group_chat_socket.emit('send message', {
                 from: {username: $.cookie('username'), uuid: $.cookie('uuid')},
                 to: '<%- project.ID %>',
+                participants: '<%- project.COLLABORATORS %>'+'<%- project.FOUNDER %>'+',',
+                group: '<5- project.NAME %>',
                 text: $('#message-to-send').val()
             });
             $('#message-to-send').val('');
