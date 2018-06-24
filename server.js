@@ -76,7 +76,7 @@ io.on('connection', function (socket) {
                 if(lastMessage[req.to]){
                     debug.log(time);
                     debug.log(lastMessage[req.to]);
-                    if(time-lastMessage[req.to]>60000){
+                    if(time-lastMessage[req.to]>120000){
                         people.forEach((person) => {
                             if(connectedUsers[person]){
                                 let textToSend = "New message in group "+req.group+" from "+result[0].USERNAME;
