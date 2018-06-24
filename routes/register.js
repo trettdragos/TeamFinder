@@ -47,21 +47,22 @@ router.get('/auth', function (req, res) {
                     "ABOUT": "",
                     "PROFILE_PICTURE": ""
                 };
-                //schimba CONFIRMED la 0 imediat repun pe picioare sendgrid
-                con.query("INSERT INTO accounts (ID, USERNAME, EMAIL, PASSWORD, PROFILE, CONFIRMED, NOTIFICATION) VALUES (?, ?, ?, ?, ?, '0', '[]')", [0, user.name, user.email, hash, JSON.stringify(profile)], function (err, result) {
-                    if (err) throw err;
-                    let email_template = require('../other/utils').emailTemplate;
-                    email_template = email_template.replace(new RegExp('{{LINK}}', 'g'), 'http://localhost:3000/verification/'+user.email);
-                    let msg = {
-                      to: user.email,
-                      from: 'register@hacksquad.com',
-                      subject: 'Please verify your email',
-                      text: 'and easy to do anywhere, even with Node.js',
-                      html: email_template,
-                    };
-                    sgMail.send(msg);
-                    // debug.log('sent verification email to ' + user.email);
-                    res.send({status: "successful"});
+                security.getUUID((uuid) => {
+                    con.query("INSERT INTO accounts (ID, USERNAME, EMAIL, PASSWORD, PROFILE, CONFIRMED, NOTIFICATION) VALUES (?, ?, ?, ?, ?, '0', '[]')", [uuid, user.name, user.email, hash, JSON.stringify(profile)], function (err, result) {
+                        if (err) throw err;
+                        let email_template = require('../other/utils').emailTemplate;
+                        email_template = email_template.replace(new RegExp('{{LINK}}', 'g'), 'http://localhost:3000/verification/' + user.email);
+                        let msg = {
+                            to: user.email,
+                            from: 'register@hacksquad.com',
+                            subject: 'Please verify your email',
+                            text: 'and easy to do anywhere, even with Node.js',
+                            html: email_template,
+                        };
+                        sgMail.send(msg);
+                        // debug.log('sent verification email to ' + user.email);
+                        res.send({status: "successful"});
+                    });
                 });
             });
         }
