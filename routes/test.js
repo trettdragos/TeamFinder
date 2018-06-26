@@ -1,6 +1,15 @@
 let express = require('express');
 let router = express.Router();
-tests = ['/email', '/cookie-token', '/verify-cookie-token', '/jwt', '/verify-jwt-true', '/verify-jwt-false', '/uuid', '/uuid-base64'];
+let mysql = require('mysql');
+
+let con = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "TeamFinder"
+});
+
+tests = ['/email', '/cookie-token', '/verify-cookie-token', '/jwt', '/verify-jwt-true', '/verify-jwt-false', '/uuid', '/uuid-base64', '/create-test-projects', '/create-test-teams'];
 router.get('/', (req, res) => {
     let construct = '';
     tests.forEach((test) => {
@@ -69,14 +78,53 @@ router.get('/uuid', (req, res) => {
 });
 
 router.get('/chat/a', (req, res) => {
-    res.render('pages/chat.ejs', {from: {uuid: '8CCB2690-68A2-491C-A726-A83312E49B55', name: 'Teodor Vecerdi'}, to: {uuid: '96FA97C7-FADD-4EB1-997F-68FB02C64AA2', name: 'Trett Dragos'}, profile: 'https://thumbs.dreamstime.com/b/profile-icon-senior-female-head-chat-bubble-isolated-elderly-woman-avatar-cartoon-character-portrait-profile-icon-senior-female-108359162.jpg'});
+    res.render('pages/chat.ejs', {
+        from: {uuid: '8CCB2690-68A2-491C-A726-A83312E49B55', name: 'Teodor Vecerdi'},
+        to: {uuid: '96FA97C7-FADD-4EB1-997F-68FB02C64AA2', name: 'Trett Dragos'},
+        profile: 'https://thumbs.dreamstime.com/b/profile-icon-senior-female-head-chat-bubble-isolated-elderly-woman-avatar-cartoon-character-portrait-profile-icon-senior-female-108359162.jpg'
+    });
 });
 router.get('/chat/b', (req, res) => {
-    res.render('pages/chat.ejs', {from:{uuid: '96FA97C7-FADD-4EB1-997F-68FB02C64AA2', name: 'Trett Dragos'}, to:{uuid: '8CCB2690-68A2-491C-A726-A83312E49B55', name: 'Teodor Vecerdi'}, profile: 'https://thumbs.dreamstime.com/b/profile-icon-senior-female-head-chat-bubble-isolated-elderly-woman-avatar-cartoon-character-portrait-flat-vector-illustration-108360340.jpg' });
+    res.render('pages/chat.ejs', {
+        from: {uuid: '96FA97C7-FADD-4EB1-997F-68FB02C64AA2', name: 'Trett Dragos'},
+        to: {uuid: '8CCB2690-68A2-491C-A726-A83312E49B55', name: 'Teodor Vecerdi'},
+        profile: 'https://thumbs.dreamstime.com/b/profile-icon-senior-female-head-chat-bubble-isolated-elderly-woman-avatar-cartoon-character-portrait-flat-vector-illustration-108360340.jpg'
+    });
 });
 
 router.get('/uuid-base64', (req, res) => {
     require('../other/security').getUUID((uuid) => require('../other/security').convertUUIDToBase64(uuid, (base64) => res.send(`${uuid}<br>${base64}`)));
+});
+
+router.get('/create-test-projects', (req, res) => {
+    res.send(`Go to /test/create-test-projects/:num to create <b>num</b> projects<br>Example:<br><a href="/test/create-test-projects/50">Create 50 projects</a>`)
+});
+
+router.get('/create-test-projects/:num', (req, res) => {
+    for (i = 0; i < req.params.num; i++) {
+        require('../other/security').getUUID((uuid) => {
+            let date = Date.now().toString();
+            con.query("INSERT INTO projects (ID, TIMESTAMP, NAME, SUMMARY, COMMITMENT, PLATFORMS, PLATFORM_DETAILS, RESOURCE_LINK, STAGE, BUDGET, FUNDING, NATIONAL, FOUNDER, ACTIVE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [uuid, date, 'Test project @ ' + date, 'Test summary', 'Contractual', '["Platform 1", "Platform 2"]', 'Platform details', 'Resource link', 'Idea Stage', '$0-$1,000', 'false', '', 'teo.vecerdi@gmail.com', 1], function (err, result) {
+                if (err)
+                    throw err;
+            })
+        });
+    }
+    res.send(`Created ${req.params.num} projects successfully`);
+});
+router.get('/create-test-teams', (req, res) => {
+    res.send(`Go to /test/create-test-teams/:num to create <b>num</b> teams<br>Example:<br><a href="/test/create-test-teams/50">Create 50 projects</a>`)
+});
+
+router.get('/create-test-teams/:num', (req, res) => {
+    for (i = 0; i < req.params.num; i++) {
+        require('../other/security').getUUID((uuid) => {
+            let date = Date.now().toString();
+            con.query("INSERT INTO teams (ID, TIMESTAMP, NAME, SUMMARY, HACKATON, SECTION, START_DATE, END_DATE, PLATFORMS, RESOURCE_LINK, NR_MEMBERS, POSTS, LEADER, ACTIVE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [uuid, date, `Test team @ ${date}`, 'Team summary', 'Team hackaton', 'Team section', date, date, '["Platform 1", "Platform 2"]', 'Resource link', 0, '', 'teo.vecerdi@gmail.com', 1], function (err, result) {
+            })
+        });
+    }
+    res.send(`Created ${req.params.num} teams successfully`);
 });
 
 module.exports = {url: '/test', router: router};

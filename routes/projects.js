@@ -9,17 +9,84 @@ let con = mysql.createConnection({
     database: "TeamFinder"
 });
 
+const projects_per_page = 25;
+
 router.get('/*', (req, res, next) => require('../other/security').routeTokenVerification(req, res, next));
 
 router.get('/', function (req, res) {
+    res.redirect('/projects/page/1');
+    // if (req.cookies.username) {
+    //     con.query("SELECT * FROM projects WHERE ACTIVE=1 ORDER BY TIMESTAMP DESC", function (err, projects, fields) {
+    //         if (err) throw err;
+    //         projects.forEach((project) => {
+    //             project.PLATFORMS = project.PLATFORMS.replace(/\\'/g, '\\"');
+    //             require('../other/security').convertUUIDToBase64(project.ID, (b64) => project.BASE64 = b64);
+    //         });
+    //         res.render('pages/projects.ejs', {email: req.cookies.username, tab: '2', posts: projects, term: ''});
+    //     });
+    // }
+    // else {
+    //     res.redirect('/login');
+    // }
+});
+
+router.get('/page', (req, res) => {
+    res.redirect('/projects/page/1');
+});
+
+router.get('/page/:num', (req, res) => {
+    let current_page = parseInt(req.params.num);
+    if (current_page < 1) {
+        res.redirect('/projects/page/1');
+        return;
+    }
     if (req.cookies.username) {
         con.query("SELECT * FROM projects WHERE ACTIVE=1 ORDER BY TIMESTAMP DESC", function (err, projects, fields) {
             if (err) throw err;
-            projects.forEach((project) => {
+
+            let last_page = projects.length / projects_per_page;
+            if (last_page !== parseInt(last_page)){
+                last_page = parseInt(last_page)+1;
+            }
+
+            if (current_page > last_page) {
+                res.redirect('/projects/page/'+last_page);
+                return;
+            }
+
+            let start_page = current_page - 2;
+            let end_page = current_page + 2;
+            debug.log(start_page, end_page, current_page);
+            if (current_page <= 2) {
+                start_page = 1;
+                end_page = 5 <= last_page ? 5 : last_page;
+            } else if (current_page >= last_page - 1) {
+                start_page = last_page - 4;
+                end_page = last_page;
+            }
+            debug.log(start_page, end_page);
+
+            let pages = {
+                current_page: current_page,
+                start_page: start_page,
+                end_page: end_page,
+                last_page: last_page
+            };
+            debug.log(pages);
+
+            loaded_projects = projects.slice((current_page - 1) * projects_per_page, current_page * projects_per_page);
+            loaded_projects.forEach((project) => {
                 project.PLATFORMS = project.PLATFORMS.replace(/\\'/g, '\\"');
                 require('../other/security').convertUUIDToBase64(project.ID, (b64) => project.BASE64 = b64);
             });
-            res.render('pages/projects.ejs', {email: req.cookies.username, tab: '2', posts: projects, term: ''});
+
+            res.render('pages/projects.ejs', {
+                email: req.cookies.username,
+                tab: '2',
+                posts: loaded_projects,
+                term: '',
+                pages: pages
+            });
         });
     }
     else {
@@ -32,22 +99,71 @@ router.get('/search', function (req, res) {
 });
 
 router.get('/search/:searchTerm', function (req, res) {
-    if (!req.cookies.username)
+    res.redirect(`/projects/search/${req.params.searchTerm}/page/1`);
+});
+
+router.get('/search/:searchTerm/page', (req, res) => {
+   res.redirect(`/projects/search/${req.params.searchTerm}/page/1`);
+});
+
+router.get('/search/:searchTerm/page/:num', (req, res) => {
+    let current_page = parseInt(req.params.num);
+    if (current_page < 1) {
+        res.redirect('/projects/page/1');
+        return;
+    }
+    if (req.cookies.username) {
+        con.query("SELECT * FROM projects WHERE NAME LIKE ? ORDER BY TIMESTAMP DESC", [`%${req.params.searchTerm}%`], function (err, projects, fields) {
+            if (err) throw err;
+
+            let last_page = projects.length / projects_per_page;
+            if (last_page !== parseInt(last_page)){
+                last_page = parseInt(last_page)+1;
+            }
+
+            if (current_page > last_page) {
+                res.redirect('/projects/page/'+last_page);
+                return;
+            }
+
+            let start_page = current_page - 2;
+            let end_page = current_page + 2;
+            debug.log(start_page, end_page, current_page);
+            if (current_page <= 2) {
+                start_page = 1;
+                end_page = 5 <= last_page ? 5 : last_page;
+            } else if (current_page >= last_page - 1) {
+                start_page = last_page - 4;
+                end_page = last_page;
+            }
+            debug.log(start_page, end_page);
+
+            let pages = {
+                current_page: current_page,
+                start_page: start_page,
+                end_page: end_page,
+                last_page: last_page
+            };
+            debug.log(pages);
+
+            loaded_projects = projects.slice((current_page - 1) * projects_per_page, current_page * projects_per_page);
+            loaded_projects.forEach((project) => {
+                project.PLATFORMS = project.PLATFORMS.replace(/\\'/g, '\\"');
+                require('../other/security').convertUUIDToBase64(project.ID, (b64) => project.BASE64 = b64);
+            });
+
+            res.render('pages/projects.ejs', {
+                email: req.cookies.username,
+                tab: '2',
+                posts: loaded_projects,
+                term: '',
+                pages: pages
+            });
+        });
+    }
+    else {
         res.redirect('/login');
-    // let searchFor = '%' + req.params.searchTerm + '%';
-    con.query("SELECT * FROM projects WHERE NAME LIKE ?", [`%${req.params.searchTerm}%`], function (err, result, fields) {
-        if (err) throw err;
-        result.forEach((project) => {
-            project.PLATFORMS = project.PLATFORMS.replace(/\\'/g, '\\"');
-            require('../other/security').convertUUIDToBase64(project.ID, (b64) => project.BASE64 = b64);
-        });
-        res.render('pages/projects', {
-            email: req.cookies.username,
-            tab: '2',
-            posts: result,
-            term: req.params.searchTerm
-        });
-    });
+    }
 });
 
 router.get('/create', function (req, res) {
