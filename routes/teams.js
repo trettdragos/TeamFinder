@@ -53,10 +53,12 @@ router.get('/page/:num', (req, res) => {
                 res.redirect('/teams/page/'+last_page);
                 return;
             }
+            if(last_page === 0) {
+                last_page = 1;
+            }
 
             let start_page = current_page - 2;
             let end_page = current_page + 2;
-            debug.log(start_page, end_page, current_page);
             if (current_page <= 2) {
                 start_page = 1;
                 end_page = 5 <= last_page ? 5 : last_page;
@@ -64,7 +66,6 @@ router.get('/page/:num', (req, res) => {
                 start_page = last_page - 4;
                 end_page = last_page;
             }
-            debug.log(start_page, end_page);
 
             let pages = {
                 current_page: current_page,
@@ -72,7 +73,6 @@ router.get('/page/:num', (req, res) => {
                 end_page: end_page,
                 last_page: last_page
             };
-            debug.log(pages);
 
             loaded_teams = teams.slice((current_page - 1) * teams_per_page, current_page * teams_per_page);
             loaded_teams.forEach((team) => {
@@ -118,7 +118,7 @@ router.get('/search/:searchTerm/page', (req, res) => {
 router.get('/search/:searchTerm/page/:num', (req, res) => {
     let current_page = parseInt(req.params.num);
     if (current_page < 1) {
-        res.redirect('/teams/page/1');
+        res.redirect('/teams/search/'+req.params.searchTerm+'/page/1');
         return;
     }
     if (req.cookies.username) {
@@ -129,15 +129,17 @@ router.get('/search/:searchTerm/page/:num', (req, res) => {
             if (last_page !== parseInt(last_page)){
                 last_page = parseInt(last_page)+1;
             }
+            if(last_page === 0) {
+                last_page = 1;
+            }
 
             if (current_page > last_page) {
-                res.redirect('/teams/page/'+last_page);
+                res.redirect('/teams/search/'+req.params.searchTerm+'/page/'+last_page);
                 return;
             }
 
             let start_page = current_page - 2;
             let end_page = current_page + 2;
-            debug.log(start_page, end_page, current_page);
             if (current_page <= 2) {
                 start_page = 1;
                 end_page = 5 <= last_page ? 5 : last_page;
@@ -145,7 +147,6 @@ router.get('/search/:searchTerm/page/:num', (req, res) => {
                 start_page = last_page - 4;
                 end_page = last_page;
             }
-            debug.log(start_page, end_page);
 
             let pages = {
                 current_page: current_page,
@@ -153,7 +154,6 @@ router.get('/search/:searchTerm/page/:num', (req, res) => {
                 end_page: end_page,
                 last_page: last_page
             };
-            debug.log(pages);
 
             loaded_teams = teams.slice((current_page - 1) * teams_per_page, current_page * teams_per_page);
             loaded_teams.forEach((team) => {
