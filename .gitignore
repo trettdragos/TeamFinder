@@ -3,3 +3,7 @@ node_modules/
 \.idea/
 sendgrid.env
 sendgrid.env
+
+\.eslintrc\.js
+
+\.eslintignore
