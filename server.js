@@ -5,7 +5,10 @@ let path = require('path');
 let mysql = require('mysql');
 let cookieParser = require('cookie-parser');
 let bodyParser = require('body-parser');
+let validator = require('express-validator');
+
 let server = require('http').createServer(app);
+
 global.debug = require('tracer').colorConsole({format : '\x1b[36m{{message}}\x1b[0m (in \x1b[31m{{file}}:{{line}}\x1b[0m)'});
 
 let connectedUsers = {};
@@ -34,6 +37,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(logger('dev'));
+app.use(validator());
+app.use(function(req, res, next) {
+    for (let item in req.body) {
+        req.sanitize(item).escape();
+    }
+    next();
+});
+
 
 io.on('connection', function (socket) {
     //add user to connected list
