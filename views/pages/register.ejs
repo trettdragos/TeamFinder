@@ -4,6 +4,12 @@
 <head>
     <% include ../partials/head.ejs %>
     <link href="/vendor/bootstrap-tagsinput/tagsinput.css" rel="stylesheet"/>
+    <style>
+        .error {
+            color: red;
+            border-color: red;
+        }
+    </style>
 </head>
 
 <body>
@@ -15,33 +21,33 @@
                 <div class="card-body">
                     <h4 style="text-align: center; margin-bottom: 15px;"><b>Register</b></h4>
                     <form class="form-signin" id="form">
-                        <div class="md-form">
-                            <input type="email" id="email" name="email" class="form-control" required>
+                        <div class="form-group">
                             <label for="email">Email</label>
+                            <input type="email" id="email" name="email" class="form-control" required>
                         </div>
-                        <div class="md-form">
-                            <input type="password" id="password" name="password" class="form-control" required>
+                        <div class="form-group">
                             <label for="password">Password</label>
+                            <input type="password" id="password" name="password" class="form-control" required>
                         </div>
-                        <div class="md-form">
-                            <input type="password" id="passwordCheck" name="passwordCheck" class="form-control" required>
+                        <div class="form-group">
                             <label for="passwordCheck">Check Password</label>
+                            <input type="password" id="passwordCheck" name="passwordCheck" class="form-control" required>
                         </div>
-                        <div class="md-form">
-                            <input type="text" id="fullName" name="fullName" class="form-control" required>
+                        <div class="form-group">
                             <label for="fullName">Full Name</label>
+                            <input type="text" id="fullName" name="fullName" class="form-control" required>
                         </div>
-                        <div class="md-form">
+                        <div class="form-group">
+                            <label for="github">GitHub Link</label>
                             <i class="fab fa-github prefix"></i>
                             <input type="url" id="github" name="github" class="form-control">
-                            <label for="github">GitHub Link</label>
                         </div>
-                        <div class="md-form">
+                        <div class="form-group">
+                            <label for="linkedin">LinkedIn Link</label>
                             <i class="fab fa-linkedin prefix"></i>
                             <input type="url" id="linkedin" name="linkedin" class="form-control">
-                            <label for="linkedin">LinkedIn Link</label>
                         </div>
-                        <div class="md-form">
+                        <div class="form-group">
                             <label for="skillsInput">Skills</label>
                             <input type="text" id="skillsInput" class="form-control" data-role="tagsinput">
                         </div>
@@ -115,11 +121,13 @@
             },
             github: {
                 required: false,
-                url: true
+                url: true,
+                regex: /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/|www\.)?github\.com\/(.*)[a-zA-Z0-9].*/
             },
             linkedin: {
                 required: false,
-                url: true
+                url: true,
+                regex: /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/|www\.)?linkedin\.com\/in\/(.*)[a-zA-Z0-9\-].*/
             }
         },
         messages: {
@@ -138,68 +146,15 @@
                 required: "Full Name is required",
             },
             github: {
-                url: "GitHub Link must be an URL"
+                url: "GitHub Link must be an URL",
+                regex: 'You must provide an actual GitHub URL'
             },
             linkedin: {
-                url: "LinkedIn Link must be an URL"
+                url: "LinkedIn Link must be an URL",
+                regex: 'You must provide an actual LinkedIn URL'
             }
         }
     });
-
-    function auth() {
-        let user = {
-            email: document.getElementById("email").value,
-            password: document.getElementById("password").value,
-            name: document.getElementById('fullName').value,
-            linkedin: document.getElementById('linkedin').value,
-            github: document.getElementById('github').value,
-            skills: $("#skillsInput").tagsinput('items')
-        }
-        let ok = true;
-        if (user.email === '') {
-            document.getElementById("email").style.borderColor = "red";
-            ok = false;
-        } else {
-            document.getElementById("email").style.borderColor = "green";
-        }
-        if (user.password === '') {
-            document.getElementById("password").style.borderColor = "red";
-            ok = false;
-        } else {
-            document.getElementById("password").style.borderColor = "green";
-        }
-        if (user.name === '') {
-            document.getElementById("fullName").style.borderColor = "red";
-            ok = false;
-        } else {
-            document.getElementById("fullName").style.borderColor = "green";
-        }
-        if (user.password !== document.getElementById('passwordCheck').value || user.password === '') {
-            document.getElementById("password").style.borderColor = "red";
-            document.getElementById("passwordCheck").style.borderColor = "red";
-            ok = false;
-        } else {
-            document.getElementById("password").style.borderColor = "green";
-            document.getElementById("passwordCheck").style.borderColor = "green";
-        }
-        if (ok == true) {
-            $.ajax({
-                data: user,
-                type: 'GET',
-                url: 'http://localhost:3000/register/auth',
-                success: function (res) {
-                    console.log(res.status);
-                    if (res.status == "successful") {
-                        window.location.href = '/register/confirmed';
-                    } else {
-                        document.getElementById("email").style.borderColor = "red";
-                        // /alert(res.status);
-                    }
-                }
-            });
-            //socket.emit('auth register', user);
-        }
-    }
 </script>
 </body>
 
