@@ -401,7 +401,7 @@
                 from: {username: $.cookie('username'), uuid: $.cookie('uuid')},
                 to: '<%- project.ID %>',
                 participants: '<%- project.COLLABORATORS %>'+'<%- project.FOUNDER %>'+',',
-                group: '<5- project.NAME %>',
+                group: '<%- project.NAME %>',
                 text: $('#message-to-send').val()
             });
             $('#message-to-send').val('');

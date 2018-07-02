@@ -55,9 +55,6 @@
                                             <label for="linkedinLink">Linkedin Link</label>
                                         </div>
                                         <div class="md-form">
-                                            <%
-                                            console.log(profile.SKILLS+ "CACA")
-                                            %>
                                             <select title="skills" multiple id="skillsInput" name="skills" class="form-control" data-role="tagsinput">
                                                 <% profile.SKILLS.forEach((platform) => { %>
                                                 <option value="<%= platform %>"><%= platform %></option>
@@ -173,6 +170,12 @@
 <script src="/vendor/bootstrap-tagsinput/tagsinput.js"></script>
 
 <script>
+    $(function () {
+        let tagsInput = $('.bootstrap-tagsinput > input')[0];
+        $(tagsInput).on('change paste keyup', function () {
+            $(tagsInput).val($(tagsInput).val().replace(/"/g, '\''));
+        })
+    })
     let selected = false;
 
     function ChangeProfilePictureHandler() {

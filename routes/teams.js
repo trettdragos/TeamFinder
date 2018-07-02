@@ -199,8 +199,8 @@ router.get('/register', function (req, res) {
     });
 });
 
-router.get('/finish', function (req, res) {
-    require('../other/security').convertBase64ToUUID(req.query.BASE64, (uuid) => {
+router.post('/finish', function (req, res) {
+    require('../other/security').convertBase64ToUUID(req.body.BASE64, (uuid) => {
         con.query("UPDATE teams SET ACTIVE=0 WHERE ID=?", [uuid], function (err, result) {
             if (err) throw err;
             res.send({status: "successful"});
@@ -208,13 +208,13 @@ router.get('/finish', function (req, res) {
     });
 });
 
-router.get('/update', function (req, res) {
-    team = req.query;
+router.post('/update', function (req, res) {
+    team = req.body;
     let platforms = [];
     if (team.platforms) {
         platforms = team.platforms;
     }
-    require('../other/security').convertBase64ToUUID(team.id, (uuid) => {
+    require('../other/security').convertBase64ToUUID(team.BASE64, (uuid) => {
         con.query("UPDATE teams SET SUMMARY=?, RESOURCE_LINK=?, PLATFORMS=?, HACKATON=?, SECTION=?, START_DATE=?, END_DATE=? WHERE ID=?", [team.summary, team.resource_link, JSON.stringify(platforms), team.hackaton, team.section, team.startDate, team.endDate, uuid], function (err, result) {
             if (err) throw err;
             res.send({status: "successful"});
@@ -222,16 +222,14 @@ router.get('/update', function (req, res) {
     });
 });
 
-router.get('/remove-member', (req, res) => {
-    let team = req.query.team;
-    let members = team.POSTS.trim().substr(0, team.POSTS.length - 1).split(',');
+router.post('/remove-member', (req, res) => {
+    debug.log(req.body);
+    let members = req.body.team_posts.trim().substr(0, req.body.team_posts.length - 1).split(',');
     let index = members.indexOf(req.query.collaborator);
-    debug.log(members);
     members.splice(index, 1);
-    debug.log(members);
     let newMembers = '';
     members.forEach((member) => newMembers += member + ',');
-    con.query('UPDATE teams SET POSTS = ? WHERE ID = ?', [newMembers, team.ID], (err, result) => {
+    con.query('UPDATE teams SET POSTS = ? WHERE ID = ?', [newMembers, req.body.team_id], (err, result) => {
         if (err) throw err;
         res.send({status: 'successful'})
     });
@@ -296,10 +294,6 @@ router.get('/edit/:team', function (req, res) {
     if (!req.cookies.username)
         res.redirect('/login');
 
-    // debug.log('Access teams from page: ' + req.params.team);
-
-    if (req.params.team == 'create')
-        return;
     require('../other/security').convertBase64ToUUID(req.params.team, (uuid) => {
         con.query("SELECT * FROM teams WHERE ID = ? LIMIT 1", [uuid], function (err, result, fields) {
             if (err) throw err;

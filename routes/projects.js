@@ -199,8 +199,9 @@ router.get('/finish', function (req, res) {
     });
 });
 
-router.get('/update', function (req, res) {
-    project = req.query;
+router.post('/update', function (req, res) {
+    debug.log(req.body);
+    project = req.body;
     let platforms = [];
     if (project.platforms) {
         platforms = project.platforms;

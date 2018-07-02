@@ -110,6 +110,7 @@ router.get('/:account_id', (req, res) => {
 router.post('/update-profile', (req, res) => {
     let xss = require('xss');
     let security = require('../other/security');
+    debug.log(req.body);
     let req_data = JSON.parse(xss(JSON.stringify(req.body)));
     switch (req_data.action) {
         case 'CHANGE_PASSWORD': {

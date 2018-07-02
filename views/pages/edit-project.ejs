@@ -141,6 +141,12 @@
 <script src="/vendor/bootstrap-tagsinput/tagsinput.js"></script>
 
 <script>
+    $(function () {
+        let tagsInput = $('.bootstrap-tagsinput > input')[0];
+        $(tagsInput).on('change paste keyup', function () {
+            $(tagsInput).val($(tagsInput).val().replace(/"/g, '\''));
+        })
+    })
     $('.removeCollaborator').on('click', function () {
         $.ajax({
             data: {
@@ -177,7 +183,7 @@
         console.log()
         $.ajax({
             data: project,
-            type: "GET",
+            type: "POST",
             url: "http://localhost:3000/projects/update",
             success: function (res) {
                 console.log(res.status);

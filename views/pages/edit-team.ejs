@@ -65,13 +65,17 @@
                                             <label for="linkedinLink">Section</label>
                                             <input required type="text" name="about" id="section" class="form-control form-control-lg" value="<%= team.SECTION %>">
                                         </div>
-                                        <div class="form-group">
-                                            <label for="linkedinLink">Startting on</label>
-                                            <input type="text" class="form-control" id="datepickerStart" value="<%= team.START_DATE %>">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="linkedinLink">Ending on</label>
-                                            <input type="text" class="form-control" id="datepickerEnd" value="<%= team.END_DATE %>">
+                                        <div class="date-range">
+                                            <div class="row text-center">
+                                                <div class="col-6">Starting on</div>
+                                                <div class="col-6">Ending on</div>
+                                            </div>
+                                            <div class="input-daterange input-group" id="datepicker">
+                                                <% let ds = new Date(parseInt(team.START_DATE)) %>
+                                                <input type="text" value="<%= `${('00' + ds.getDate()).slice(-2)}/${('00' + (ds.getMonth() + 1)).slice(-2)}/${ds.getFullYear()}` %>" class="input-sm form-control" id="date_start" name="date_start"/>
+                                                <% let de = new Date(parseInt(team.END_DATE)) %>
+                                                <input type="text" value="<%= `${('00' + de.getDate()).slice(-2)}/${('00' + (de.getMonth() + 1)).slice(-2)}/${de.getFullYear()}` %>" class="input-sm form-control" id="date_end" name="date_end"/>
+                                            </div>
                                         </div>
                                         <div class="form-group">
                                             <h4 id="platform">What Platform Will Your Project Be Built On?</h4>
@@ -126,25 +130,31 @@
 <script src="/vendor/bootstrap-tagsinput/tagsinput.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js" type="text/javascript"></script>
 <script>
-    $('#datepickerStart').datepicker({
-        format: 'dd/mm/yyyy',
-        startDate: '+1d'
-    });
-    $('#datepickerEnd').datepicker({
-        format: 'dd/mm/yyyy',
-        startDate: '+1d'
+    $('.date-range .input-daterange').datepicker({
+        format: "dd/mm/yyyy",
+        startDate: '-3d',
+        clearBtn: true,
+        autoclose: true,
+        todayHighlight: true
     });
 </script>
 
 
 <script>
+    $(function () {
+        let tagsInput = $('.bootstrap-tagsinput > input')[0];
+        $(tagsInput).on('change paste keyup', function () {
+            $(tagsInput).val($(tagsInput).val().replace(/"/g, '\''));
+        })
+    })
     $('.removeCollaborator').on('click', function () {
         $.ajax({
             data: {
                 collaborator: $(this).data('collaborator'),
-                team: <%- JSON.stringify(team) %>
+                team_id: '<%- team.ID %>',
+                team_posts: '<%- team.POSTS %>'
             },
-            type: 'GET',
+            type: 'POST',
             url: '/teams/remove-member',
             success: function (res) {
                 if (res.status === 'successful')
@@ -161,12 +171,12 @@
             platforms: $("#platformsInput").tagsinput('items'),
             hackaton: document.getElementById('hackaton').value,
             section: document.getElementById('section').value,
-            startDate: document.getElementById('datepickerStart').value,
-            endDate: document.getElementById('datepickerEnd').value
+            startDate: $('#date_start').datepicker('getDate').getTime(),
+            endDate: $('#date_end').datepicker('getDate').getTime()
         };
         $.ajax({
             data: team,
-            type: "GET",
+            type: "POST",
             url: "http://localhost:3000/teams/update",
             success: function (res) {
                 console.log(res.status);
@@ -181,7 +191,7 @@
             data: {
                 BASE64:'<%- team.BASE64 %>'
             },
-            type: 'GET',
+            type: 'POST',
             url: 'http://localhost:3000/teams/finish',
             success: function (res) {
                 console.log(res.status);
