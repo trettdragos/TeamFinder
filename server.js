@@ -38,10 +38,11 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(logger('dev'));
 app.use(validator());
+
 app.use(function(req, res, next) {
-    for (let item in req.body) {
-        req.sanitize(item).escape();
-    }
+    let xss = require('xss')
+        , S = require('string');
+    req.body = JSON.parse(xss(S(JSON.stringify(req.body)).stripTags().s));
     next();
 });
 
