@@ -163,8 +163,7 @@ router.get('/create', function (req, res) {
 });
 
 router.get('/register', function (req, res) {
-    let xss = require('xss');
-    project = JSON.parse(xss(JSON.stringify(req.query)));
+    project = req.query
     // debug.log('checking if project...' + project.name + ' is in db');
     con.query("SELECT * FROM projects WHERE NAME = ? LIMIT 1", [project.name], function (err, result, fields) {
         if (err) throw err;
