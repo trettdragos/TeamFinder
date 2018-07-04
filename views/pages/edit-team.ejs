@@ -168,7 +168,7 @@
             BASE64: '<%- team.BASE64 %>',
             summary: document.getElementById('summary').value,
             resource_link: $('#resource_link').val(),
-            platforms: $("#platformsInput").tagsinput('items'),
+            platforms: JSON.stringify($("#platformsInput").tagsinput('items')),
             hackaton: document.getElementById('hackaton').value,
             section: document.getElementById('section').value,
             startDate: $('#date_start').datepicker('getDate').getTime(),

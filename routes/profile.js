@@ -66,6 +66,8 @@ router.get('/answer', (req, res) => {
                             }
                         });
                     });
+                } else {
+                    res.send({status: "successful"});
                 }
             }
         });
@@ -169,7 +171,7 @@ router.post('/update-profile', (req, res) => {
                 db_data.SKILLS = data.SKILLS;
                 con.query('UPDATE accounts SET PROFILE = ? WHERE EMAIL = ?', [JSON.stringify(db_data), req.cookies.username], (db_err_2, db_res_2) => {
                     if (db_err_2) throw db_err_2;
-                    res.end(JSON.stringify({code: 200, message: "Profile picture successfully reset!"}));
+                    res.end(JSON.stringify({code: 200, message: "Links, about and skills successfully updated!"}));
                 })
             });
             break;

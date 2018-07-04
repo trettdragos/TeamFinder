@@ -47,45 +47,38 @@
                                             <input title="Resource URL" value="<%= project.RESOURCE_LINK %>" placeholder="Example: https://www.github.com/your_account/your_repository/" class="form-control" id="resource_link"/>
                                         </div>
                                         <div class="form-group">
-                                            <label for="exampleFormControlSelect1">Commitment,
-                                                currently:<%= project.COMMITMENT %> </label>
+                                            <label for="exampleFormControlSelect1">Commitment</label>
                                             <select class="form-control" id="commitmentLevel">
-                                                <option>Contractual</option>
-                                                <option>Part-time</option>
-                                                <option>Full-time</option>
-                                                <option>Co-founder</option>
+                                                <option <%if(project.COMMITMENT === "Contractual"){%> selected="selected" <%}%>>Contractual</option>
+                                                <option <%if(project.COMMITMENT === "Part-time"){%> selected="selected" <%}%>>Part-time</option>
+                                                <option <%if(project.COMMITMENT === "Full-time"){%> selected="selected" <%}%>>Full-time</option>
+                                                <option <%if(project.COMMITMENT === "Co-founder"){%> selected="selected" <%}%>>Co-founder</option>
                                             </select>
                                         </div>
                                         <div class="form-group">
-                                            <label for="linkedinLink">Stage: <%= project.STAGE %></label>
+                                            <label for="linkedinLink">Stage</label>
                                             <select class="form-control" id="stage">
-                                                <option>Ideea Stage</option>
-                                                <option>Prototype Already Build</option>
-                                                <option>Live-version available</option>
+                                                <option <%if(project.STAGE === "Idea Stage"){%> selected="selected" <%}%>>Idea Stage</option>
+                                                <option <%if(project.STAGE === "Prototype Already Built"){%> selected="selected" <%}%>>Prototype Already Built</option>
+                                                <option <%if(project.STAGE === "Live Version Available"){%> selected="selected" <%}%>>Live Version Available</option>
                                             </select>
                                         </div>
                                         <div class="form-group">
-                                            <label for="linkedinLink">Budget Range: <%= project.BUDGET %></label>
+                                            <label for="budget">Budget Range</label>
                                             <select class="form-control" id="budget">
-                                                <option>$0-$1,000</option>
-                                                <option>$1,000-$5,000</option>
-                                                <option>$5,000-$10,000</option>
-                                                <option>$10,000-$25,000</option>
-                                                <option>$25,000-$50,000</option>
-                                                <option>$50,000-$100,000</option>
-                                                <option>$100,000+</option>
+                                                <option <%if(project.BUDGET === "$0-$1,000"){%> selected="selected" <%}%>>$0-$1,000</option>
+                                                <option <%if(project.BUDGET === "$1,000-$5,000"){%> selected="selected" <%}%>>$1,000-$5,000</option>
+                                                <option <%if(project.BUDGET === "$5,000-$10,000"){%> selected="selected" <%}%>>$5,000-$10,000</option>
+                                                <option <%if(project.BUDGET === "$10,000-$25,000"){%> selected="selected" <%}%>>$10,000-$25,000</option>
+                                                <option <%if(project.BUDGET === "$25,000-$50,000"){%> selected="selected" <%}%>>$25,000-$50,000</option>
+                                                <option <%if(project.BUDGET === "$50,000-$100,000"){%> selected="selected" <%}%>>$50,000-$100,000</option>
+                                                <option <%if(project.BUDGET === "$100,000+"){%> selected="selected" <%}%>>$100,000+</option>
                                             </select>
                                         </div>
                                         <div class="form-group">
-                                            <label for="linkedinLink">Do you have funding</label>
-                                            <% if(project.FUNDING == 'true' || project.FUNDING == '1'){ %>
                                             <h4>Do you have funding?
-                                                <input type="checkbox" id="funding" data-toggle="toggle" checked="checked">
+                                                <input type="checkbox" id="funding" data-toggle="toggle" <% if(project.FUNDING == 'true' || project.FUNDING == '1'){ %>checked="checked"<%}%>>
                                             </h4>
-                                            <% }else{ %>
-                                            <h4>Do you have funding?
-                                                <input type="checkbox" id="funding" data-toggle="toggle"></h4>
-                                            <% } %>
                                         </div>
                                         <div class="form-group">
                                             <h4 id="platform">What Platform Will Your Project Be Built On?</h4>
@@ -174,7 +167,7 @@
             BASE64: '<%-project.BASE64%>',
             summary: document.getElementById("summary").value,
             commitment: commitmentLevel,
-            platforms: $("#platformsInput").tagsinput('items'),
+            platforms: JSON.stringify($("#platformsInput").tagsinput('items')),
             resource_link: $('#resource_link').val(),
             stage: Stage,
             budget: Budget,

@@ -210,9 +210,10 @@ router.post('/finish', function (req, res) {
 
 router.post('/update', function (req, res) {
     team = req.body;
+    debug.log(team);
     let platforms = [];
     if (team.platforms) {
-        platforms = team.platforms;
+        platforms = JSON.parse(team.platforms);
     }
     require('../other/security').convertBase64ToUUID(team.BASE64, (uuid) => {
         con.query("UPDATE teams SET SUMMARY=?, RESOURCE_LINK=?, PLATFORMS=?, HACKATON=?, SECTION=?, START_DATE=?, END_DATE=? WHERE ID=?", [team.summary, team.resource_link, JSON.stringify(platforms), team.hackaton, team.section, team.startDate, team.endDate, uuid], function (err, result) {

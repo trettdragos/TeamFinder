@@ -34,7 +34,10 @@
         }
 
         .img-circle {
+            max-width: 200px;
             max-height: 200px;
+            width: auto;
+            height: auto;
         }
 
         .link-unstyled, .link-unstyled:link, .link-unstyled:hover {
@@ -187,10 +190,6 @@
 <script>
     let socket = io.connect();
     $('.accept-notification').on('click', function () {
-        console.log()
-        console.log()
-        console.log()
-        console.log()
         let notif = {
             status: 'accept',
             id: $(this).data('notification-id'),
@@ -212,10 +211,6 @@
         });
     });
     $('.refuse-notification').on('click', function () {
-        console.log()
-        console.log()
-        console.log()
-        console.log()
         let notif = {
             status: 'refuse',
             id: $(this).data('notification-id'),

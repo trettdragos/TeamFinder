@@ -163,7 +163,7 @@ router.get('/create', function (req, res) {
 });
 
 router.get('/register', function (req, res) {
-    project = req.query
+    project = req.query;
     // debug.log('checking if project...' + project.name + ' is in db');
     con.query("SELECT * FROM projects WHERE NAME = ? LIMIT 1", [project.name], function (err, result, fields) {
         if (err) throw err;
@@ -203,7 +203,7 @@ router.post('/update', function (req, res) {
     project = req.body;
     let platforms = [];
     if (project.platforms) {
-        platforms = project.platforms;
+        platforms = JSON.parse(project.platforms);
     }
     require('../other/security').convertBase64ToUUID(project.BASE64, (uuid) => {
         con.query("UPDATE projects SET SUMMARY=?, RESOURCE_LINK=?, PLATFORMS=?, COMMITMENT=?, STAGE=?, BUDGET=?, FUNDING=? WHERE ID=?", [project.summary, project.resource_link, JSON.stringify(platforms), project.commitment, project.stage, project.budget, project.funding, uuid], function (err, result) {
