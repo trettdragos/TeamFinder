@@ -59,7 +59,6 @@ router.get('/page/:num', (req, res) => {
 
             let start_page = current_page - 2;
             let end_page = current_page + 2;
-            debug.log(start_page, end_page, current_page);
             if (current_page <= 2) {
                 start_page = 1;
                 end_page = 5 <= last_page ? 5 : last_page;
@@ -67,7 +66,6 @@ router.get('/page/:num', (req, res) => {
                 start_page = last_page - 4;
                 end_page = last_page;
             }
-            debug.log(start_page, end_page);
 
             let pages = {
                 current_page: current_page,
@@ -75,7 +73,6 @@ router.get('/page/:num', (req, res) => {
                 end_page: end_page,
                 last_page: last_page
             };
-            debug.log(pages);
 
             loaded_posts = list.slice((current_page - 1) * posts_per_page, current_page * posts_per_page);
             loaded_posts.forEach((post) => {
