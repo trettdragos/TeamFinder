@@ -67,6 +67,12 @@ router.get('/page/:num', (req, res) => {
                 end_page = last_page;
             }
 
+            if(start_page < 1)
+                start_page = 1;
+            if(end_page > last_page)
+                end_page = last_page;
+
+
             let pages = {
                 current_page: current_page,
                 start_page: start_page,
@@ -147,6 +153,11 @@ router.get('/search/:searchTerm/page/:num', (req, res) => {
                 start_page = last_page - 4;
                 end_page = last_page;
             }
+
+            if(start_page < 1)
+                start_page = 1;
+            if(end_page > last_page)
+                end_page = last_page;
 
             let pages = {
                 current_page: current_page,

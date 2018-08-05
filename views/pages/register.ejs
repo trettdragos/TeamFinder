@@ -51,10 +51,13 @@
                             <label for="skillsInput">Skills</label>
                             <input type="text" id="skillsInput" class="form-control" data-role="tagsinput">
                         </div>
-                        <button class="btn btn-lg btn-block btn-register" type="button" id="submit">Register<i class="fas fa-user"></i></button>
+                        <div class="g-recaptcha" data-sitekey="6LfoYGgUAAAAAI57MspAbR0DdLMxqGpqAHvg5syn"></div>
+                        <button class="btn btn-lg btn-block btn-register" type="button" id="submit">
+                            Register<i class="fas fa-user"></i></button>
                     </form>
                     <div class="pt-1">
-                        <small class="text-center text-muted">Already have an account? <a href="/login" class="font-weight-bold link-unstyled">Log In</a></small>
+                        <small class="text-center text-muted">Already have an account?
+                            <a href="/login" class="font-weight-bold link-unstyled">Log In</a></small>
                     </div>
                 </div>
             </div>
@@ -86,18 +89,24 @@
             name: document.getElementById('fullName').value,
             linkedin: document.getElementById('linkedin').value,
             github: document.getElementById('github').value,
-            skills: $("#skillsInput").tagsinput('items')
+            skills: $("#skillsInput").tagsinput('items'),
+            grecaptcharesponse: grecaptcha.getResponse()
         }
         $.ajax({
             data: user,
-            type: 'GET',
+            type: 'POST',
             url: 'http://localhost:3000/register/auth',
             success: function (res) {
                 console.log(res.status);
                 if (res.status == "successful") {
                     window.location.href = '/register/confirmed';
                 } else {
-                    document.getElementById("email").style.borderColor = "red";
+                    grecaptcha.reset();
+                    if (res.status == 'recaptcha invalid') {
+                        $('.g-recaptcha').find('iframe').first().css('box-sizing', 'border-box').css('-moz-box-sizing', 'border-box').css('-webkit-box-sizing', 'border-box').css('border', '2px solid red');
+                    } else {
+                        document.getElementById("email").style.borderColor = "red";
+                    }
                 }
             }
         });

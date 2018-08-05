@@ -1,15 +1,17 @@
 let express = require('express');
 let logger = require('morgan');
-let app = express();
 let path = require('path');
 let mysql = require('mysql');
 let cookieParser = require('cookie-parser');
 let bodyParser = require('body-parser');
 let validator = require('express-validator');
+let Ddos = require('ddos');
+let ddos = new Ddos({burst:20, limit:30, testmode:true, whitelist:['localhost', '127.0.0.1']});
+global.debug = require('tracer').colorConsole({format : '\x1b[36m{{message}}\x1b[0m (in \x1b[31m{{file}}:{{line}}\x1b[0m)'});
 
+let app = express();
 let server = require('http').createServer(app);
 
-global.debug = require('tracer').colorConsole({format : '\x1b[36m{{message}}\x1b[0m (in \x1b[31m{{file}}:{{line}}\x1b[0m)'});
 
 let connectedUsers = {};
 let connectedSockets = {};
@@ -38,6 +40,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(logger('dev'));
 app.use(validator());
+app.use(ddos.express);
 
 app.use(function(req, res, next) {
     let xss = require('xss')
@@ -45,7 +48,6 @@ app.use(function(req, res, next) {
     req.body = JSON.parse(xss(S(JSON.stringify(req.body)).stripTags().s));
     next();
 });
-
 
 io.on('connection', function (socket) {
     //add user to connected list
