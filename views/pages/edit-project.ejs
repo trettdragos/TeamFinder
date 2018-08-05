@@ -144,9 +144,10 @@
         $.ajax({
             data: {
                 collaborator: $(this).data('collaborator'),
-                project: <%- JSON.stringify(project) %>
+                project_id: '<%- project.ID %>',
+                project_posts: '<%- project.COLLABORATORS %>'
             },
-            type: 'GET',
+            type: 'POST',
             url: '/projects/remove-member',
             success: function (res) {
                 if (res.status === 'successful')
@@ -188,7 +189,11 @@
     });
     $("#finish").on('click', function () {
         $.ajax({
-            data: '<%- project.BASE64 %>',
+            data: {
+                project_id: '<%- project.ID %>',
+                project_posts: '<%= project.COLLABORATORS%>',
+                project_founder: '<%= project.FOUNDER %>'
+            },
             type: 'GET',
             url: 'http://localhost:3000/projects/finish',
             success: function (res) {

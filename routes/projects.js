@@ -202,9 +202,14 @@ router.get('/register', function (req, res) {
 });
 
 router.get('/finish', function (req, res) {
-    project = req.query.name;
-    con.query("UPDATE projects SET ACTIVE=0 WHERE NAME=?", [project], function (err, result) {
+    project = req.query;
+    con.query("UPDATE projects SET ACTIVE=0 WHERE ID=?", [project.project_id], function (err, result) {
         if (err) throw err;
+        project.project_posts.substr(0, project.project_posts.length-1).split(',').concat([project.project_founder]).forEach((user) => {
+            con.query("UPDATE accounts SET REPUTATION = REPUTATION + 2 WHERE EMAIL = ?", [user], (err, res) => {
+                if(err) throw err;
+            });
+        });
         res.send({status: "successful"});
     });
 });
@@ -224,16 +229,20 @@ router.post('/update', function (req, res) {
     });
 });
 
-router.get('/remove-member', (req, res) => {
-    let project = req.query.project;
-    let members = project.COLLABORATORS.trim().substr(0, project.COLLABORATORS.length - 1).split(',');
-    let index = members.indexOf(req.query.collaborator);
-    members.splice(index, 1);
-    let newMembers = '';
-    members.forEach((member) => newMembers += member + ',')
-    con.query('UPDATE projects SET COLLABORATORS = ? WHERE ID = ?', [newMembers, project.ID], (err, result) => {
-        if (err) throw err;
-        res.send({status: 'successful'})
+router.post('/remove-member', (req, res) => {
+    let project = req.body;
+    debug.log(req.body);
+    let members = project.project_posts.trim().substr(0, project.project_posts.length - 1).split(',');
+    con.query("UPDATE accounts SET REPUTATION = REPUTATION - 2 WHERE EMAIL = ?", [req.body.collaborator], function (err1, result1) {
+        if (err1) throw err1;
+        let index = members.indexOf(req.body.collaborator);
+        members.splice(index, 1);
+        let newMembers = '';
+        members.forEach((member) => newMembers += member + ',');
+        con.query('UPDATE projects SET COLLABORATORS = ? WHERE ID = ?', [newMembers, project.project_id], (err, result) => {
+            if (err) throw err;
+            res.send({status: 'successful'})
+        });
     });
 });
 

@@ -189,7 +189,9 @@
     $("#finish").on('click', function () {
         $.ajax({
             data: {
-                BASE64:'<%- team.BASE64 %>'
+                team_id: '<%= team.ID%>',
+                team_collaborators: '<%= team.POSTS %>',
+                team_founder: '<%= team.LEADER%>'
             },
             type: 'POST',
             url: 'http://localhost:3000/teams/finish',

@@ -45,15 +45,15 @@ router.get('/page/:num', (req, res) => {
             if (err) throw err;
 
             let last_page = teams.length / teams_per_page;
-            if (last_page !== parseInt(last_page)){
-                last_page = parseInt(last_page)+1;
+            if (last_page !== parseInt(last_page)) {
+                last_page = parseInt(last_page) + 1;
             }
 
             if (current_page > last_page) {
-                res.redirect('/teams/page/'+last_page);
+                res.redirect('/teams/page/' + last_page);
                 return;
             }
-            if(last_page === 0) {
+            if (last_page === 0) {
                 last_page = 1;
             }
 
@@ -67,9 +67,9 @@ router.get('/page/:num', (req, res) => {
                 end_page = last_page;
             }
 
-            if(start_page < 1)
+            if (start_page < 1)
                 start_page = 1;
-            if(end_page > last_page)
+            if (end_page > last_page)
                 end_page = last_page;
 
 
@@ -124,7 +124,7 @@ router.get('/search/:searchTerm/page', (req, res) => {
 router.get('/search/:searchTerm/page/:num', (req, res) => {
     let current_page = parseInt(req.params.num);
     if (current_page < 1) {
-        res.redirect('/teams/search/'+req.params.searchTerm+'/page/1');
+        res.redirect('/teams/search/' + req.params.searchTerm + '/page/1');
         return;
     }
     if (req.cookies.username) {
@@ -132,15 +132,15 @@ router.get('/search/:searchTerm/page/:num', (req, res) => {
             if (err) throw err;
 
             let last_page = teams.length / teams_per_page;
-            if (last_page !== parseInt(last_page)){
-                last_page = parseInt(last_page)+1;
+            if (last_page !== parseInt(last_page)) {
+                last_page = parseInt(last_page) + 1;
             }
-            if(last_page === 0) {
+            if (last_page === 0) {
                 last_page = 1;
             }
 
             if (current_page > last_page) {
-                res.redirect('/teams/search/'+req.params.searchTerm+'/page/'+last_page);
+                res.redirect('/teams/search/' + req.params.searchTerm + '/page/' + last_page);
                 return;
             }
 
@@ -154,9 +154,9 @@ router.get('/search/:searchTerm/page/:num', (req, res) => {
                 end_page = last_page;
             }
 
-            if(start_page < 1)
+            if (start_page < 1)
                 start_page = 1;
-            if(end_page > last_page)
+            if (end_page > last_page)
                 end_page = last_page;
 
             let pages = {
@@ -211,12 +211,17 @@ router.get('/register', function (req, res) {
 });
 
 router.post('/finish', function (req, res) {
-    require('../other/security').convertBase64ToUUID(req.body.BASE64, (uuid) => {
-        con.query("UPDATE teams SET ACTIVE=0 WHERE ID=?", [uuid], function (err, result) {
-            if (err) throw err;
-            res.send({status: "successful"});
-        })
-    });
+    debug.log(req.body);
+    let team = req.body;
+    con.query("UPDATE teams SET ACTIVE=0 WHERE ID=?", [team.team_id], function (err, result) {
+        if (err) throw err;
+        team.team_collaborators.substr(0, team.team_collaborators.length - 1).split(',').concat([team.team_founder]).forEach((user) => {
+            con.query("UPDATE accounts SET REPUTATION = REPUTATION + 2 WHERE EMAIL = ?", [user], (err, res) => {
+                if (err) throw err;
+            });
+        });
+        res.send({status: "successful"});
+    })
 });
 
 router.post('/update', function (req, res) {
@@ -235,16 +240,18 @@ router.post('/update', function (req, res) {
 });
 
 router.post('/remove-member', (req, res) => {
-    debug.log(req.body);
     let members = req.body.team_posts.trim().substr(0, req.body.team_posts.length - 1).split(',');
-    let index = members.indexOf(req.query.collaborator);
-    members.splice(index, 1);
-    let newMembers = '';
-    members.forEach((member) => newMembers += member + ',');
-    con.query('UPDATE teams SET POSTS = ? WHERE ID = ?', [newMembers, req.body.team_id], (err, result) => {
-        if (err) throw err;
-        res.send({status: 'successful'})
-    });
+    con.query("UPDATE accounts SET REPUTATION = REPUTATION - 2 WHERE EMAIL = ?", [req.body.collaborator], function (err1, result1) {
+        if (err1) throw err1;
+        let index = members.indexOf(req.query.collaborator);
+        members.splice(index, 1);
+        let newMembers = '';
+        members.forEach((member) => newMembers += member + ',');
+        con.query('UPDATE teams SET POSTS = ? WHERE ID = ?', [newMembers, req.body.team_id], (err, result) => {
+            if (err) throw err;
+            res.send({status: 'successful'})
+        });
+    })
 });
 
 router.get('/:team', function (req, res) {
@@ -258,14 +265,14 @@ router.get('/:team', function (req, res) {
             if (err) throw err;
             if (result[0]) {
                 result[0].BASE64 = req.params.team;
-                con.query("SELECT * FROM group_messages WHERE group_uuid = ?", [uuid], function(error, result2){
-                    if(error) throw error;
+                con.query("SELECT * FROM group_messages WHERE group_uuid = ?", [uuid], function (error, result2) {
+                    if (error) throw error;
                     let options = {
                         weekday: "long", year: "numeric", month: "short",
                         day: "numeric", hour: "2-digit", minute: "2-digit",
                         second: '2-digit', hour12: false
                     };
-                    for(index in result2){
+                    for (index in result2) {
                         result2[index].timestamp = new Date(parseInt(result2[index].timestamp)).toLocaleTimeString("en-us", options);
                     }
                     let people = result[0].POSTS.trim().substr(0, result[0].POSTS.trim().length - 1).split(',');
@@ -273,7 +280,7 @@ router.get('/:team', function (req, res) {
                     people.forEach((person) => {
                         list += `\'${person}\', `
                     });
-                    list = list.substr(0, list.length-2);
+                    list = list.substr(0, list.length - 2);
                     con.query(`SELECT * FROM accounts WHERE EMAIL in (${list})`, (err, result3) => {
                         con.query('SELECT * FROM accounts WHERE EMAIL = ?', [result[0].LEADER], (err, result4) => {
                             result[0].PLATFORMS = result[0].PLATFORMS.replace(/\\'/g, '\\"');

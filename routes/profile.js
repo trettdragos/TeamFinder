@@ -37,7 +37,7 @@ router.get('/answer', (req, res) => {
         let notif = JSON.parse(stringNotif);
         for (i in notif) {
             if (notif[i].id === notification.id) {
-                notif[i].vis = "true";
+                notif.splice(i, 1);
             }
         }
         stringNotif = JSON.stringify(notif);
@@ -46,26 +46,28 @@ router.get('/answer', (req, res) => {
             if (result2.affectedRows != 0) {
                 // debug.log('updated notifications for leader');
                 if (notification.status === "accept") {
-                    let table = notification.type + 's';
-                    let col;
-                    if (table === 'projects')
-                        col = 'COLLABORATORS';
-                    else col = 'POSTS';
-                    con.query("SELECT " + col + " FROM " + table + " WHERE NAME = ?", [notification.name], function (err3, result3) {
-                        if (err3) throw err3;
-                        let coll;
-                        if (col == 'POSTS')
-                            coll = result3[0].POSTS;
-                        else coll = result3[0].COLLABORATORS;
-                        coll = coll + notification.requester + ',';
-                        con.query("UPDATE " + table + " SET " + col + " = ? WHERE NAME = ?", [coll, notification.name], function (err4, result4) {
-                            if (err4) throw err4;
-                            if (result4.affectedRows != 0) {
-                                // debug.log('added requester as colaborator');
-                                res.send({status: "successful"});
-                            }
+                    con.query("UPDATE accounts SET REPUTATION = REPUTATION + 1 WHERE EMAIL = ?", [notification.requester], function (err22, result22) {
+                        if(err22) throw err22;
+                        let table = notification.type + 's';
+                        let col;
+                        if (table === 'projects')
+                            col = 'COLLABORATORS';
+                        else col = 'POSTS';
+                        con.query("SELECT " + col + " FROM " + table + " WHERE NAME = ?", [notification.name], function (err3, result3) {
+                            if (err3) throw err3;
+                            let coll;
+                            if (col == 'POSTS')
+                                coll = result3[0].POSTS;
+                            else coll = result3[0].COLLABORATORS;
+                            coll = coll + notification.requester + ',';
+                            con.query("UPDATE " + table + " SET " + col + " = ? WHERE NAME = ?", [coll, notification.name], function (err4, result4) {
+                                if (err4) throw err4;
+                                if (result4.affectedRows != 0) {
+                                    res.send({status: "successful"});
+                                }
+                            });
                         });
-                    });
+                    })
                 } else {
                     res.send({status: "successful"});
                 }
@@ -101,7 +103,8 @@ router.get('/:account_id', (req, res) => {
                         projects: projects,
                         teams: teams,
                         profile: JSON.parse(result[0].PROFILE),
-                        notifications: JSON.parse(result[0].NOTIFICATION)
+                        notifications: JSON.parse(result[0].NOTIFICATION),
+                        reputation: JSON.parse(result[0].REPUTATION)
                     });
                 }
             });

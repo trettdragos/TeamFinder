@@ -44,6 +44,15 @@
             color: inherit;
             text-decoration: inherit;
         }
+        .reputation.red {
+            color: red;
+        }
+        .reputation.green {
+            color: green;
+        }
+        .reputation.yellow {
+            color: yellow;
+        }
     </style>
 </head>
 
@@ -85,6 +94,10 @@
                         </p>
                         <% } %>
 
+                        <p><strong>Reputation: </strong>
+                            <span class="reputation <%if(reputation < 0) {%>red<%} else if(reputation == 0) {%>amber<% } else {%>green<%}%>-text"><%= reputation %></span>
+                        </p>
+
                     </div>
                     <div class="col-12 col-lg-5 order-1 order-sm-1 order-md-1 order-lg-11 text-center text-lg-right">
                         <img src="<% if(profile.PROFILE_PICTURE){ %> <%= profile.PROFILE_PICTURE %> <% } else { %>https://identicon-api.herokuapp.com/<%= email %>/512?format=png<% } %>"
@@ -121,7 +134,7 @@
                                     data-notification-name="<%= notifications[i].name %>" data-notification-user="<%= notifications[i].user %>">Accept</button>
                             <button class="btn refuse-notification" data-notification-id="<%= notifications[i].id %>" data-notification-type="<%= notifications[i].type %>"
                                     data-notification-name="<%= notifications[i].name %>" data-notification-user="<%= notifications[i].user %>">Refuse</button>
-                            User <b><%= notifications[i].user %></b> wants to join <%= notifications[i].type %>
+                            User <b><a href="/profile/<%= notifications[i].user %>"><%= notifications[i].user %></a> </b> wants to join <%= notifications[i].type %>
                             : <%= notifications[i].name %></h4>
                     </div>
                     <% }} %>

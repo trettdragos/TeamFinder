@@ -29,11 +29,11 @@ if (cluster.isMaster) {
     let bodyParser = require('body-parser');
     let validator = require('express-validator');
     let Ddos = require('ddos');
-    let ddos = new Ddos({burst: 20, limit: 30, testmode: true, whitelist: ['localhost', '127.0.0.1']});
+    let ddos = new Ddos({burst: 200, limit: 1000, testmode: true, whitelist: ['localhost', '127.0.0.1']});
 
     let app = express();
     let server = app.listen(3000, function () {
-        debug.info(`Process ${process.pid} is listening to all incoming requests`);
+        // debug.info(`Process ${process.pid} is listening to all incoming requests`);
     });
 
 
@@ -51,10 +51,6 @@ if (cluster.isMaster) {
         password: "",
         database: "TeamFinder"
     });
-
-//// CHAT TEST REMOVE LATER
-    let messagesUsers = {};
-    let messagesSockets = {};
 
     let lastMessage = {};
 
