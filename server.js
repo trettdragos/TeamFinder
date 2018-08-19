@@ -29,7 +29,7 @@ if (cluster.isMaster) {
     let bodyParser = require('body-parser');
     let validator = require('express-validator');
     let Ddos = require('ddos');
-    let ddos = new Ddos({burst: 200, limit: 1000, testmode: true, whitelist: ['localhost', '127.0.0.1']});
+    let ddos = new Ddos({ burst: 300, limit: 4000 });
 
     let app = express();
     let server = app.listen(3000, function () {

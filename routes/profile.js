@@ -47,7 +47,7 @@ router.get('/answer', (req, res) => {
                 // debug.log('updated notifications for leader');
                 if (notification.status === "accept") {
                     con.query("UPDATE accounts SET REPUTATION = REPUTATION + 1 WHERE EMAIL = ?", [notification.requester], function (err22, result22) {
-                        if(err22) throw err22;
+                        if (err22) throw err22;
                         let table = notification.type + 's';
                         let col;
                         if (table === 'projects')
@@ -92,19 +92,37 @@ router.get('/:account_id', (req, res) => {
                         message_page: "Requested profile: " + req.params.account_id
                     });
                 } else {
-                    projects.forEach((project) => require('../other/security').convertUUIDToBase64(project.ID, (base64) => project.BASE64 = base64));
-                    teams.forEach((team) => require('../other/security').convertUUIDToBase64(team.ID, (base64) => team.BASE64 = base64));
-                    res.render('pages/profile', {
-                        username: req.cookies.username,
-                        // profile: "https://identicon-api.herokuapp.com/"+req.params.account_id+"/512?format=png",
-                        tab: '4',
-                        name: result[0].USERNAME,
-                        email: req.params.account_id,
-                        projects: projects,
-                        teams: teams,
-                        profile: JSON.parse(result[0].PROFILE),
-                        notifications: JSON.parse(result[0].NOTIFICATION),
-                        reputation: JSON.parse(result[0].REPUTATION)
+                    let notifications = JSON.parse(result[0].NOTIFICATION);
+                    let requests = notifications.map((notification) => {
+                        return new Promise((resolve) => {
+                            con.query("SELECT USERNAME, EMAIL, REPUTATION FROM accounts WHERE email = ?", [notification.user], (errNotif, account) => {
+                                if (errNotif) throw errNotif;
+                                let data = {
+                                    USERNAME: account[0].USERNAME,
+                                    EMAIL: account[0].EMAIL,
+                                    REPUTATION: account[0].REPUTATION
+                                };
+                                notification.user = data;
+                                resolve();
+                            });
+                        });
+                    });
+                    Promise.all(requests).then(() => {
+                        projects.forEach((project) => require('../other/security').convertUUIDToBase64(project.ID, (base64) => project.BASE64 = base64));
+                        teams.forEach((team) => require('../other/security').convertUUIDToBase64(team.ID, (base64) => team.BASE64 = base64));
+
+                        res.render('pages/profile', {
+                            username: req.cookies.username,
+                            // profile: "https://identicon-api.herokuapp.com/"+req.params.account_id+"/512?format=png",
+                            tab: '4',
+                            name: result[0].USERNAME,
+                            email: req.params.account_id,
+                            projects: projects,
+                            teams: teams,
+                            profile: JSON.parse(result[0].PROFILE),
+                            notifications: notifications,
+                            reputation: JSON.parse(result[0].REPUTATION)
+                        });
                     });
                 }
             });
