@@ -61,7 +61,7 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-lg-12 text-left">
+        <div class="col-lg-12 text-center text-lg-left">
             <div class="card">
                 <div class="row profile align-items-center px-5">
                     <div class="col-12 col-lg-7 order-11 order-sm-11 order-md-11 order-lg-1">
@@ -129,13 +129,18 @@
                     <hr class="my-4">
                     <% for(i in notifications){ %>
                     <% if(notifications[i].vis === "false"){ %>
-                    <div>
-                        <h4><button class="btn accept-notification" data-notification-id="<%= notifications[i].id %>" data-notification-type="<%= notifications[i].type %>"
+                    <div class="row">
+                        <div class="col-lg-2 col-6">
+                            <button class="btn btn-block accept-notification" data-notification-id="<%= notifications[i].id %>" data-notification-type="<%= notifications[i].type %>"
                                     data-notification-name="<%= notifications[i].name %>" data-notification-user="<%= notifications[i].user %>">Accept</button>
-                            <button class="btn refuse-notification" data-notification-id="<%= notifications[i].id %>" data-notification-type="<%= notifications[i].type %>"
+                        </div>
+                        <div class="col-lg-2 col-6">
+                            <button class="btn btn-block refuse-notification" data-notification-id="<%= notifications[i].id %>" data-notification-type="<%= notifications[i].type %>"
                                     data-notification-name="<%= notifications[i].name %>" data-notification-user="<%= notifications[i].user %>">Refuse</button>
-                            User <b><a href="/profile/<%= notifications[i].user %>"><%= notifications[i].user %></a> </b> wants to join <%= notifications[i].type %>
-                            : <%= notifications[i].name %></h4>
+                        </div>
+                        <div class="col-lg-8 col-xs-12 pt-3 pt-lg-0">
+                            <h4>User <b><a href="/profile/<%= notifications[i].user.EMAIL %>"><%= notifications[i].user.USERNAME %></a> (Rep: <span class="reputation <%if(notifications[i].user.REPUTATION < 0) {%>red<%} else if(notifications[i].user.REPUTATION == 0) {%>amber<% } else {%>green<%}%>-text"><%= notifications[i].user.REPUTATION %></span>) </b> wants to join <%= notifications[i].type %> <%= notifications[i].name %></h4>
+                        </div>
                     </div>
                     <% }} %>
                 </div>
