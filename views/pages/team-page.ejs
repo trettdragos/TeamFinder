@@ -388,7 +388,7 @@
                 from: {username: $.cookie('username'), uuid: $.cookie('uuid')},
                 to: '<%- team.ID %>',
                 participants: '<%- team.POSTS %>'+'<%- team.LEADER %>'+',',
-                group: '<%- team.NAME %>',
+                group: '<%- team.NAME.replace("\'", "`") %>',
                 text: $('#message-to-send').val()
             });
             $('#message-to-send').val('');

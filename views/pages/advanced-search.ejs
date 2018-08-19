@@ -4,7 +4,7 @@
 <head>
     <% include ../partials/head.ejs %>
     <link href="/vendor/bootstrap-tagsinput/tagsinput.css" rel="stylesheet"/>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.standalone.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/bootstrap-datepicker.standalone.min.css" rel="stylesheet" type="text/css"/>
 
     <style type="text/css">
         span.tags {
@@ -329,8 +329,9 @@
                                         <div class="col-6">Ending on</div>
                                     </div>
                                     <div class="input-daterange input-group" id="datepicker">
-                                        <input type="text" class="input-sm form-control" id="date_start" name="date_start"/>
-                                        <input type="text" class="input-sm form-control" id="date_end" name="date_end"/>
+                                        <% let ds = new Date() %>
+                                        <input value="<%= `${('00' + ds.getDate()).slice(-2)}/${('00' + (ds.getMonth() + 1)).slice(-2)}/${ds.getFullYear()}` %>" type="text" class="input-sm form-control" id="date_start" name="date_start"/>
+                                        <input value="<%= `${('00' + ds.getDate()).slice(-2)}/${('00' + (ds.getMonth() + 1)).slice(-2)}/${ds.getFullYear()}` %>" type="text" class="input-sm form-control" id="date_end" name="date_end"/>
                                     </div>
                                 </div>
                             </div>

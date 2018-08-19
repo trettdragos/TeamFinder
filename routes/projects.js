@@ -45,12 +45,15 @@ router.get('/page/:num', (req, res) => {
             }
 
             let start_page = current_page - 2;
+            debug.log(start_page);
             let end_page = current_page + 2;
             if (current_page <= 2) {
                 start_page = 1;
+                debug.log(start_page + " 1");
                 end_page = 5 <= last_page ? 5 : last_page;
             } else if (current_page >= last_page - 1) {
                 start_page = last_page - 4;
+                debug.log(start_page + " 2");
                 end_page = last_page;
             }
 
@@ -71,6 +74,8 @@ router.get('/page/:num', (req, res) => {
                 project.PLATFORMS = project.PLATFORMS.replace(/\\'/g, '\\"');
                 require('../other/security').convertUUIDToBase64(project.ID, (b64) => project.BASE64 = b64);
             });
+
+            debug.log(pages)
 
             res.render('pages/projects.ejs', {
                 email: req.cookies.username,
@@ -130,6 +135,11 @@ router.get('/search/:searchTerm/page/:num', (req, res) => {
                 start_page = last_page - 4;
                 end_page = last_page;
             }
+            
+            if(start_page < 1)
+                start_page = 1;
+            if(end_page > last_page)
+                end_page = last_page;
 
             if(start_page < 1)
                 start_page = 1;

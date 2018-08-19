@@ -375,6 +375,7 @@
         });
         $("#send").on('click', function () {
             sendMessage();
+            alert("caca");
         });
         $('#message-to-send').on("keypress", function (e) {
             if (e.keyCode == 13 && !e.shiftKey) {
@@ -385,6 +386,7 @@
         });
 
         function sendMessage() {
+
             if ($('#message-to-send').val().trim() == '') return;
             $('#messages').append(`<li class="clearfix">
                         <div class="message-data align-right">
@@ -401,7 +403,7 @@
                 from: {username: $.cookie('username'), uuid: $.cookie('uuid')},
                 to: '<%- project.ID %>',
                 participants: '<%- project.COLLABORATORS %>'+'<%- project.FOUNDER %>'+',',
-                group: '<%- project.NAME %>',
+                group: '<%- project.NAME.replace("\'", "`") %>',
                 text: $('#message-to-send').val()
             });
             $('#message-to-send').val('');
