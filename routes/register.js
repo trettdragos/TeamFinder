@@ -61,7 +61,7 @@ router.post('/auth', function (req, res) {
                             security.getUUID((uuid) => {
                                 con.query("INSERT INTO accounts (ID, USERNAME, EMAIL, PASSWORD, PROFILE, CONFIRMED, NOTIFICATION) VALUES (?, ?, ?, ?, ?, '0', '[]')", [uuid, user.name, user.email, hash, JSON.stringify(profile)], function (err, result) {
                                     if (err) throw err;
-                                    let email_template = require('../other/utils').emailTemplate;
+                                    let email_template = require('../other/utils').activateAccountEmailTemplate;
                                     email_template = email_template.replace(new RegExp('{{LINK}}', 'g'), 'http://localhost:3000/verification/' + user.email);
                                     let msg = {
                                         to: user.email,

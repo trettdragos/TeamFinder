@@ -21,7 +21,7 @@ router.get('/', (req, res) => {
 router.get('/email', (req, res) => {
     const sgMail = require('@sendgrid/mail');
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-    let email_template = require('../other/utils').emailTemplate;
+    let email_template = require('../other/utils').activateAccountEmailTemplate;
     let useremail = req.cookies.username;
     email_template = email_template.replace(new RegExp('{{LINK}}', 'g'), 'http://localhost:3000/verification/' + useremail);
     let msg = {

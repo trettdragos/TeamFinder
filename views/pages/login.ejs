@@ -26,10 +26,13 @@
                         <button class="btn btn-lg btn-block btn-signin" type="button" onclick="auth()" id="submit"> Login <i
                                     class="fas fa-sign-in-alt"></i></button>
                     </form>
-                    <div class="pt-1">
-                        <small class="text-center text-muted">Don't have an account? <a href="/register"
-                                                                                        class="font-weight-bold link-unstyled">Register</a>
-                        </small>
+                    <div class="row mt-2 text-center">
+                        <div class="col-md-6 col-12">
+                            <small class="text-center text-muted">Don't have an account? <a href="/register" class="font-weight-bold link-unstyled">Register</a></small>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <small class="text-center text-muted"><a href="/reset-password" class="font-weight-bold link-unstyled">Reset password</a></small>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -74,7 +77,6 @@
                     document.getElementById("password").style.borderColor = "red";
                     $('#error').empty().append('Email or Password incorect!');
                 }
-                console.log(JSON.stringify(data));
             }
         });
         //socket.emit('auth login', {email:document.getElementById('email').value, password:document.getElementById('password').value})

@@ -4,8 +4,8 @@ let jwt = require('jsonwebtoken');
 
 let encryptPassword = (pwd, cb) => bcrypt.hash(pwd, 10, (err, encrypted) => cb(encrypted));
 let checkPassword = (pwd, hash, cb) => bcrypt.compare(pwd, hash, (err, res) => cb(res));
-let generateCookieToken = (email, cb) => cb(crypto.createHmac('sha512', require('./utils').server_secret).update(email).digest('hex'));
-let verifyCookieToken = (email, token, cb) => cb(token == crypto.createHmac('sha512', require('./utils').server_secret).update(email).digest('hex'));
+let generateEmailToken = (email, cb) => cb(crypto.createHmac('sha512', require('./utils').server_secret).update(email).digest('hex'));
+let verifyEmailToken = (email, token, cb) => cb(token == crypto.createHmac('sha512', require('./utils').server_secret).update(email).digest('hex'));
 let generateJWT = (email, cb, expiresIn='7d') => cb(jwt.sign({username: email}, require('./utils').server_secret, {algorithm: 'HS512', expiresIn: expiresIn}));
 let verifyJWT = (email, token, cb) => {
     jwt.verify(token, require('./utils').server_secret, {algorithms: ['HS512']}, (err, payload) => {
@@ -33,4 +33,4 @@ let getUUID = (cb) => {require('request').get({url: 'https://www.uuidgenerator.n
 let convertUUIDToBase64 = (UUID, cb) => {cb(require('uuid-base64').encode(UUID).replace(/\./g, '-'))};
 let convertBase64ToUUID = (Base64, cb) => {cb(require('uuid-base64').decode(Base64.replace(/-/g, '.')).toUpperCase())};
 
-module.exports = {encryptPassword, checkPassword, generateJWT, verifyJWT, routeTokenVerification, getUUID, convertBase64ToUUID, convertUUIDToBase64};
+module.exports = {encryptPassword, checkPassword, generateJWT, verifyJWT, routeTokenVerification, getUUID, convertBase64ToUUID, convertUUIDToBase64, generateEmailToken, verifyEmailToken};
