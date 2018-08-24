@@ -305,7 +305,7 @@ if (cluster.isMaster) {
         if (req.query.skip)
             res.render('pages/logout', {time: 1});
         else
-            res.render('pages/logout', {time: 5000});
+            res.render('pages/logout', {time: 2000});
     });
     app.get('/*', (req, res) => {
         res.render('pages/404.ejs', {
