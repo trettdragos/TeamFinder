@@ -1,6 +1,7 @@
 let express = require('express');
 let router = express.Router();
 let mysql = require('mysql');
+let security = require('../other/security');
 
 let con = mysql.createConnection({
     host: "localhost",
@@ -9,7 +10,7 @@ let con = mysql.createConnection({
     database: "TeamFinder"
 });
 
-router.get('/*', (req, res, next) => require('../other/security').routeTokenVerification(req, res, next));
+router.get('/*', (req, res, next) => security.routeTokenVerification(req, res, next));
 
 router.get('/', (req, res) => {
     res.redirect('/profile/' + req.cookies.username);
@@ -103,13 +104,20 @@ router.get('/:account_id', (req, res) => {
                                     REPUTATION: account[0].REPUTATION
                                 };
                                 notification.user = data;
-                                resolve();
+                                con.query("SELECT NAME FROM " + notification.type + "s WHERE ID = ?", [notification.uuid], (errPT, project_team) => {
+                                    if(errPT) throw errPT;
+                                    notification.data = {
+                                        NAME: project_team[0].NAME,
+                                        UUID: notification.uuid
+                                    };
+                                    security.convertUUIDToBase64(notification.uuid, (b64) => {notification.data.BASE64 = b64; resolve()});
+                                });
                             });
                         });
                     });
                     Promise.all(requests).then(() => {
-                        projects.forEach((project) => require('../other/security').convertUUIDToBase64(project.ID, (base64) => project.BASE64 = base64));
-                        teams.forEach((team) => require('../other/security').convertUUIDToBase64(team.ID, (base64) => team.BASE64 = base64));
+                        projects.forEach((project) => security.convertUUIDToBase64(project.ID, (base64) => project.BASE64 = base64));
+                        teams.forEach((team) => security.convertUUIDToBase64(team.ID, (base64) => team.BASE64 = base64));
 
                         res.render('pages/profile', {
                             username: req.cookies.username,
@@ -132,7 +140,7 @@ router.get('/:account_id', (req, res) => {
 
 router.post('/update-profile', (req, res) => {
     let xss = require('xss');
-    let security = require('../other/security');
+    let security = security;
     debug.log(req.body);
     let req_data = JSON.parse(xss(JSON.stringify(req.body)));
     switch (req_data.action) {
@@ -216,7 +224,7 @@ router.post('/change-profile-picture', (req, res) => {
 });
 
 router.post('/change-password', (req, res) => {
-    let security = require('../other/security');
+    let security = security;
     let xss = require('xss');
     let data = JSON.parse(xss(JSON.stringify(req.body)));
 

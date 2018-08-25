@@ -139,7 +139,7 @@
                                     data-notification-name="<%= notifications[i].name %>" data-notification-user="<%= notifications[i].user %>">Refuse</button>
                         </div>
                         <div class="col-lg-8 col-xs-12 pt-3 pt-lg-0">
-                            <h4>User <b><a href="/profile/<%= notifications[i].user.EMAIL %>"><%= notifications[i].user.USERNAME %></a> (Rep: <span class="reputation <%if(notifications[i].user.REPUTATION < 0) {%>red<%} else if(notifications[i].user.REPUTATION == 0) {%>amber<% } else {%>green<%}%>-text"><%= notifications[i].user.REPUTATION %></span>) </b> wants to join <%= notifications[i].type %> <%= notifications[i].name %></h4>
+                            <h4>User <span class="font-weight-bold"><a href="/profile/<%= notifications[i].user.EMAIL %>"><%= notifications[i].user.USERNAME %></a> (Rep: <span class="reputation <%if(notifications[i].user.REPUTATION < 0) {%>red<%} else if(notifications[i].user.REPUTATION == 0) {%>amber<% } else {%>green<%}%>-text"><%= notifications[i].user.REPUTATION %></span>)</span> wants to join <%= notifications[i].type %> <span class="font-weight-bold"><a href="/<%= notifications[i].type %>s/<%=notifications[i].data.BASE64%>"><%= notifications[i].data.NAME %></a></span></h4>
                         </div>
                     </div>
                     <% }} %>

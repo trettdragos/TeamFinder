@@ -62,6 +62,12 @@ if (cluster.isMaster) {
     app.use(validator());
     app.use(ddos.express);
 
+    app.use(function(req, res, next) {
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        next();
+    });
+
     app.use(function (req, res, next) {
         debug.log('Request handled by process ' + process.pid);
         let xss = require('xss')
@@ -142,7 +148,9 @@ if (cluster.isMaster) {
                 if (result) {
                     let notifications = JSON.parse(result[0].NOTIFICATION);
                     let id = req.username;
-                    require('./other/security').convertBase64ToUUID(req.teamUUID, (uuid) => id += uuid);
+                    let teamUUID = '';
+                    require('./other/security').convertBase64ToUUID(req.teamUUID, (uuid) => teamUUID = uuid);
+                    id += teamUUID;
                     id = id.replace('/', '');
                     id = id.replace('@', '');
                     id = id.replace('.', '');
@@ -151,7 +159,7 @@ if (cluster.isMaster) {
                         "user": req.username,
                         "vis": "false",
                         "type": "team",
-                        "name": req.teamName,
+                        "uuid": teamUUID,
                         "id": id
                     };
                     if (connectedUsers[req.leader]) {
@@ -193,7 +201,9 @@ if (cluster.isMaster) {
                 if (result) {
                     let notifications = JSON.parse(result[0].NOTIFICATION);
                     let id = req.username;
-                    require('./other/security').convertBase64ToUUID(req.projectUUID, (uuid) => id += uuid);
+                    let projectUUID = '';
+                    require('./other/security').convertBase64ToUUID(req.projectUUID, (uuid) => projectUUID = uuid);
+                    id += projectUUID;
                     id = id.replace('/', '');
                     id = id.replace('@', '');
                     id = id.replace('.', '');
@@ -202,14 +212,14 @@ if (cluster.isMaster) {
                         "user": req.username,
                         "vis": "false",
                         "type": "project",
-                        "name": req.projectName,
+                        "uuid": projectUUID,
                         "id": id
                     };
                     let newAltReq = {
                         "user": req.username,
                         "vis": "true",
                         "type": "project",
-                        "name": req.projectName,
+                        "uuid": projectUUID,
                         "id": id
                     };
                     if (connectedUsers[req.leader]) {

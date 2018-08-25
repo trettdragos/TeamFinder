@@ -398,13 +398,13 @@
 
     $("#join").on('click', function () {
         let socket = io.connect();
-        let teamname = <%- JSON.stringify(team.NAME) %>;
-        let leadern = <%- JSON.stringify(team.LEADER) %>;
+        let teamName = '<%- team.NAME %>';
+        let teamLeader = '<%- team.LEADER %>';
         socket.emit('request join team', {
             username: $.cookie('username'),
             teamUUID: '<%- team.BASE64 %>',
-            teamName: teamname,
-            leader: leadern,
+            teamName: teamName,
+            leader: teamLeader,
             token: 'alabalaportocala'
         });
         socket.on('request join team', function (res) {

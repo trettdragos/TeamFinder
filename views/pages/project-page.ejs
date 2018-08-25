@@ -416,8 +416,7 @@
 
     $("#join").on('click', function () {
         let socket = io.connect();
-        let projectName = <%- JSON.stringify(project.NAME) %>;
-        let leader = <%- JSON.stringify(project.FOUNDER) %>;
+        let leader = '<%-project.FOUNDER %>';
         socket.emit('request join project', {
             username: $.cookie('username'),
             projectName: '<%- project.NAME %>',
