@@ -354,6 +354,7 @@
                             ${res.text}
                         </div>
                     </li>`);
+                document.getElementsByClassName('chat-history')[0].scrollTop = document.getElementsByClassName('chat-history')[0].scrollHeight;
             }
         });
         $("#send").on('click', function () {
