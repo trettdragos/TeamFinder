@@ -31,7 +31,7 @@ router.get('/edit', (req, res) => {
 
 router.get('/answer', (req, res) => {
     notification = req.query;
-    // debug.log(notification);
+    debug.log(notification);
     con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ?", [notification.leader], function (err, result) {
         if (err) throw err;
         let stringNotif = result[0].NOTIFICATION;
@@ -54,14 +54,14 @@ router.get('/answer', (req, res) => {
                         if (table === 'projects')
                             col = 'COLLABORATORS';
                         else col = 'POSTS';
-                        con.query("SELECT " + col + " FROM " + table + " WHERE NAME = ?", [notification.name], function (err3, result3) {
+                        con.query("SELECT " + col + " FROM " + table + " WHERE ID = ?", [notification.name], function (err3, result3) {
                             if (err3) throw err3;
                             let coll;
                             if (col == 'POSTS')
                                 coll = result3[0].POSTS;
                             else coll = result3[0].COLLABORATORS;
                             coll = coll + notification.requester + ',';
-                            con.query("UPDATE " + table + " SET " + col + " = ? WHERE NAME = ?", [coll, notification.name], function (err4, result4) {
+                            con.query("UPDATE " + table + " SET " + col + " = ? WHERE ID = ?", [coll, notification.name], function (err4, result4) {
                                 if (err4) throw err4;
                                 if (result4.affectedRows != 0) {
                                     res.send({status: "successful"});
@@ -118,7 +118,7 @@ router.get('/:account_id', (req, res) => {
                     Promise.all(requests).then(() => {
                         projects.forEach((project) => security.convertUUIDToBase64(project.ID, (base64) => project.BASE64 = base64));
                         teams.forEach((team) => security.convertUUIDToBase64(team.ID, (base64) => team.BASE64 = base64));
-
+                        debug.log(notifications);
                         res.render('pages/profile', {
                             username: req.cookies.username,
                             // profile: "https://identicon-api.herokuapp.com/"+req.params.account_id+"/512?format=png",
