@@ -140,7 +140,6 @@ router.get('/:account_id', (req, res) => {
 
 router.post('/update-profile', (req, res) => {
     let xss = require('xss');
-    let security = security;
     debug.log(req.body);
     let req_data = JSON.parse(xss(JSON.stringify(req.body)));
     switch (req_data.action) {
@@ -224,7 +223,6 @@ router.post('/change-profile-picture', (req, res) => {
 });
 
 router.post('/change-password', (req, res) => {
-    let security = security;
     let xss = require('xss');
     let data = JSON.parse(xss(JSON.stringify(req.body)));
 

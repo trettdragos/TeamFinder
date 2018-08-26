@@ -371,11 +371,11 @@
                             ${res.text}
                         </div>
                     </li>`);
+                document.getElementsByClassName('chat-history')[0].scrollTop = document.getElementsByClassName('chat-history')[0].scrollHeight;
             }
         });
         $("#send").on('click', function () {
             sendMessage();
-            alert("caca");
         });
         $('#message-to-send').on("keypress", function (e) {
             if (e.keyCode == 13 && !e.shiftKey) {
