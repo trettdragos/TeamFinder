@@ -1,0 +1,80 @@
+.about-container-top {
+    margin-top: -50px;
+    min-height: 100vh;
+    background: #343a40; /* Old browsers */
+    background: -moz-linear-gradient(-45deg, #343a40 0%, #66717c 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(-45deg, #343a40 0%,#66717c 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(135deg, #343a40 0%,#66717c 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#343a40', endColorstr='#66717c',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+}
+
+.no-shadow {
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+    box-shadow: none !important;
+}
+
+.get-started-button {
+    background: #212121; /* Old browsers */
+    background: -moz-linear-gradient(0deg, #2E2E2E 0%, #212121 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(0deg, #2E2E2E 0%,#212121 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(0deg, #2E2E2E 0%,#212121 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    font-weight: 700 !important;
+    color: white !important;
+}
+
+#get_started_button {
+    cursor: pointer;
+}
+
+.btn-rounded {
+    border-radius: 3em !important;
+}
+
+.get-started-button:hover {
+    color: white !important;
+}
+
+.content {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+.content p {
+    margin: 0 0 20px;
+}
+
+/* Arrow & Hover Animation */
+#more-arrows {
+    width: 75px;
+    height: 65px;
+}
+#more-arrows:hover polygon {
+    fill: #FFF;
+    transition: all .2s ease-out;
+}
+#more-arrows:hover polygon.arrow-bottom {
+    -webkit-transform: translateY(-18px);
+    transform: translateY(-18px);
+}
+#more-arrows:hover polygon.arrow-top {
+    -webkit-transform: translateY(18px);
+    transform: translateY(18px);
+}
+
+polygon {
+    fill: #FFF;
+    transition: all .2s ease-out;
+}
+polygon.arrow-middle {
+    opacity: 0.75;
+}
+polygon.arrow-top {
+    opacity: 0.5;
+}
+
+nav {
+    transition: background-color 300ms;
+}
