@@ -69,7 +69,7 @@
                     $.cookie('token', res.token, {expires: 7, path: '/'});
                     $.cookie('notifications', JSON.stringify(res.notifications), {expires: 7, path: '/'});
                     $.cookie('newNotif', res.newNotif, {expires: 7, path: '/'});
-                    window.location.href = '/dashboard';
+                    window.location.href = '/profile';
                 } else if (res.status == "account not verified") {
                     $('#error').empty().append('Account not verified. Please confirm your email');
                 } else {

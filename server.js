@@ -91,7 +91,7 @@ if (cluster.isMaster) {
     });
 
     app.use(function (req, res, next) {
-        debug.log('Request handled by process ' + process.pid);
+        // debug.log('Request handled by process ' + cluster.worker.id);
         let xss = require('xss')
             , S = require('string');
         req.body = JSON.parse(xss(S(JSON.stringify(req.body)).stripTags().s));
