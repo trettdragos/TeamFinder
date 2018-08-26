@@ -163,6 +163,19 @@ if (cluster.isMaster) {
             });
         });
 
+        socket.on('send pm', (req) => {
+            let time = Date.now();
+            con.query("SELECT ID FROM accounts WHERE EMAIL = ? LIMIT 1", [req.to], function(err, result, fields){
+                if(err) throw err;
+                let textToSend = req.from.username + ' send you a private message';
+                if(connectedUsers[req.to])
+                    io.sockets.connected[connectedUsers[req.to]].emit('notification', textToSend);
+                con.query("INSERT INTO group_messages (id, from_uuid, from_name, group_uuid, message, timestamp) VALUES (?, ?, ?, ?, ?, ?)", [0, req.from.uuid, req.from.username, result[0].ID, req.text, time], function (err2, resultI) {
+                    if(err2) throw err2;
+                });
+            });
+        });
+
         socket.on('request join team', function (req) {
             // debug.log("client " + req.username + " requested to join team " + req.teamName + " of user " + req.leader + " with token " + req.token);
             con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ? LIMIT 1", [req.leader], function (err, result, fields) {
