@@ -1,4 +1,21 @@
-let cluster = require('cluster');
+let cluster = require('cluster'),
+    express = require('express'),
+    net = require('net'),
+    sio = require('socket.io'),
+    sio_redis = require('socket.io-redis'),
+    farmhash = require('farmhash');
+
+let logger = require('morgan');
+let path = require('path');
+let mysql = require('mysql');
+let cookieParser = require('cookie-parser');
+let bodyParser = require('body-parser');
+let validator = require('express-validator');
+let Ddos = require('ddos');
+
+let port = 3000,
+    num_processes = require('os').cpus().length;
+
 global.debug = require('tracer').colorConsole({
     format: ['\x1b[36m{{message}}\x1b[0m (in \x1b[31m{{file}}:{{line}}\x1b[0m)', {
         log: '\x1b[36m{{message}}\x1b[0m (in \x1b[31m{{file}}:{{line}}\x1b[0m)',
@@ -8,42 +25,47 @@ global.debug = require('tracer').colorConsole({
 });
 
 if (cluster.isMaster) {
-    let workers = require('os').cpus().length;
-    debug.log(`Master cluster setting up ${workers} workers.`);
-    for (let i = 0; i < workers; i++) {
-        cluster.fork();
+    let workers = [];
+    debug.log(`Master cluster setting up ${num_processes} workers.`);
+    let spawn = (i) => {
+        workers[i] = cluster.fork();
+        workers[i].on('exit', (code, signal) => {
+            debug.log(`Respawning worker ${i}`);
+            spawn(i);
+        })
+    };
+
+    for (let i = 0; i < num_processes; i++) {
+        spawn(i);
     }
-    cluster.on('online', function (worker) {
-        debug.info(`Worker ${worker.process.pid} is online`);
-    });
-    cluster.on('exit', function (worker, code, signal) {
-        debug.error(`Worker ${worker.process.pid} died with code ${code} and signal ${signal}`);
-        cluster.fork();
-    })
+
+    let worker_index = (ip, len) => {
+        return farmhash.fingerprint32(ip) % len;
+    };
+
+    let server = net.createServer({pauseOnConnect: true}, (connection) => {
+        let worker = workers[worker_index(connection.remoteAddress, num_processes)];
+        worker.send('sticky-session:connection', connection);
+    }).listen(port);
 } else {
-    let express = require('express');
-    let logger = require('morgan');
-    let path = require('path');
-    let mysql = require('mysql');
-    let cookieParser = require('cookie-parser');
-    let bodyParser = require('body-parser');
-    let validator = require('express-validator');
-    let Ddos = require('ddos');
+
     let ddos = new Ddos({ burst: 300, limit: 4000 });
 
-    let app = express();
-    let server = app.listen(3000, function () {
-        // debug.info(`Process ${process.pid} is listening to all incoming requests`);
-    });
+    let app = new express();
+    let server = app.listen(0, 'localhost');
+    let io = sio(server);
 
+    io.adapter(sio_redis());
+
+    process.on('message', (message, connection) => {
+        if(message !== 'sticky-session:connection')
+            return;
+        server.emit('connection', connection);
+        connection.resume();
+    });
 
     let connectedUsers = {};
     let connectedSockets = {};
-    let io = require('socket.io').listen(server, {
-        log: false,
-        agent: false,
-        origins: '*:*'
-    });
 
     let con = mysql.createConnection({
         host: "localhost",
@@ -60,7 +82,7 @@ if (cluster.isMaster) {
     app.use(cookieParser());
     app.use(logger('dev'));
     app.use(validator());
-    app.use(ddos.express);
+    // app.use(ddos.express);
 
     app.use(function(req, res, next) {
         res.header("Access-Control-Allow-Origin", "*");
