@@ -145,6 +145,14 @@ router.get('/:account_id/chat', (req, res) => {
         if(err) throw err;
         con.query("SELECT * FROM group_messages WHERE (group_uuid = ? AND from_uuid = ?) OR (group_uuid = ? AND from_uuid = ?)", [req.cookies.uuid, result[0].ID, result[0].ID, req.cookies.uuid], function(err2, result2, fields2){
             if(err2) throw err2;
+            let options = {
+                weekday: "long", year: "numeric", month: "short",
+                day: "numeric", hour: "2-digit", minute: "2-digit",
+                second: '2-digit', hour12: false
+            };
+            for (index in result2) {
+                result2[index].timestamp = new Date(parseInt(result2[index].timestamp)).toLocaleTimeString("en-us", options);
+            }
             res.render('pages/pm.ejs', {
                 tab: '4',
                 email: req.cookies.username,
