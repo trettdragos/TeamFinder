@@ -139,11 +139,12 @@ router.get('/:account_id', (req, res) => {
 });
 
 router.get('/:account_id/chat', (req, res) => {
+    if(!req.cookies.username)
+        res.redirect('/login');
     con.query("SELECT ID FROM accounts WHERE EMAIL = ? LIMIT 1", [req.params.account_id], function(err, result, fields){
         if(err) throw err;
         con.query("SELECT * FROM group_messages WHERE (group_uuid = ? AND from_uuid = ?) OR (group_uuid = ? AND from_uuid = ?)", [req.cookies.uuid, result[0].ID, result[0].ID, req.cookies.uuid], function(err2, result2, fields2){
             if(err2) throw err2;
-            debug.log(result2);
             res.render('pages/pm.ejs', {
                 tab: '4',
                 email: req.cookies.username,

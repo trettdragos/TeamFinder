@@ -227,7 +227,13 @@
     };
 
     let socket = io.connect();
-
+    socket.on('request email', function(){
+            socket.emit('receive email', {email:$.cookie('username')});
+        });
+    socket.on('notification', function(notification){
+        if(notification !== '<%= receiver %> sent you a private message')
+        $.notify(notification, "info");
+    });
     socket.on('send pm', function (res) {
         if (res.from.username != $.cookie('username')) {
             $('#messages').append(`<li>

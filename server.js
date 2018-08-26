@@ -167,9 +167,11 @@ if (cluster.isMaster) {
             let time = Date.now();
             con.query("SELECT ID FROM accounts WHERE EMAIL = ? LIMIT 1", [req.to], function(err, result, fields){
                 if(err) throw err;
-                let textToSend = req.from.username + ' send you a private message';
-                if(connectedUsers[req.to])
+                let textToSend = req.from.username + ' sent you a private message';
+                if(connectedUsers[req.to]){
                     io.sockets.connected[connectedUsers[req.to]].emit('notification', textToSend);
+                    io.sockets.connected[connectedUsers[req.to]].emit('send pm', {text: req.text, from: req.from, time: time});
+                }
                 con.query("INSERT INTO group_messages (id, from_uuid, from_name, group_uuid, message, timestamp) VALUES (?, ?, ?, ?, ?, ?)", [0, req.from.uuid, req.from.username, result[0].ID, req.text, time], function (err2, resultI) {
                     if(err2) throw err2;
                 });
