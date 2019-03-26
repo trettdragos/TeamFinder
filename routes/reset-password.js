@@ -78,8 +78,6 @@ router.post('/reset', (req, res) => {
 router.post('/reset-success', (req, res) => {
    let password = req.body.password;
    let email = req.body.email;
-   debug.log(password);
-   debug.log(email);
 
    security.encryptPassword(password, (encrypted) => {
       con.query('UPDATE accounts SET PASSWORD = ? WHERE EMAIL = ?', [encrypted, email], (err, results) => {

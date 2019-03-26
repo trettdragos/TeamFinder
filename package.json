@@ -1,16 +1,14 @@
 {
-  "name": "teamfinder",
-  "version": "0.0.1",
-  "description": "Web app for finding team",
+  "name": "hacksquad",
+  "version": "1.0.0",
+  "description": "Web application used to find team and project members",
   "main": "server.js",
   "scripts": {
     "run": "node server.js"
   },
-  "keywords": [
-    "trett"
-  ],
+  "keywords": [],
   "author": "Trett Dragos",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@sendgrid/mail": "^6.3.1",
     "bcrypt": "^2.0.1",
@@ -33,7 +31,6 @@
     "passport.socketio": "^3.7.0",
     "path": "^0.12.7",
     "redis": "^2.8.0",
-    "sleep": "^5.1.1",
     "socket.io": "^2.0.4",
     "socket.io-bundle": "^0.1.2",
     "socket.io-redis": "^5.2.0",

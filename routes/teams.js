@@ -278,9 +278,11 @@ router.get('/:team', function (req, res) {
                     let people = result[0].POSTS.trim().substr(0, result[0].POSTS.trim().length - 1).split(',');
                     let list = '';
                     people.forEach((person) => {
-                        list += `\'${person}\', `
+                        list += `\'${person.trim()}\', `
                     });
+                    debug.log(list);
                     list = list.substr(0, list.length - 2);
+                    debug.log(list);
                     con.query(`SELECT * FROM accounts WHERE EMAIL in (${list})`, (err, result3) => {
                         con.query('SELECT * FROM accounts WHERE EMAIL = ?', [result[0].LEADER], (err, result4) => {
                             result[0].PLATFORMS = result[0].PLATFORMS.replace(/\\'/g, '\\"');

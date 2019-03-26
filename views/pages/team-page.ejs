@@ -166,11 +166,11 @@
 </head>
 <body>
 <% if(!email){ %>
-<% include ../partials/dashboard-header.ejs %>
+    <% include ../partials/dashboard-header.ejs %>
 <% } else { %>
-<% include ../partials/header.ejs %>
+    <% include ../partials/header.ejs %>
 <% } %>
-<% include ../partials/footer %>
+<% include ../partials/footer.ejs %>
 <div class="container">
     <div class="row">
         <div class="col-lg-12">
@@ -190,13 +190,13 @@
                             <hr class="my-4">
                             <%
                             let joined = false;
-                            // console.log(team.POSTS.trim().substr(0, team.POSTS.length - 1).split(',').length);
                             let participants = team.POSTS.trim().substr(0, team.POSTS.length - 1).split(',');
                             if (participants.includes(email) || email == team.LEADER) joined = true
                             %>
                             <% if(team.RESOURCE_LINK && joined) { %>
-                            <label for="comment">Resource URL</label>
-                            <h5><a href="<%= team.RESOURCE_LINK %>" target="_blank"><%= team.RESOURCE_LINK %></a></h5>
+                                <label for="comment">Resource URL</label>
+                                <h5><a href="<%= team.RESOURCE_LINK %>" target="_blank"><%= team.RESOURCE_LINK %></a>
+                                </h5>
                             <% } %>
                             <label for="comment">Section</label>
                             <h5><%= team.SECTION %></h5>
@@ -209,7 +209,7 @@
                             <h5><%= `${('00' + de.getDate()).slice(-2)}/${('00' + (de.getMonth() + 1)).slice(-2)}/${de.getFullYear()}` %></h5>
                             <label for="comment">Platforms</label><br>
                             <% JSON.parse(team.PLATFORMS).forEach((platform) => { %>
-                            <span class="tags teal"><%= platform %></span>
+                                <span class="tags teal"><%= platform %></span>
                             <% }) %>
                         </div>
                     </div>
@@ -231,91 +231,104 @@
                                         <div class="col-12 col-md-6 my-auto">
                                             <h5><%= leader.USERNAME %></h5>
                                             <h6><%= leader.EMAIL %></h6>
-                                            <h5>Reputation: <span class="<%if(leader.REPUTATION < 0) {%>red<%} else if(leader.REPUTATION == 0) {%>amber<% } else {%>green<%}%>-text"><%= leader.REPUTATION%></span></h5>
+                                            <h5>Reputation: <span
+                                                        class="<% if(leader.REPUTATION < 0) { %>red<% } else if(leader.REPUTATION == 0) { %>amber<% } else { %>green<% } %>-text"><%= leader.REPUTATION %></span>
+                                            </h5>
                                         </div>
                                         <div class="col-12 col-md-6 my-0 py-0" style="">
-                                            <img src="<% if(leader.PROFILE_PICTURE){ %> <%= leader.PROFILE_PICTURE %> <% } else { %>https://identicon-api.herokuapp.com/<%= leader.EMAIL %>/100?format=png<% } %>" alt="" class="" style="max-width: 100px; float: right;">
+                                            <img src="<% if(leader.PROFILE_PICTURE){ %> <%= leader.PROFILE_PICTURE %> <% } else { %>https://identicon-api.herokuapp.com/<%= leader.EMAIL %>/100?format=png<% } %>"
+                                                 alt="" class="" style="max-width: 100px; float: right;">
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <label for="comment">Other Members:</label>
                             <% if(team.POSTS){ %>
-                            <% let collaborators = team.POSTS.trim().substr(0, team.POSTS.length - 1).split(',') %>
-                            <% for(index in accounts) { %>
-                            <div class="card align-items-center my-2 profile-link" data-profile="<%= accounts[index].EMAIL %>">
-                                <div class="card-body col-12 d-flex flex-column">
-                                    <div class="row">
-                                        <div class="col-12 col-md-6 my-auto">
-                                            <h5><%= accounts[index].USERNAME %></h5>
-                                            <h6><%= accounts[index].EMAIL %></h6>
-                                            <h5>Reputation: <span class="<%if(accounts[index].REPUTATION < 0) {%>red<%} else if(accounts[index].REPUTATION == 0) {%>amber<% } else {%>green<%}%>-text"><%= accounts[index].REPUTATION%></span></h5>
-                                        </div>
-                                        <div class="col-12 col-md-6 my-0 py-0" style="">
-                                            <img src="<% if(accounts[index].PROFILE_PICTURE){ %> <%= accounts[index].PROFILE_PICTURE %> <% } else { %>https://identicon-api.herokuapp.com/<%= accounts[index].EMAIL %>/70?format=png<% } %>" alt="" class="" style="max-width: 100px; float: right;">
+                                <% let collaborators = team.POSTS.trim().substr(0, team.POSTS.length - 1).split(','); %>
+                                <% for(index in accounts) { %>
+                                    <div class="card align-items-center my-2 profile-link"
+                                         data-profile="<%= accounts[index].EMAIL %>">
+                                        <div class="card-body col-12 d-flex flex-column">
+                                            <div class="row">
+                                                <div class="col-12 col-md-6 my-auto">
+                                                    <h5><%= accounts[index].USERNAME %></h5>
+                                                    <h6><%= accounts[index].EMAIL %></h6>
+                                                    <h5>Reputation: <span
+                                                                class="<% if(accounts[index].REPUTATION < 0) { %>red<% } else if(accounts[index].REPUTATION == 0) { %>amber<% } else { %>green<% } %>-text"><%= accounts[index].REPUTATION %></span>
+                                                    </h5>
+                                                </div>
+                                                <div class="col-12 col-md-6 my-0 py-0" style="">
+                                                    <img src="<% if(accounts[index].PROFILE_PICTURE){ %> <%= accounts[index].PROFILE_PICTURE %> <% } else { %>https://identicon-api.herokuapp.com/<%= accounts[index].EMAIL %>/70?format=png<% } %>"
+                                                         alt="" class="" style="max-width: 100px; float: right;">
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            <% } %>
+                                <% } %>
                             <% } else{ %>
-                            <h5>none</h5>
+                                <h5>none</h5>
                             <% } %>
                         </div>
                         <div class="card-footer">
                             <% if (email != team.LEADER && team.ACTIVE && !joined) { %>
-                            <button class="my-3 btn btn-lg btn-block font-weight-bold" id="join">Join</button>
+                                <button class="my-3 btn btn-lg btn-block font-weight-bold" id="join">Join</button>
                             <% } else if (team.ACTIVE && email == team.LEADER) { %>
-                            <a href="/teams/edit/<%= team.BASE64 %>" class="my-3 btn btn-lg btn-block font-weight-bold" id="editBtn">Edit
-                                Team</a>
+                                <a href="/teams/edit/<%= team.BASE64 %>"
+                                   class="my-3 btn btn-lg btn-block font-weight-bold" id="editBtn">Edit
+                                    Team</a>
                             <% } else if(!team.ACTIVE){ %>
-                            <h5 class="font-weight-bold text-center">This team was marked as inactive<br> (no longer searching
-                                for participants)</h5>
+                                <h5 class="font-weight-bold text-center">This team was marked as inactive<br> (no longer
+                                    searching
+                                    for participants)</h5>
                             <% } %>
                         </div>
                     </div>
                 </div>
             </div>
             <% if(joined) { %>
-            <div class="card my-5">
-                <div class="card-body">
-                    <div class="chat w-100">
-                        <div class="chat-history">
-                            <ul class="list-unstyled" id="messages">
-                                <% for(index in messages){ %>
-                                <% if(messages[index].from_uuid == uuid){ %>
-                                <li class="clearfix">
-                                    <div class="message-data align-right">
-                                        <span class="message-data-time"><%= messages[index].timestamp %></span> &nbsp;
-                                        &nbsp; <span class="message-data-name"><%= messages[index].from_name %></span>
-                                        <i class="fa fa-circle me"></i>
+                <div class="card my-5">
+                    <div class="card-body">
+                        <div class="chat w-100">
+                            <div class="chat-history">
+                                <ul class="list-unstyled" id="messages">
+                                    <% for(index in messages){ %>
+                                        <% if(messages[index].from_uuid == uuid){ %>
+                                            <li class="clearfix">
+                                                <div class="message-data align-right">
+                                                    <span class="message-data-time"><%= messages[index].timestamp %></span>
+                                                    &nbsp;
+                                                    &nbsp; <span
+                                                            class="message-data-name"><%= messages[index].from_name %></span>
+                                                    <i class="fa fa-circle me"></i>
 
-                                    </div>
-                                    <div class="message other-message float-right">
-                                        <%= messages[index].message %>
-                                    </div>
-                                </li>
-                                <% }else{ %>
-                                <li>
-                                    <div class="message-data">
-                                        <span class="message-data-name"><i class="fa fa-circle online"></i><%= messages[index].from_name %></span>
-                                        <span class="message-data-time"><%= messages[index].timestamp %></span>
-                                    </div>
-                                    <div class="message my-message">
-                                        <%= messages[index].message %>
-                                    </div>
-                                </li>
-                                <% } %>
-                                <% } %>
-                            </ul>
-                        </div>
-                        <div class="chat-message clearfix">
-                            <textarea name="message-to-send" id="message-to-send" placeholder="Type your message" rows="3"></textarea>
-                            <button id="send">Send</button>
+                                                </div>
+                                                <div class="message other-message float-right">
+                                                    <%= messages[index].message %>
+                                                </div>
+                                            </li>
+                                        <% }else{ %>
+                                            <li>
+                                                <div class="message-data">
+                                                    <span class="message-data-name"><i
+                                                                class="fa fa-circle online"></i><%= messages[index].from_name %></span>
+                                                    <span class="message-data-time"><%= messages[index].timestamp %></span>
+                                                </div>
+                                                <div class="message my-message">
+                                                    <%= messages[index].message %>
+                                                </div>
+                                            </li>
+                                        <% } %>
+                                    <% } %>
+                                </ul>
+                            </div>
+                            <div class="chat-message clearfix">
+                                <textarea name="message-to-send" id="message-to-send" placeholder="Type your message"
+                                          rows="3"></textarea>
+                                <button id="send">Send</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
             <% } %>
         </div>
     </div>
@@ -367,11 +380,6 @@
                 return false;
             }
         });
-
-        $('.profile-link').on('click', function () {
-            window.location.href = '/profile/' + $(this).data('profile');
-        })
-
         function sendMessage() {
             if ($('#message-to-send').val().trim() == '') return;
             $('#messages').append(`<li class="clearfix">
@@ -388,14 +396,20 @@
             group_chat_socket.emit('send message', {
                 from: {username: $.cookie('username'), uuid: $.cookie('uuid')},
                 to: '<%- team.ID %>',
-                participants: '<%- team.POSTS %>'+'<%- team.LEADER %>'+',',
+                participants: '<%- team.POSTS %>' + '<%- team.LEADER %>' + ',',
                 group: '<%- team.NAME.replace("\'", "`") %>',
                 text: $('#message-to-send').val()
             });
             $('#message-to-send').val('');
         }
+
         document.getElementsByClassName('chat-history')[0].scrollTop = document.getElementsByClassName('chat-history')[0].scrollHeight;
     }
+
+    $('.profile-link').on('click', function () {
+        window.location.href = '/profile/' + $(this).data('profile');
+    });
+
 
     $("#join").on('click', function () {
         let socket = io.connect();
