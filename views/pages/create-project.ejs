@@ -199,7 +199,7 @@
             $.ajax({
                 data: project,
                 type: 'GET',
-                url: 'http://localhost:3000/projects/register',
+                url: '/projects/register',
                 success: function (res) {
                     console.log(res.status);
                     if (res.status === 'successful')

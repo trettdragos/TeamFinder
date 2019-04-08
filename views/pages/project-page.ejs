@@ -249,7 +249,10 @@
                                     <div class="row">
                                         <div class="col-12 col-md-6 my-auto">
                                             <h5><%= leader.USERNAME %></h5>
-                                            <h5><%= leader.EMAIL %></h5>
+                                            <h6><%= leader.EMAIL %></h6>
+                                            <h5>Reputation: <span
+                                                        class="<% if(leader.REPUTATION < 0) { %>red<% } else if(leader.REPUTATION == 0) { %>amber<% } else { %>green<% } %>-text"><%= leader.REPUTATION %></span>
+                                            </h5>
                                         </div>
                                         <div class="col-12 col-md-6 my-0 py-0" style="">
                                             <img src="<% if(leader.PROFILE_PICTURE){ %> <%= leader.PROFILE_PICTURE %> <% } else { %>https://identicon-api.herokuapp.com/<%= leader.EMAIL %>/70?format=png<% } %>" alt="" class="" style="max-width: 70px; float: right;">
@@ -266,7 +269,10 @@
                                     <div class="row">
                                         <div class="col-12 col-md-6 my-auto">
                                             <h5><%= accounts[index].USERNAME %></h5>
-                                            <h5><%= accounts[index].EMAIL %></h5>
+                                            <h6><%= accounts[index].EMAIL %></h6>
+                                            <h5>Reputation: <span
+                                                        class="<% if(accounts[index].REPUTATION < 0) { %>red<% } else if(accounts[index].REPUTATION == 0) { %>amber<% } else { %>green<% } %>-text"><%= accounts[index].REPUTATION %></span>
+                                            </h5>
                                         </div>
                                         <div class="col-12 col-md-6 my-0 py-0" style="">
                                             <img src="<% if(accounts[index].PROFILE_PICTURE){ %> <%= accounts[index].PROFILE_PICTURE %> <% } else { %>https://identicon-api.herokuapp.com/<%= accounts[index].EMAIL %>/70?format=png<% } %>" alt="" class="" style="max-width: 70px; float: right;">

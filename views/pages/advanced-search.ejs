@@ -405,7 +405,7 @@
             $.ajax({
                     data: data,
                     type: 'GET',
-                    url: 'http://localhost:3000/advanced-search/projects',
+                    url: '/advanced-search/projects',
                     success: function (res) {
                         console.log(res);
                         if (res.status == 'successful') {
@@ -452,7 +452,7 @@
             $.ajax({
                     data: data,
                     type: 'GET',
-                    url: 'http://localhost:3000/advanced-search/teams',
+                    url: '/advanced-search/teams',
                     success: function (res) {
                         console.log(res);
                         if (res.status == 'successful') {

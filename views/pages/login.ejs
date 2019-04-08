@@ -60,7 +60,7 @@
                 password: document.getElementById('password').value
             },
             type: 'GET',
-            url: 'http://localhost:3000/login/auth',
+            url: '/login/auth',
             success: function (res) {
                 console.log(res.status);
                 if (res.status == "successful") {

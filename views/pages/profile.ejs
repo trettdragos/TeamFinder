@@ -223,7 +223,7 @@
         $.ajax({
             data: notif,
             type: 'GET',
-            url: 'http://localhost:3000/profile/answer',
+            url: '/profile/answer',
             success: function (res) {
                 console.log(res.status);
                 if (res.status == "successful") {
@@ -244,7 +244,7 @@
         $.ajax({
             data: notif,
             type: 'GET',
-            url: 'http://localhost:3000/profile/answer',
+            url: '/profile/answer',
             success: function (res) {
                 console.log(res.status);
                 if (res.status == "successful") {

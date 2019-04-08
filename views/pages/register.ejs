@@ -95,7 +95,7 @@
         $.ajax({
             data: user,
             type: 'POST',
-            url: 'http://localhost:3000/register/auth',
+            url: '/register/auth',
             success: function (res) {
                 console.log(res.status);
                 if (res.status == "successful") {

@@ -178,7 +178,7 @@
         $.ajax({
             data: project,
             type: "POST",
-            url: "http://localhost:3000/projects/update",
+            url: "/projects/update",
             success: function (res) {
                 console.log(res.status);
                 if (res.status === 'successful')
@@ -195,7 +195,7 @@
                 project_founder: '<%= project.FOUNDER %>'
             },
             type: 'GET',
-            url: 'http://localhost:3000/projects/finish',
+            url: '/projects/finish',
             success: function (res) {
                 console.log(res.status);
                 if (res.status === 'successful')
