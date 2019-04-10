@@ -49,7 +49,7 @@ if (cluster.isMaster) {
     }).listen(port);
 } else {
 
-    let ddos = new Ddos({ burst: 300, limit: 4000 });
+    let ddos = new Ddos({burst: 300, limit: 4000});
 
     let app = new express();
     let server = app.listen(0, 'localhost');
@@ -58,7 +58,7 @@ if (cluster.isMaster) {
     io.adapter(sio_redis());
 
     process.on('message', (message, connection) => {
-        if(message !== 'sticky-session:connection')
+        if (message !== 'sticky-session:connection')
             return;
         server.emit('connection', connection);
         connection.resume();
@@ -66,6 +66,7 @@ if (cluster.isMaster) {
 
     let connectedUsers = {};
     let connectedSockets = {};
+    let lastMessage = {};
 
     let con = mysql.createConnection({
         host: "localhost",
@@ -73,8 +74,6 @@ if (cluster.isMaster) {
         password: "",
         database: "TeamFinder"
     });
-
-    let lastMessage = {};
 
     app.use(express.static(path.join(__dirname, 'public')));
     app.use(bodyParser.json());
@@ -84,7 +83,7 @@ if (cluster.isMaster) {
     app.use(validator());
     // app.use(ddos.express);
 
-    app.use(function(req, res, next) {
+    app.use(function (req, res, next) {
         res.header("Access-Control-Allow-Origin", "*");
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         next();
@@ -132,9 +131,23 @@ if (cluster.isMaster) {
             //debug.log(`-------USER ${req.from.username}(${req.from.uuid}) SENT ${req.text} TO ROOM ${req.to} -------`);
             let time = Date.now();
             con.query("SELECT USERNAME FROM accounts WHERE ID = ?", [req.from.uuid], function (error, result) {
-                if (error) throw error;
+                if (error) {
+                    res.render('pages/error.ejs', {
+                        message_main: "Internal Server Error (500)",
+                        message_redirect: `${error.errno}/${error.code}`,
+                        message_page: "Requested page: " + req.url.substr(0)
+                    });
+                    throw error;
+                }
                 con.query("INSERT INTO group_messages (id, from_uuid, from_name, group_uuid, message, timestamp) VALUES (?, ?, ?, ?, ?, ?)", [0, req.from.uuid, result[0].USERNAME, req.to, req.text, time], function (err, resultI) {
-                    if (err) throw err;
+                    if (err) {
+                        res.render('pages/error.ejs', {
+                            message_main: "Internal Server Error (500)",
+                            message_redirect: `${err.errno}/${err.code}`,
+                            message_page: "Requested page: " + req.url.substr(0)
+                        });
+                        throw err;
+                    }
                     let people = req.participants.trim().substr(0, req.participants.trim().length - 1).split(',');
                     if (lastMessage[req.to]) {
                         debug.log(time);
@@ -165,15 +178,33 @@ if (cluster.isMaster) {
 
         socket.on('send pm', (req) => {
             let time = Date.now();
-            con.query("SELECT ID FROM accounts WHERE EMAIL = ? LIMIT 1", [req.to], function(err, result, fields){
-                if(err) throw err;
+            con.query("SELECT ID FROM accounts WHERE EMAIL = ? LIMIT 1", [req.to], function (err, result, fields) {
+                if (err) {
+                    res.render('pages/error.ejs', {
+                        message_main: "Internal Server Error (500)",
+                        message_redirect: `${err.errno}/${err.code}`,
+                        message_page: "Requested page: " + req.url.substr(0)
+                    });
+                    throw err;
+                }
                 let textToSend = req.from.username + ' sent you a private message';
-                if(connectedUsers[req.to]){
+                if (connectedUsers[req.to]) {
                     io.sockets.connected[connectedUsers[req.to]].emit('notification', textToSend);
-                    io.sockets.connected[connectedUsers[req.to]].emit('send pm', {text: req.text, from: req.from, time: time});
+                    io.sockets.connected[connectedUsers[req.to]].emit('send pm', {
+                        text: req.text,
+                        from: req.from,
+                        time: time
+                    });
                 }
                 con.query("INSERT INTO group_messages (id, from_uuid, from_name, group_uuid, message, timestamp) VALUES (?, ?, ?, ?, ?, ?)", [0, req.from.uuid, req.from.username, result[0].ID, req.text, time], function (err2, resultI) {
-                    if(err2) throw err2;
+                    if (err2) {
+                        res.render('pages/error.ejs', {
+                            message_main: "Internal Server Error (500)",
+                            message_redirect: `${err2.errno}/${err2.code}`,
+                            message_page: "Requested page: " + req.url.substr(0)
+                        });
+                        throw err2;
+                    }
                 });
             });
         });
@@ -181,7 +212,14 @@ if (cluster.isMaster) {
         socket.on('request join team', function (req) {
             // debug.log("client " + req.username + " requested to join team " + req.teamName + " of user " + req.leader + " with token " + req.token);
             con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ? LIMIT 1", [req.leader], function (err, result, fields) {
-                if (err) throw err;
+                if (err) {
+                    res.render('pages/error.ejs', {
+                        message_main: "Internal Server Error (500)",
+                        message_redirect: `${err.errno}/${err.code}`,
+                        message_page: "Requested page: " + req.url.substr(0)
+                    });
+                    throw err;
+                }
                 if (result) {
                     let notifications = JSON.parse(result[0].NOTIFICATION);
                     let id = req.username;
@@ -217,7 +255,14 @@ if (cluster.isMaster) {
                         notifications.push(newReq);
                         let notifTxt = JSON.stringify(notifications);
                         con.query("UPDATE accounts SET NOTIFICATION = ? WHERE EMAIL = ?", [notifTxt, req.leader], function (err, result) {
-                            if (err) throw err;
+                            if (err) {
+                                res.render('pages/error.ejs', {
+                                    message_main: "Internal Server Error (500)",
+                                    message_redirect: `${err.errno}/${err.code}`,
+                                    message_page: "Requested page: " + req.url.substr(0)
+                                });
+                                throw err;
+                            }
                             if (result.affectedRows == 0) {
                                 socket.emit('request join team', {status: "failed"});
                                 // debug.log('failed to register request to team leader ' + req.leader + " from user " + req.username + " in team " + req.teamName);
@@ -234,7 +279,14 @@ if (cluster.isMaster) {
         socket.on('request join project', function (req) {
             // debug.log("client " + req.username + " requested to join project " + req.projectName + " of user " + req.leader + " with token " + req.token);
             con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ? LIMIT 1", [req.leader], function (err, result, fields) {
-                if (err) throw err;
+                if (err) {
+                    res.render('pages/error.ejs', {
+                        message_main: "Internal Server Error (500)",
+                        message_redirect: `${err.errno}/${err.code}`,
+                        message_page: "Requested page: " + req.url.substr(0)
+                    });
+                    throw err;
+                }
                 if (result) {
                     let notifications = JSON.parse(result[0].NOTIFICATION);
                     let id = req.username;
@@ -278,7 +330,14 @@ if (cluster.isMaster) {
                         notifications.push(newReq);
                         let notifTxt = JSON.stringify(notifications);
                         con.query("UPDATE accounts SET NOTIFICATION = ? WHERE EMAIL = ?", [notifTxt, req.leader], function (err, result) {
-                            if (err) throw err;
+                            if (err) {
+                                res.render('pages/error.ejs', {
+                                    message_main: "Internal Server Error (500)",
+                                    message_redirect: `${err.errno}/${err.code}`,
+                                    message_page: "Requested page: " + req.url.substr(0)
+                                });
+                                throw err;
+                            }
                             if (result.affectedRows == 0) {
                                 socket.emit('request join project', {status: "failed"});
                                 // debug.log('failed to register request to team leader ' + req.leader + " from user " + req.username + " in team " + req.teamName);
@@ -294,7 +353,14 @@ if (cluster.isMaster) {
         socket.on('answer request', function (req) {
             // debug.log("leader " + req.leader);
             con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ?", [req.leader], function (err, result) {
-                if (err) throw err;
+                if (err) {
+                    res.render('pages/error.ejs', {
+                        message_main: "Internal Server Error (500)",
+                        message_redirect: `${err.errno}/${err.code}`,
+                        message_page: "Requested page: " + req.url.substr(0)
+                    });
+                    throw err;
+                }
                 // debug.log(req.leader);
                 let stringNotif = result[0].NOTIFICATION;
                 let notif = JSON.parse(stringNotif);
@@ -305,7 +371,14 @@ if (cluster.isMaster) {
                 }
                 stringNotif = JSON.stringify(notif);
                 con.query("UPDATE accounts SET NOTIFICATION = ? WHERE EMAIL = ?", [stringNotif, req.leader], function (err2, result2) {
-                    if (err2) throw err2;
+                    if (err2) {
+                        res.render('pages/error.ejs', {
+                            message_main: "Internal Server Error (500)",
+                            message_redirect: `${err2.errno}/${err2.code}`,
+                            message_page: "Requested page: " + req.url.substr(0)
+                        });
+                        throw err2;
+                    }
                     if (result2.affectedRows != 0) {
                         // debug.log('updated notifications for leader');
                         if (req.status === "accept") {
@@ -315,14 +388,28 @@ if (cluster.isMaster) {
                                 col = 'COLLABORATORS';
                             else col = 'POSTS';
                             con.query("SELECT " + col + " FROM " + table + " WHERE NAME = ?", [req.name], function (err3, result3) {
-                                if (err3) throw err3;
+                                if (err3) {
+                                    res.render('pages/error.ejs', {
+                                        message_main: "Internal Server Error (500)",
+                                        message_redirect: `${err3.errno}/${err3.code}`,
+                                        message_page: "Requested page: " + req.url.substr(0)
+                                    });
+                                    throw err3;
+                                }
                                 let coll;
                                 if (col == 'POSTS')
                                     coll = result3[0].POSTS;
                                 else coll = result3[0].COLLABORATORS;
                                 coll = coll + req.requester + ',';
                                 con.query("UPDATE " + table + " SET " + col + " = ? WHERE NAME = ?", [coll, req.name], function (err4, result4) {
-                                    if (err4) throw err4;
+                                    if (err4) {
+                                        res.render('pages/error.ejs', {
+                                            message_main: "Internal Server Error (500)",
+                                            message_redirect: `${err4.errno}/${err4.code}`,
+                                            message_page: "Requested page: " + req.url.substr(0)
+                                        });
+                                        throw err4;
+                                    }
                                     if (result4.affectedRows != 0) {
                                         // debug.log('added requester as colaborator');
                                         socket.emit('answer request', {status: 'successful'});
@@ -355,7 +442,7 @@ if (cluster.isMaster) {
             res.render('pages/logout', {time: 2000});
     });
     app.get('/*', (req, res) => {
-        res.render('pages/404.ejs', {
+        res.render('pages/error.ejs', {
             message_main: "The page you're looking for could not be found (404)",
             message_redirect: `Click <a href=\"/\">here</a> to go back to home`,
             message_page: "Requested page: " + req.url.substr(0)

@@ -33,7 +33,14 @@ router.get('/answer', (req, res) => {
     notification = req.query;
     debug.log(notification);
     con.query("SELECT NOTIFICATION FROM accounts WHERE EMAIL = ?", [notification.leader], function (err, result) {
-        if (err) throw err;
+        if (err) {
+            res.render('pages/error.ejs', {
+                message_main: "Internal Server Error (500)",
+                message_redirect: `${err.errno}/${err.code}`,
+                message_page: "Requested page: " + req.url.substr(0)
+            });
+            throw err;
+        }
         let stringNotif = result[0].NOTIFICATION;
         let notif = JSON.parse(stringNotif);
         for (i in notif) {
@@ -43,26 +50,54 @@ router.get('/answer', (req, res) => {
         }
         stringNotif = JSON.stringify(notif);
         con.query("UPDATE accounts SET NOTIFICATION = ? WHERE EMAIL = ?", [stringNotif, notification.leader], function (err2, result2) {
-            if (err2) throw err2;
+            if (err2) {
+                res.render('pages/error.ejs', {
+                    message_main: "Internal Server Error (500)",
+                    message_redirect: `${err2.errno}/${err2.code}`,
+                    message_page: "Requested page: " + req.url.substr(0)
+                });
+                throw err2;
+            }
             if (result2.affectedRows != 0) {
                 // debug.log('updated notifications for leader');
                 if (notification.status === "accept") {
                     con.query("UPDATE accounts SET REPUTATION = REPUTATION + 1 WHERE EMAIL = ?", [notification.requester], function (err22, result22) {
-                        if (err22) throw err22;
+                        if (err22) {
+                            res.render('pages/error.ejs', {
+                                message_main: "Internal Server Error (500)",
+                                message_redirect: `${err22.errno}/${err22.code}`,
+                                message_page: "Requested page: " + req.url.substr(0)
+                            });
+                            throw err22;
+                        }
                         let table = notification.type + 's';
                         let col;
                         if (table === 'projects')
                             col = 'COLLABORATORS';
                         else col = 'POSTS';
                         con.query("SELECT " + col + " FROM " + table + " WHERE ID = ?", [notification.name], function (err3, result3) {
-                            if (err3) throw err3;
+                            if (err3) {
+                                res.render('pages/error.ejs', {
+                                    message_main: "Internal Server Error (500)",
+                                    message_redirect: `${err3.errno}/${err3.code}`,
+                                    message_page: "Requested page: " + req.url.substr(0)
+                                });
+                                throw err3;
+                            }
                             let coll;
                             if (col == 'POSTS')
                                 coll = result3[0].POSTS;
                             else coll = result3[0].COLLABORATORS;
                             coll = coll + notification.requester + ',';
                             con.query("UPDATE " + table + " SET " + col + " = ? WHERE ID = ?", [coll, notification.name], function (err4, result4) {
-                                if (err4) throw err4;
+                                if (err4) {
+                                    res.render('pages/error.ejs', {
+                                        message_main: "Internal Server Error (500)",
+                                        message_redirect: `${err4.errno}/${err4.code}`,
+                                        message_page: "Requested page: " + req.url.substr(0)
+                                    });
+                                    throw err4;
+                                }
                                 if (result4.affectedRows != 0) {
                                     res.send({status: "successful"});
                                 }
@@ -81,13 +116,27 @@ router.get('/:account_id', (req, res) => {
     // if (req.cookies.username) {
     let searchFor = '%' + req.params.account_id + '%';
     con.query("SELECT * FROM projects WHERE COLLABORATORS LIKE ? OR FOUNDER = ? ORDER BY TIMESTAMP DESC", [searchFor, req.params.account_id], function (err, projects, fields) {
-        if (err) throw err;
+        if (err) {
+            res.render('pages/error.ejs', {
+                message_main: "Internal Server Error (500)",
+                message_redirect: `${err.errno}/${err.code}`,
+                message_page: "Requested page: " + req.url.substr(0)
+            });
+            throw err;
+        }
         con.query("SELECT * FROM teams WHERE POSTS LIKE ? OR LEADER = ? ORDER BY TIMESTAMP DESC", [searchFor, req.params.account_id], function (errTeams, teams, fields2) {
-            if (errTeams) throw errTeams;
+            if (errTeams) {
+                res.render('pages/error.ejs', {
+                    message_main: "Internal Server Error (500)",
+                    message_redirect: `${errTeams.errno}/${errTeams.code}`,
+                    message_page: "Requested page: " + req.url.substr(0)
+                });
+                throw errTeams;
+            }
             con.query("SELECT * FROM accounts WHERE EMAIL = ?", [req.params.account_id], function (err3, result, fields3) {
                 if (err3 || !result[0]) {
                     console.error(err3);
-                    res.render('pages/404.ejs', {
+                    res.render('pages/error.ejs', {
                         message_main: "The profile you're looking for does not exist (404)",
                         message_redirect: `Click <a href=\"/profile\">here</a> to go to your profile`,
                         message_page: "Requested profile: " + req.params.account_id
@@ -97,7 +146,14 @@ router.get('/:account_id', (req, res) => {
                     let requests = notifications.map((notification) => {
                         return new Promise((resolve) => {
                             con.query("SELECT USERNAME, EMAIL, REPUTATION FROM accounts WHERE email = ?", [notification.user], (errNotif, account) => {
-                                if (errNotif) throw errNotif;
+                                if (errNotif) {
+                                    res.render('pages/error.ejs', {
+                                        message_main: "Internal Server Error (500)",
+                                        message_redirect: `${errNotif.errno}/${errNotif.code}`,
+                                        message_page: "Requested page: " + req.url.substr(0)
+                                    });
+                                    throw errNotif;
+                                }
                                 let data = {
                                     USERNAME: account[0].USERNAME,
                                     EMAIL: account[0].EMAIL,
@@ -105,12 +161,22 @@ router.get('/:account_id', (req, res) => {
                                 };
                                 notification.user = data;
                                 con.query("SELECT NAME FROM " + notification.type + "s WHERE ID = ?", [notification.uuid], (errPT, project_team) => {
-                                    if(errPT) throw errPT;
+                                    if (errPT) {
+                                        res.render('pages/error.ejs', {
+                                            message_main: "Internal Server Error (500)",
+                                            message_redirect: `${errPT.errno}/${errPT.code}`,
+                                            message_page: "Requested page: " + req.url.substr(0)
+                                        });
+                                        throw errPT;
+                                    }
                                     notification.data = {
                                         NAME: project_team[0].NAME,
                                         UUID: notification.uuid
                                     };
-                                    security.convertUUIDToBase64(notification.uuid, (b64) => {notification.data.BASE64 = b64; resolve()});
+                                    security.convertUUIDToBase64(notification.uuid, (b64) => {
+                                        notification.data.BASE64 = b64;
+                                        resolve()
+                                    });
                                 });
                             });
                         });
@@ -139,12 +205,26 @@ router.get('/:account_id', (req, res) => {
 });
 
 router.get('/:account_id/chat', (req, res) => {
-    if(!req.cookies.username)
+    if (!req.cookies.username)
         res.redirect('/login');
-    con.query("SELECT ID FROM accounts WHERE EMAIL = ? LIMIT 1", [req.params.account_id], function(err, result, fields){
-        if(err) throw err;
-        con.query("SELECT * FROM group_messages WHERE (group_uuid = ? AND from_uuid = ?) OR (group_uuid = ? AND from_uuid = ?)", [req.cookies.uuid, result[0].ID, result[0].ID, req.cookies.uuid], function(err2, result2, fields2){
-            if(err2) throw err2;
+    con.query("SELECT ID FROM accounts WHERE EMAIL = ? LIMIT 1", [req.params.account_id], function (err, result, fields) {
+        if (err) {
+            res.render('pages/error.ejs', {
+                message_main: "Internal Server Error (500)",
+                message_redirect: `${err.errno}/${err.code}`,
+                message_page: "Requested page: " + req.url.substr(0)
+            });
+            throw err;
+        }
+        con.query("SELECT * FROM group_messages WHERE (group_uuid = ? AND from_uuid = ?) OR (group_uuid = ? AND from_uuid = ?)", [req.cookies.uuid, result[0].ID, result[0].ID, req.cookies.uuid], function (err2, result2, fields2) {
+            if (err2) {
+                res.render('pages/error.ejs', {
+                    message_main: "Internal Server Error (500)",
+                    message_redirect: `${err2.errno}/${err2.code}`,
+                    message_page: "Requested page: " + req.url.substr(0)
+                });
+                throw err2;
+            }
             let options = {
                 weekday: "long", year: "numeric", month: "short",
                 day: "numeric", hour: "2-digit", minute: "2-digit",
@@ -161,7 +241,7 @@ router.get('/:account_id/chat', (req, res) => {
                 receiver: req.params.account_id
             });
         });
-    }); 
+    });
 });
 
 router.post('/update-profile', (req, res) => {
@@ -173,14 +253,28 @@ router.post('/update-profile', (req, res) => {
             let data = JSON.parse(req_data.body);
             // debug.log(data);
             con.query('SELECT PASSWORD FROM accounts WHERE EMAIL = ?', [req.cookies.username], (err, db_res) => {
-                if (err) throw err;
+                if (err) {
+                    res.render('pages/error.ejs', {
+                        message_main: "Internal Server Error (500)",
+                        message_redirect: `${err.errno}/${err.code}`,
+                        message_page: "Requested page: " + req.url.substr(0)
+                    });
+                    throw err;
+                }
                 security.checkPassword(data.currentPassword, db_res[0].PASSWORD, (ok) => {
                     if (!ok) {
                         res.end(JSON.stringify({code: 403, message: "Invalid current password!"}));
                     } else {
                         security.encryptPassword(data.newPassword, (enc) => {
                             con.query("UPDATE accounts SET PASSWORD = ? WHERE EMAIL = ?", [enc, req.cookies.username], (err, db_res) => {
-                                if (err) throw err;
+                                if (err) {
+                                    res.render('pages/error.ejs', {
+                                        message_main: "Internal Server Error (500)",
+                                        message_redirect: `${err.errno}/${err.code}`,
+                                        message_page: "Requested page: " + req.url.substr(0)
+                                    });
+                                    throw err;
+                                }
                                 res.end(JSON.stringify({code: 200, message: "Password successfully changed!"}));
                             });
                         });

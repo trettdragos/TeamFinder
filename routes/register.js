@@ -23,20 +23,26 @@ router.get('/confirmed', function (req, res) {
 router.post('/auth', function (req, res) {
     user = req.body;
     request(
-        'https://www.google.com/recaptcha/api/siteverify?secret=6LfoYGgUAAAAAFqy55ilTtFvaF4p0ShFVwPd3Iq2&response='+user.grecaptcharesponse+'&remoteip='+req.connection.remoteAddress,
+        'https://www.google.com/recaptcha/api/siteverify?secret=6LfoYGgUAAAAAFqy55ilTtFvaF4p0ShFVwPd3Iq2&response=' + user.grecaptcharesponse + '&remoteip=' + req.connection.remoteAddress,
         function (error, response, body) {
             body = JSON.parse(body);
-            if(body.success !== undefined && !body.success) {
+            if (body.success !== undefined && !body.success) {
                 res.send({status: "recaptcha invalid", email: user.email});
             } else {
                 debug.log('recaptcha ok');
                 con.query("SELECT * FROM accounts WHERE EMAIL = ? LIMIT 1", [user.email], function (err, result, fields) {
-                    if (err) throw err;
+                    if (err) {
+                        res.render('pages/error.ejs', {
+                            message_main: "Internal Server Error (500)",
+                            message_redirect: `${err.errno}/${err.code}`,
+                            message_page: "Requested page: " + req.url.substr(0)
+                        });
+                        throw err;
+                    }
                     if (result[0]) {
                         // debug.log("user with email " + user.email + " already exists");
                         res.send({status: "Email already used.", email: user.email});
-                    }
-                    else {
+                    } else {
                         // debug.log("registering user: " + user.name + " with the email: " + user.email);
                         /* Encrypt password */
                         security.encryptPassword(user.password, (hash) => {
@@ -56,7 +62,14 @@ router.post('/auth', function (req, res) {
                             };
                             security.getUUID((uuid) => {
                                 con.query("INSERT INTO accounts (ID, USERNAME, EMAIL, PASSWORD, PROFILE, CONFIRMED, NOTIFICATION) VALUES (?, ?, ?, ?, ?, '0', '[]')", [uuid, user.name, user.email, hash, JSON.stringify(profile)], function (err, result) {
-                                    if (err) throw err;
+                                    if (err) {
+                                        res.render('pages/error.ejs', {
+                                            message_main: "Internal Server Error (500)",
+                                            message_redirect: `${err.errno}/${err.code}`,
+                                            message_page: "Requested page: " + req.url.substr(0)
+                                        });
+                                        throw err;
+                                    }
                                     let email_template = require('../other/utils').activateAccountEmailTemplate;
                                     email_template = email_template.replace(new RegExp('{{LINK}}', 'g'), 'http://localhost:3000/verification/' + user.email);
                                     let msg = {

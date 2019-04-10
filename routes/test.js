@@ -95,8 +95,14 @@ router.get('/create-test-projects/:num', (req, res) => {
         require('../other/security').getUUID((uuid) => {
             let date = Date.now().toString();
             con.query("INSERT INTO projects (ID, TIMESTAMP, NAME, SUMMARY, COMMITMENT, PLATFORMS, PLATFORM_DETAILS, RESOURCE_LINK, STAGE, BUDGET, FUNDING, NATIONAL, FOUNDER, ACTIVE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [uuid, date, 'Test project @ ' + date, 'Test summary', 'Contractual', '["Platform 1", "Platform 2"]', 'Platform details', 'Resource link', 'Idea Stage', '$0-$1,000', 'false', '', 'teo.vecerdi@gmail.com', 1], function (err, result) {
-                if (err)
+                if (err) {
+                    res.render('pages/error.ejs', {
+                        message_main: "Internal Server Error (500)",
+                        message_redirect: `${err.errno}/${err.code}`,
+                        message_page: "Requested page: " + req.url.substr(0)
+                    });
                     throw err;
+                }
             })
         });
     }

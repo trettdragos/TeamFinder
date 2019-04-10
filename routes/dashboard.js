@@ -11,19 +11,6 @@ let con = mysql.createConnection({
 
 const posts_per_page = 25;
 
-// router.get('/', function (req, res) {
-//     con.query("SELECT * FROM projects WHERE ACTIVE=1 ORDER BY TIMESTAMP DESC", function (err, projects, fields) {
-//         if (err) throw err;
-//         projects.forEach((project) => require('../other/security').convertUUIDToBase64(project.ID, (b64) => project.BASE64 = b64));
-//         con.query("SELECT * FROM teams WHERE ACTIVE=1 ORDER BY TIMESTAMP DESC", function (err, teams, fields) {
-//             if (err) throw err;
-//             teams.forEach((team) => require('../other/security').convertUUIDToBase64(team.ID, (b64) => team.BASE64 = b64));
-//             let list = teams.concat(projects);
-//             res.render('pages/dashboard.ejs', {email: req.cookies.username, tab: '1', posts: list, term: ''});
-//         });
-//     });
-// });
-
 router.get('/', function (req, res) {
     res.redirect('/dashboard/page/1');
 });
@@ -39,16 +26,30 @@ router.get('/page/:num', (req, res) => {
         return;
     }
     con.query("SELECT * FROM projects WHERE ACTIVE=1 ORDER BY TIMESTAMP DESC", function (err, projects, fields) {
-        if (err) throw err;
+        if (err) {
+            res.render('pages/error.ejs', {
+                message_main: "Internal Server Error (500)",
+                message_redirect: `${err.errno}/${err.code}`,
+                message_page: "Requested page: " + req.url.substr(0)
+            });
+            throw err;
+        }
         con.query("SELECT * FROM teams WHERE ACTIVE=1 ORDER BY TIMESTAMP DESC", function (err, teams, fields) {
-            if (err) throw err;
+            if (err) {
+                res.render('pages/error.ejs', {
+                    message_main: "Internal Server Error (500)",
+                    message_redirect: `${err.errno}/${err.code}`,
+                    message_page: "Requested page: " + req.url.substr(0)
+                });
+                throw err;
+            }
             let list = teams.concat(projects);
 
             let last_page = projects.length / posts_per_page;
             if (last_page !== parseInt(last_page)) {
                 last_page = parseInt(last_page) + 1;
             }
-            if(last_page === 0) {
+            if (last_page === 0) {
                 last_page = 1;
             }
 
@@ -66,9 +67,9 @@ router.get('/page/:num', (req, res) => {
                 start_page = last_page - 4;
                 end_page = last_page;
             }
-            if(start_page < 1)
+            if (start_page < 1)
                 start_page = 1;
-            if(end_page > last_page)
+            if (end_page > last_page)
                 end_page = last_page;
 
             let pages = {
@@ -106,24 +107,38 @@ router.get('/:searchTerm/page', (req, res) => {
 router.get('/:searchTerm/page/:num', function (req, res) {
     let current_page = parseInt(req.params.num);
     if (current_page < 1) {
-        res.redirect('/dashboard/'+req.params.searchTerm+'/page/1');
+        res.redirect('/dashboard/' + req.params.searchTerm + '/page/1');
         return;
     }
     con.query("SELECT * FROM projects WHERE NAME LIKE ? ORDER BY TIMESTAMP DESC", [`%${req.params.searchTerm}%`], function (err, projects, fields) {
-        if (err) throw err;
+        if (err) {
+            res.render('pages/error.ejs', {
+                message_main: "Internal Server Error (500)",
+                message_redirect: `${err.errno}/${err.code}`,
+                message_page: "Requested page: " + req.url.substr(0)
+            });
+            throw err;
+        }
         con.query("SELECT * FROM teams WHERE NAME LIKE ? ORDER BY TIMESTAMP DESC", [`%${req.params.searchTerm}%`], function (err, teams, fields) {
-            if (err) throw err;
+            if (err) {
+                res.render('pages/error.ejs', {
+                    message_main: "Internal Server Error (500)",
+                    message_redirect: `${err.errno}/${err.code}`,
+                    message_page: "Requested page: " + req.url.substr(0)
+                });
+                throw err;
+            }
             let list = teams.concat(projects);
 
             let last_page = projects.length / posts_per_page;
             if (last_page !== parseInt(last_page)) {
                 last_page = parseInt(last_page) + 1;
             }
-            if(last_page === 0) {
+            if (last_page === 0) {
                 last_page = 1;
             }
             if (current_page > last_page) {
-                res.redirect('/dashboard/'+req.params.searchTerm+'/page/' + last_page);
+                res.redirect('/dashboard/' + req.params.searchTerm + '/page/' + last_page);
                 return;
             }
 

@@ -20,7 +20,14 @@ router.get('/', function (req, res) {
 router.get('/auth', function (req, res) {
     user = req.query;
     con.query("SELECT * FROM accounts WHERE EMAIL = ? LIMIT 1", [user.email], function (err, result, fields) {
-        if (err) throw err;
+        if (err) {
+            res.render('pages/error.ejs', {
+                message_main: "Internal Server Error (500)",
+                message_redirect: `${err.errno}/${err.code}`,
+                message_page: "Requested page: " + req.url.substr(0)
+            });
+            throw err;
+        }
 
         if (result[0]) {
             security.checkPassword(user.password, result[0].PASSWORD, (passwordMatches) => {
@@ -51,8 +58,7 @@ router.get('/auth', function (req, res) {
                     res.send({status: "faileded", email: user.email});
                 }
             });
-        }
-        else {
+        } else {
             // debug.log("auth failed for user: " + user.email);
             res.send({status: "faileded", email: user.email});
         }

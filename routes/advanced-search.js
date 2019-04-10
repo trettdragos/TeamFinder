@@ -19,15 +19,15 @@ router.get('/teams', (req, res) => {
     let searchPreferences = req.query;
     let params = [];
     let query = 'SELECT * FROM teams WHERE';
-    if(searchPreferences.teamNameCheck == 'on') {
+    if (searchPreferences.teamNameCheck == 'on') {
         query += ' NAME LIKE ? AND';
         params.push(`%${searchPreferences.teamName}%`);
     }
-    if(searchPreferences.teamHackatonCheck == 'on') {
+    if (searchPreferences.teamHackatonCheck == 'on') {
         query += ' HACKATON LIKE ? AND';
         params.push(`%${searchPreferences.teamHackaton}%`);
     }
-    if(searchPreferences.teamDateCheck == 'on') {
+    if (searchPreferences.teamDateCheck == 'on') {
         query += ' START_DATE >= ? AND END_DATE <= ? AND';
         params.push(searchPreferences.date_start);
         params.push(searchPreferences.date_end);
@@ -37,14 +37,21 @@ router.get('/teams', (req, res) => {
     debug.log(params);
 
     con.query(query, params, (err, result) => {
-        if (err) throw err;
+        if (err) {
+            res.render('pages/error.ejs', {
+                message_main: "Internal Server Error (500)",
+                message_redirect: `${err.errno}/${err.code}`,
+                message_page: "Requested page: " + req.url.substr(0)
+            });
+            throw err;
+        }
 
         //--- DO SOME SPECIAL MAGIC FOR PLATFORMS ---//
-        if(searchPreferences.platformsTeamInputCheck == 'on' && searchPreferences.platformsTeamInput != '') {
+        if (searchPreferences.platformsTeamInputCheck == 'on' && searchPreferences.platformsTeamInput != '') {
             let platforms = searchPreferences.platformsTeamInput.split(',');
             let results = [];
             result.forEach((team) => {
-                if(match_platform(platforms, JSON.parse(team.PLATFORMS))) {
+                if (match_platform(platforms, JSON.parse(team.PLATFORMS))) {
                     console.log(`Added team with uuid ${team.ID} with platforms ${team.PLATFORMS} | Filter: ${platforms}`);
                     results.push(team);
                 }
@@ -102,17 +109,24 @@ router.get('/projects', (req, res) => {
     debug.log(query);
     debug.log(params);
     con.query(query, params, (err, result) => {
-        if (err) throw err;
+        if (err) {
+            res.render('pages/error.ejs', {
+                message_main: "Internal Server Error (500)",
+                message_redirect: `${err.errno}/${err.code}`,
+                message_page: "Requested page: " + req.url.substr(0)
+            });
+            throw err;
+        }
 
         //--- DO SOME SPECIAL MAGIC FOR PLATFORMS ---//
-        if(searchPreferences.platformsInputCheck == 'on' && searchPreferences.platformsInput != '') {
+        if (searchPreferences.platformsInputCheck == 'on' && searchPreferences.platformsInput != '') {
             let platforms = searchPreferences.platformsInput.split(',');
             let results = [];
             result.forEach((project) => {
-               if(match_platform(platforms, JSON.parse(project.PLATFORMS))) {
-                   console.log(`Added project with uuid ${project.ID} with platforms ${project.PLATFORMS} | Filter: ${platforms}`);
-                   results.push(project);
-               }
+                if (match_platform(platforms, JSON.parse(project.PLATFORMS))) {
+                    console.log(`Added project with uuid ${project.ID} with platforms ${project.PLATFORMS} | Filter: ${platforms}`);
+                    results.push(project);
+                }
             });
             // console.log(result);
             // console.log(results);
@@ -133,8 +147,8 @@ router.get('/projects', (req, res) => {
 function match_platform(filters, platforms) {
     for (i in filters) {
         for (j in platforms) {
-           if(platforms[j].includes(filters[i]) || filters[i].includes(platforms[j]))
-               return true;
+            if (platforms[j].includes(filters[i]) || filters[i].includes(platforms[j]))
+                return true;
         }
     }
     return false;

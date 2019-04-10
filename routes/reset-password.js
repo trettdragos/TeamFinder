@@ -26,19 +26,19 @@ router.get('/success', (req, res) => {
 });
 
 router.get('/:token', (req, res) => {
-    let [token,email] = req.params.token.split(';');
+    let [token, email] = req.params.token.split(';');
     debug.log(token);
     debug.log(email);
-    if(token == null || email == null) {
-        res.render('pages/404.ejs', {
+    if (token == null || email == null) {
+        res.render('pages/error.ejs', {
             message_main: "Invalid token (400)",
             message_redirect: `Click <a href=\"/\">here</a> to go back to home`,
             message_page: ""
         });
     } else {
         security.verifyEmailToken(email, token, (result) => {
-            if(!result) {
-                res.render('pages/404.ejs', {
+            if (!result) {
+                res.render('pages/error.ejs', {
                     message_main: "Invalid token (400)",
                     message_redirect: `Click <a href=\"/\">here</a> to go back to home`,
                     message_page: ""
@@ -54,13 +54,20 @@ router.get('/:token', (req, res) => {
 router.post('/reset', (req, res) => {
     let email = req.body.email;
     con.query('SELECT EMAIL from accounts WHERE EMAIL = ?', [email], (err, results) => {
-        if (err) throw err;
+        if (err) {
+            res.render('pages/error.ejs', {
+                message_main: "Internal Server Error (500)",
+                message_redirect: `${err.errno}/${err.code}`,
+                message_page: "Requested page: " + req.url.substr(0)
+            });
+            throw err;
+        }
         if (results.length == 0) {
             res.send({status: 'Fail'})
         } else {
             security.generateEmailToken(email, (token) => {
                 let email_template = require('../other/utils').resetPasswordEmailTemplate;
-                email_template = email_template.replace(new RegExp('{{LINK}}', 'g'), 'http://localhost:3000/reset-password/' + token+';'+email);
+                email_template = email_template.replace(new RegExp('{{LINK}}', 'g'), 'http://localhost:3000/reset-password/' + token + ';' + email);
                 let msg = {
                     to: email,
                     from: 'register@hacksquad.com',
@@ -76,15 +83,22 @@ router.post('/reset', (req, res) => {
 });
 
 router.post('/reset-success', (req, res) => {
-   let password = req.body.password;
-   let email = req.body.email;
+    let password = req.body.password;
+    let email = req.body.email;
 
-   security.encryptPassword(password, (encrypted) => {
-      con.query('UPDATE accounts SET PASSWORD = ? WHERE EMAIL = ?', [encrypted, email], (err, results) => {
-          if (err) throw err;
-          res.send({status: 'Success'});
-      })
-   });
+    security.encryptPassword(password, (encrypted) => {
+        con.query('UPDATE accounts SET PASSWORD = ? WHERE EMAIL = ?', [encrypted, email], (err, results) => {
+            if (err) {
+                res.render('pages/error.ejs', {
+                    message_main: "Internal Server Error (500)",
+                    message_redirect: `${err.errno}/${err.code}`,
+                    message_page: "Requested page: " + req.url.substr(0)
+                });
+                throw err;
+            }
+            res.send({status: 'Success'});
+        })
+    });
 });
 
 module.exports = {url: '/reset-password', router: router};

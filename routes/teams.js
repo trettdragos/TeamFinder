@@ -15,19 +15,6 @@ router.get('/*', (req, res, next) => require('../other/security').routeTokenVeri
 
 router.get('/', function (req, res) {
     res.redirect('/teams/page/1');
-    // if (req.cookies.username) {
-    //     con.query("SELECT * FROM teams WHERE ACTIVE=1  ORDER BY TIMESTAMP DESC", function (err, teams, fields) {
-    //         if (err) throw err;
-    //         teams.forEach((team) => {
-    //             team.PLATFORMS = team.PLATFORMS.replace(/\\'/g, '\\"');
-    //             require('../other/security').convertUUIDToBase64(team.ID, (b64) => team.BASE64 = b64);
-    //         });
-    //         res.render('pages/teams', {email: req.cookies.username, tab: '3', posts: teams, term: ''});
-    //     });
-    // }
-    // else {
-    //     res.redirect('/login');
-    // }
 });
 
 router.get('/page', (req, res) => {
@@ -42,7 +29,14 @@ router.get('/page/:num', (req, res) => {
     }
     if (req.cookies.username) {
         con.query("SELECT * FROM teams WHERE ACTIVE=1 ORDER BY TIMESTAMP DESC", function (err, teams, fields) {
-            if (err) throw err;
+            if (err) {
+                res.render('pages/error.ejs', {
+                    message_main: "Internal Server Error (500)",
+                    message_redirect: `${err.errno}/${err.code}`,
+                    message_page: "Requested page: " + req.url.substr(0)
+                });
+                throw err;
+            }
 
             let last_page = teams.length / teams_per_page;
             if (last_page !== parseInt(last_page)) {
@@ -94,8 +88,7 @@ router.get('/page/:num', (req, res) => {
                 pages: pages
             });
         });
-    }
-    else {
+    } else {
         res.redirect('/login');
     }
 });
@@ -103,8 +96,7 @@ router.get('/page/:num', (req, res) => {
 router.get('/create', function (req, res) {
     if (req.cookies.username) {
         res.render('pages/create-team', {tab: '3'});
-    }
-    else {
+    } else {
         res.redirect('/login');
     }
 });
@@ -129,7 +121,14 @@ router.get('/search/:searchTerm/page/:num', (req, res) => {
     }
     if (req.cookies.username) {
         con.query("SELECT * FROM teams WHERE NAME LIKE ? ORDER BY TIMESTAMP DESC", [`%${req.params.searchTerm}%`], function (err, teams, fields) {
-            if (err) throw err;
+            if (err) {
+                res.render('pages/error.ejs', {
+                    message_main: "Internal Server Error (500)",
+                    message_redirect: `${err.errno}/${err.code}`,
+                    message_page: "Requested page: " + req.url.substr(0)
+                });
+                throw err;
+            }
 
             let last_page = teams.length / teams_per_page;
             if (last_page !== parseInt(last_page)) {
@@ -180,8 +179,7 @@ router.get('/search/:searchTerm/page/:num', (req, res) => {
                 pages: pages
             });
         });
-    }
-    else {
+    } else {
         res.redirect('/login');
     }
 });
@@ -189,11 +187,17 @@ router.get('/search/:searchTerm/page/:num', (req, res) => {
 router.get('/register', function (req, res) {
     team = req.query;
     con.query("SELECT * FROM teams WHERE NAME = ? LIMIT 1", [team.name], function (err, result, fields) {
-        if (err) throw err;
+        if (err) {
+            res.render('pages/error.ejs', {
+                message_main: "Internal Server Error (500)",
+                message_redirect: `${err.errno}/${err.code}`,
+                message_page: "Requested page: " + req.url.substr(0)
+            });
+            throw err;
+        }
         if (result[0]) {
             res.send({status: "failed, team already exists"});
-        }
-        else {
+        } else {
             let platforms = [];
             if (team.platforms) {
                 platforms = team.platforms;
@@ -214,10 +218,24 @@ router.post('/finish', function (req, res) {
     debug.log(req.body);
     let team = req.body;
     con.query("UPDATE teams SET ACTIVE=0 WHERE ID=?", [team.team_id], function (err, result) {
-        if (err) throw err;
+        if (err) {
+            res.render('pages/error.ejs', {
+                message_main: "Internal Server Error (500)",
+                message_redirect: `${err.errno}/${err.code}`,
+                message_page: "Requested page: " + req.url.substr(0)
+            });
+            throw err;
+        }
         team.team_collaborators.substr(0, team.team_collaborators.length - 1).split(',').concat([team.team_founder]).forEach((user) => {
             con.query("UPDATE accounts SET REPUTATION = REPUTATION + 2 WHERE EMAIL = ?", [user], (err, res) => {
-                if (err) throw err;
+                if (err) {
+                    res.render('pages/error.ejs', {
+                        message_main: "Internal Server Error (500)",
+                        message_redirect: `${err.errno}/${err.code}`,
+                        message_page: "Requested page: " + req.url.substr(0)
+                    });
+                    throw err;
+                }
             });
         });
         res.send({status: "successful"});
@@ -233,7 +251,14 @@ router.post('/update', function (req, res) {
     }
     require('../other/security').convertBase64ToUUID(team.BASE64, (uuid) => {
         con.query("UPDATE teams SET SUMMARY=?, RESOURCE_LINK=?, PLATFORMS=?, HACKATON=?, SECTION=?, START_DATE=?, END_DATE=? WHERE ID=?", [team.summary, team.resource_link, JSON.stringify(platforms), team.hackaton, team.section, team.startDate, team.endDate, uuid], function (err, result) {
-            if (err) throw err;
+            if (err) {
+                res.render('pages/error.ejs', {
+                    message_main: "Internal Server Error (500)",
+                    message_redirect: `${err.errno}/${err.code}`,
+                    message_page: "Requested page: " + req.url.substr(0)
+                });
+                throw err;
+            }
             res.send({status: "successful"});
         })
     });
@@ -242,13 +267,27 @@ router.post('/update', function (req, res) {
 router.post('/remove-member', (req, res) => {
     let members = req.body.team_posts.trim().substr(0, req.body.team_posts.length - 1).split(',');
     con.query("UPDATE accounts SET REPUTATION = REPUTATION - 2 WHERE EMAIL = ?", [req.body.collaborator], function (err1, result1) {
-        if (err1) throw err1;
+        if (err1) {
+            res.render('pages/error.ejs', {
+                message_main: "Internal Server Error (500)",
+                message_redirect: `${err1.errno}/${err1.code}`,
+                message_page: "Requested page: " + req.url.substr(0)
+            });
+            throw err1;
+        }
         let index = members.indexOf(req.query.collaborator);
         members.splice(index, 1);
         let newMembers = '';
         members.forEach((member) => newMembers += member + ',');
         con.query('UPDATE teams SET POSTS = ? WHERE ID = ?', [newMembers, req.body.team_id], (err, result) => {
-            if (err) throw err;
+            if (err) {
+                res.render('pages/error.ejs', {
+                    message_main: "Internal Server Error (500)",
+                    message_redirect: `${err.errno}/${err.code}`,
+                    message_page: "Requested page: " + req.url.substr(0)
+                });
+                throw err;
+            }
             res.send({status: 'successful'})
         });
     })
@@ -262,11 +301,25 @@ router.get('/:team', function (req, res) {
         return;
     require('../other/security').convertBase64ToUUID(req.params.team, (uuid) => {
         con.query("SELECT * FROM teams WHERE ID = ? LIMIT 1", [uuid], function (err, result, fields) {
-            if (err) throw err;
+            if (err) {
+                res.render('pages/error.ejs', {
+                    message_main: "Internal Server Error (500)",
+                    message_redirect: `${err.errno}/${err.code}`,
+                    message_page: "Requested page: " + req.url.substr(0)
+                });
+                throw err;
+            }
             if (result[0]) {
                 result[0].BASE64 = req.params.team;
                 con.query("SELECT * FROM group_messages WHERE group_uuid = ?", [uuid], function (error, result2) {
-                    if (error) throw error;
+                    if (error) {
+                        res.render('pages/error.ejs', {
+                            message_main: "Internal Server Error (500)",
+                            message_redirect: `${error.errno}/${error.code}`,
+                            message_page: "Requested page: " + req.url.substr(0)
+                        });
+                        throw error;
+                    }
                     let options = {
                         weekday: "long", year: "numeric", month: "short",
                         day: "numeric", hour: "2-digit", minute: "2-digit",
@@ -298,9 +351,8 @@ router.get('/:team', function (req, res) {
                         });
                     });
                 });
-            }
-            else {
-                res.render('pages/404.ejs', {
+            } else {
+                res.render('pages/error.ejs', {
                     message_main: "The team you're looking for does not exist (404)",
                     message_redirect: `Click <a href=\"/teams\">here</a> to go back`,
                     message_page: "Requested team: " + req.params.team
@@ -317,10 +369,17 @@ router.get('/edit/:team', function (req, res) {
 
     require('../other/security').convertBase64ToUUID(req.params.team, (uuid) => {
         con.query("SELECT * FROM teams WHERE ID = ? LIMIT 1", [uuid], function (err, result, fields) {
-            if (err) throw err;
+            if (err) {
+                res.render('pages/error.ejs', {
+                    message_main: "Internal Server Error (500)",
+                    message_redirect: `${err.errno}/${err.code}`,
+                    message_page: "Requested page: " + req.url.substr(0)
+                });
+                throw err;
+            }
             if (result[0]) {
                 if (result[0].LEADER != req.cookies.username) {
-                    res.render('pages/404.ejs', {
+                    res.render('pages/error.ejs', {
                         message_main: "You are not allowed to edit the team (403)",
                         message_redirect: `Click <a href=\"/teams/${req.params.team}\">here</a> to go back`,
                         message_page: "Requested team: " + req.params.team
@@ -330,9 +389,8 @@ router.get('/edit/:team', function (req, res) {
                     result[0].PLATFORMS = result[0].PLATFORMS.replace(/\\'/g, '\\"');
                     res.render('pages/edit-team', {email: req.cookies.username, tab: '3', team: result[0]});
                 }
-            }
-            else {
-                res.render('pages/404.ejs', {
+            } else {
+                res.render('pages/error.ejs', {
                     message_main: "The team you're looking for does not exist (404)",
                     message_redirect: `Click <a href=\"/teams\">here</a> to go back`,
                     message_page: "Requested team: " + req.params.team
