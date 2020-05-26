@@ -1,30 +1,28 @@
 # TeamFinder
 
-## Munca in echipa
+## Teamwork
 
-**_Pentru descrierea detaliata a functionalitatiilor vizualizati documentatia_**
+### Functionalities implemented by Trett Dragos-Constantin:
 
-### Functionalitati implementate de Trett Dragos-Constantin:
+- User accounts
+- Notifications
+- Visualising personal teams
+- Creating teams
+- Editing teams
+- Visualise public teams
+- Participation requests
+- Group live messaging for teams
 
-- Contul de Utilizator
-- Notificari
-- Vizualizare Echipe personale
-- Creeare echipe
-- Editare Echipe
-- vizualizare echipe publice
-- Cererea de participare
-- Messagerie de grup echipa
+### Functionalities implemented by Vecerdi Teodor:
 
-### Functionalitati implementate de Vecerdi Teodor:
+- Edit profile
+- Profile picture
+- Editing teams
+- Group live messaging for teams
+- Search and filtered search
+- Page numerotation
 
-- Editare Profil
-- Poza de profil
-- Editare echipe
-- Messagerie de grup echipa
-- Cautare si filtrare cautare
-- Vizualizarea cu ajutorul paginilor numerotate
-
-## Biblioteci folosite:
+## Libraries used:
 
     "@sendgrid/mail": "^6.3.1",
     "bcrypt": "^2.0.1",
